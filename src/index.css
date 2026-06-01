@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #fdf8f5;
+    color: #3d2c2c;
+    overflow-x: hidden;
+  }
+  h1, h2, h3, h4 { font-family: 'Playfair Display', Georgia, serif; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-yarn-blush text-white font-medium px-6 py-3 rounded-full 
+           transition-all duration-300 hover:bg-blush-700 hover:shadow-lg 
+           hover:-translate-y-0.5 active:translate-y-0;
+  }
+  .btn-outline {
+    @apply border-2 border-yarn-blush text-yarn-blush font-medium px-6 py-3 
+           rounded-full transition-all duration-300 hover:bg-yarn-blush hover:text-white hover:shadow-lg;
+  }
+  .card {
+    @apply bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden;
+  }
+  .input-field {
+    @apply w-full px-4 py-3 rounded-xl border border-blush-200 bg-white 
+           focus:outline-none focus:ring-2 focus:ring-yarn-blush focus:border-transparent
+           transition-all duration-200 text-yarn-dark placeholder-blush-300;
+  }
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #c9877a, #c9a96e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .bg-mesh {
+    background-color: #fdf8f5;
+    background-image: 
+      radial-gradient(at 40% 20%, hsla(10, 50%, 90%, 0.5) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, hsla(35, 60%, 88%, 0.4) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, hsla(355, 40%, 88%, 0.3) 0px, transparent 50%);
+  }
+  .glass {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #fdf8f5; }
+::-webkit-scrollbar-thumb { background: #c9877a; border-radius: 3px; }
