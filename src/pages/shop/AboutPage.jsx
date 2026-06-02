@@ -107,9 +107,7 @@ export default function AboutPage() {
 
       {/* ── STORY ── */}
       <section style={{ background: '#fff', padding: '5rem 1.5rem' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4rem', alignItems: 'center' }}
-          className="flex-col-on-mobile">
-          <style>{`@media(max-width:640px){.flex-col-on-mobile{grid-template-columns:1fr!important;gap:2rem!important;}}`}</style>
+        <div className="max-w-[900px] mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-16 items-center">
 
           {/* Image placeholder */}
           <div style={{ aspectRatio: '4/5', overflow: 'hidden', position: 'relative' }}>

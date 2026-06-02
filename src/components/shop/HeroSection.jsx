@@ -11,11 +11,11 @@ export default function HeroSection() {
       <div className="absolute top-20 right-10 w-72 h-72 bg-blush-200/80 rounded-full blur-3xl animate-pulse-soft" />
       <div className="absolute bottom-20 left-10 w-96 h-96 bg-yarn-gold/40 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1.5s' }} />
       
-      {/* Floating yarn emojis */}
-      <div className="absolute top-32 left-[5%] text-6xl animate-float opacity-60" style={{ animationDelay: '0s' }}>🧶</div>
-      <div className="absolute top-48 right-[8%] text-5xl animate-float opacity-50" style={{ animationDelay: '2s' }}>🪡</div>
-      <div className="absolute bottom-32 left-[12%] text-3xl animate-float opacity-40" style={{ animationDelay: '1s' }}>💕</div>
-      <div className="absolute bottom-48 right-[15%] text-4xl animate-float opacity-50" style={{ animationDelay: '3s' }}>✨</div>
+      {/* Floating yarn emojis — hidden on small screens to prevent overflow */}
+      <div className="hidden sm:block absolute top-32 left-[5%] text-6xl animate-float opacity-60" style={{ animationDelay: '0s' }}>🧶</div>
+      <div className="hidden sm:block absolute top-48 right-[8%] text-5xl animate-float opacity-50" style={{ animationDelay: '2s' }}>🪡</div>
+      <div className="hidden md:block absolute bottom-32 left-[12%] text-3xl animate-float opacity-40" style={{ animationDelay: '1s' }}>💕</div>
+      <div className="hidden md:block absolute bottom-48 right-[15%] text-4xl animate-float opacity-50" style={{ animationDelay: '3s' }}>✨</div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -26,7 +26,7 @@ export default function HeroSection() {
               Handcrafted with love
             </div>
 
-            <h1 className="font-display text-5xl md:text-4xl lg:text-6xl text-yarn-dark leading-[1.1] mb-4">
+            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-yarn-dark leading-[1.1] mb-4">
               Warm Loops,
               <br />
               <span className="text-gradient italic">Cozy Hearts</span>
@@ -71,8 +71,8 @@ export default function HeroSection() {
           </div>
 
           {/* Visual */}
-          <div className="relative flex justify-center lg:justify-end">
-            <div className="relative w-80 h-80 md:w-96 md:h-96">
+          <div className="relative flex justify-center lg:justify-end mt-8 lg:mt-0">
+            <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96">
               {/* Decorative rings */}
               <div className="absolute inset-0 rounded-full border-2 border-dashed border-blush-200 animate-spin" style={{ animationDuration: '30s' }} />
               <div className="absolute inset-6 rounded-full border border-yarn-gold/30" />
@@ -96,14 +96,14 @@ export default function HeroSection() {
               </div>
 
               {/* Floating cards */}
-              <div className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center gap-2 animate-float" style={{ animationDelay: '0.5s' }}>
+              <div className="hidden sm:flex absolute -top-4 -right-4 bg-white rounded-2xl shadow-lg px-4 py-3 items-center gap-2 animate-float" style={{ animationDelay: '0.5s' }}>
                 <span className="text-2xl">❤️</span>
                 <div>
                   <p className="text-xs font-semibold text-yarn-dark">Made with love</p>
                   <p className="text-xs text-gray-400">Every stitch counts</p>
                 </div>
               </div>
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-lg px-4 py-3 flex items-center gap-2 animate-float" style={{ animationDelay: '2s' }}>
+              <div className="hidden sm:flex absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-lg px-4 py-3 items-center gap-2 animate-float" style={{ animationDelay: '2s' }}>
                 <span className="text-2xl">🌿</span>
                 <div>
                   <p className="text-xs font-semibold text-yarn-dark">Natural Yarns</p>

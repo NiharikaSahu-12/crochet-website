@@ -35,7 +35,7 @@ export default function ShopPage() {
 
       {/* Search & Filters */}
       <div className="flex gap-4 mb-8 flex-wrap">
-        <div className="relative flex-1 min-w-64">
+        <div className="relative flex-1 min-w-0">
           <FaSearch size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
@@ -88,7 +88,7 @@ export default function ShopPage() {
 
       {/* Results */}
       {loading ? (
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
               <div className="aspect-[3/4] bg-blush-100" />
@@ -116,7 +116,7 @@ export default function ShopPage() {
       ) : (
         <>
           <p className="text-sm text-gray-400 mb-6">{products.length} product{products.length !== 1 ? 's' : ''} found</p>
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
             {products.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}

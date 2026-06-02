@@ -132,8 +132,8 @@ function Footer() {
         .social-em:hover { background: #b85c2a; border-color: #b85c2a; }
       `}</style>
 
-      <div className="ft" style={{ maxWidth: 1200, margin: '0 auto', padding: '3.5rem 4rem 0', textAlign: 'left' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr 1fr', gap: '3rem' }}>
+      <div className="ft max-w-[1200px] mx-auto px-5 sm:px-8 lg:px-16 pt-14 pb-10 text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
 
           {/* Brand */}
           <div style={{ textAlign: 'left' }}>
@@ -146,7 +146,7 @@ function Footer() {
             <p style={{ fontSize: '0.88rem', lineHeight: 1.8, color: '#a07050', marginTop: '1rem', maxWidth: 240 }}>
               Every piece is made by hand with love. No mass production — just slow, intentional craft.
             </p>
-            <div style={{ display: 'flex', gap: 10, marginTop: '1.5rem', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+            <div className="flex gap-2 mt-6 flex-wrap justify-start">
               <a href={`https://instagram.com/${INSTAGRAM_HANDLE}`} target="_blank" rel="noopener noreferrer" className="social-btn social-ig">
                 <FaInstagram size={15} /> Instagram
               </a>
@@ -187,7 +187,7 @@ function Footer() {
       </div>
 
       <div style={{ borderTop: '1px solid #3a1f0f', marginTop: '3rem' }} />
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '1.2rem 8rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, textAlign: 'left' }}>
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 lg:px-16 py-5 flex justify-between flex-wrap gap-2 text-left">
         <p style={{ fontSize: '0.8rem', color: '#6b4025', margin: 0 }}>© 2025 TheCozzyLoops. All rights reserved.</p>
         <p style={{ fontSize: '0.8rem', color: '#6b4025', margin: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
           Made with <FaHeart size={12} color="#e8854a" /> and lots of yarn

@@ -68,18 +68,18 @@ export default function HomePage() {
       {/* Featured Products */}
       <section className="py-20 bg-blush-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-12">
+          <div className="flex flex-wrap items-end justify-between gap-4 mb-12">
             <div>
               <p className="font-script text-yarn-blush text-2xl mb-2">Our best</p>
-              <h2 className="font-display text-4xl md:text-5xl text-yarn-dark">Featured Picks</h2>
+              <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-yarn-dark">Featured Picks</h2>
             </div>
-            <Link to="/shop" className="hidden sm:flex items-center gap-2 text-yarn-blush font-medium hover:gap-3 transition-all">
+            <Link to="/shop" className="flex items-center gap-2 text-yarn-blush font-medium hover:gap-3 transition-all text-sm sm:text-base">
               View All <MdArrowForward size={16} />
             </Link>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
               {[1,2,3,4].map(i => (
                 <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
                   <div className="aspect-[3/4] bg-blush-100" />
@@ -98,7 +98,7 @@ export default function HomePage() {
               <p className="text-gray-500">Our featured products will appear here soon.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
               {products.slice(0, 8).map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -115,12 +115,12 @@ export default function HomePage() {
 
       {/* Order CTA */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-yarn-dark to-blush-900 rounded-3xl p-10 md:p-16 text-center relative overflow-hidden">
+        <div className="bg-gradient-to-br from-yarn-dark to-blush-900 rounded-3xl p-6 sm:p-10 md:p-16 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-yarn-blush/20 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-yarn-gold/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl" />
           <div className="relative">
             <p className="font-script text-yarn-pink text-2xl mb-3">Let's connect</p>
-            <h2 className="font-display text-4xl md:text-5xl text-white mb-4">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl text-white mb-4">
               Place Your Order
             </h2>
             <p className="text-blush-200 text-lg mb-8 max-w-md mx-auto">
