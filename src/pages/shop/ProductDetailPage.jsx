@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { MdArrowBack, MdChevronLeft, MdChevronRight } from 'react-icons/md'
-import { FaInstagram, FaHeart, FaShare, FaStar, FaWhatsapp } from 'react-icons/fa'
+import { FaInstagram, FaHeart, FaRegHeart, FaShare, FaStar, FaWhatsapp } from 'react-icons/fa'
 import productController from '../../controllers/productController'
 import { openInstagramDM, WHATSAPP_NUMBER, getWhatsAppOrderUrl } from '../../utils/instagram'
 import { isOnSale, discountPercent, PRODUCT_CATEGORIES } from '../../models/Product'
@@ -30,6 +30,7 @@ export default function ProductDetailPage() {
 
   const onSale = isOnSale(product)
   const discount = discountPercent(product)
+  const outOfStock = !product.stock_qty || product.stock_qty <= 0
   const images = product.images?.length ? product.images : [null]
   const catLabel = PRODUCT_CATEGORIES.find(c => c.value === product.category)?.label || product.category
 
@@ -114,11 +115,15 @@ export default function ProductDetailPage() {
               <h1 className="font-display text-3xl md:text-4xl text-yarn-dark mt-1 leading-tight">{product.name}</h1>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setWishlisted(w => !w)}
+              <button
+                type="button"
+                onClick={() => setWishlisted(w => !w)}
+                aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
                 className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
-                  wishlisted ? 'bg-red-50 border-red-200 text-red-500' : 'border-blush-200 text-gray-400 hover:border-red-200 hover:text-red-400'
-                }`}>
-                <FaHeart size={18} fill={wishlisted ? 'currentColor' : 'none'} />
+                  wishlisted ? 'bg-red-50 border-red-200 text-red-500' : 'border-blush-200 text-gray-500 hover:border-red-200 hover:text-red-500'
+                }`}
+              >
+                {wishlisted ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
               </button>
               <button onClick={share}
                 className="w-10 h-10 rounded-full border border-blush-200 text-gray-400 hover:border-yarn-blush hover:text-yarn-blush flex items-center justify-center transition-all">
@@ -135,7 +140,7 @@ export default function ProductDetailPage() {
 
           {/* Status */}
           <div className="mb-6">
-            {product.stock_qty > 0 ? (
+            {!outOfStock ? (
               <span className="inline-flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1.5 rounded-full text-sm font-medium">
                 <span className="w-2 h-2 bg-green-500 rounded-full" /> In Stock ({product.stock_qty} available)
               </span>
@@ -189,23 +194,35 @@ export default function ProductDetailPage() {
           <div className="space-y-3 mt-auto">
             <div className="grid grid-cols-2 gap-3">
               <button
-                onClick={() => openInstagramDM(product)}
-                disabled={product.stock_qty === 0}
-                className="btn-primary flex items-center justify-center gap-2 py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                type="button"
+                onClick={() => !outOfStock && openInstagramDM(product)}
+                disabled={outOfStock}
+                className="btn-primary flex items-center justify-center gap-2 py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
               >
                 <FaInstagram size={18} />
-                {product.stock_qty > 0 ? 'Instagram' : 'Out of Stock'}
+                Instagram
               </button>
 
-              <a
-                href={getWhatsAppOrderUrl(product, WHATSAPP_NUMBER)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-4 rounded-xl flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <FaWhatsapp size={18} />
-                WhatsApp
-              </a>
+              {outOfStock ? (
+                <button
+                  type="button"
+                  disabled
+                  className="bg-green-500 text-white font-medium px-4 py-4 rounded-xl flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+                >
+                  <FaWhatsapp size={18} />
+                  WhatsApp
+                </button>
+              ) : (
+                <a
+                  href={getWhatsAppOrderUrl(product, WHATSAPP_NUMBER)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-4 rounded-xl flex items-center justify-center gap-2 transition-all"
+                >
+                  <FaWhatsapp size={18} />
+                  WhatsApp
+                </a>
+              )}
             </div>
 
             {product.is_custom && (
