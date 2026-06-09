@@ -1,57 +1,91 @@
-import { useState, useEffect } from 'react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
-import { MdArrowBack, MdFileUpload, MdClose, MdAdd, MdDelete, MdImage } from 'react-icons/md'
+import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import {
+  ArrowLeft,
+  Check,
+  ImagePlus,
+  Package,
+  Plus,
+  Save,
+  Sparkles,
+  Tag,
+  Trash2,
+  UploadCloud,
+  X,
+} from 'lucide-react'
 import productController from '../../controllers/productController'
-import { PRODUCT_CATEGORIES, PRODUCT_STATUS, createProductDTO } from '../../models/Product'
+import { PRODUCT_STATUS, createProductDTO } from '../../models/Product'
+import { useCategories } from '../../hooks/useCategories'
 import toast from 'react-hot-toast'
 
 const EMPTY_FORM = createProductDTO({
-  name: '', description: '', price: '', compare_price: '',
-  category: '', images: [], stock_qty: 1, status: PRODUCT_STATUS.ACTIVE,
-  is_featured: false, is_custom: false, yarn_type: '',
-  color_options: [], care_instructions: '', tags: [],
+  name: '',
+  description: '',
+  price: '',
+  compare_price: '',
+  category: '',
+  images: [],
+  stock_qty: 1,
+  status: PRODUCT_STATUS.ACTIVE,
+  is_featured: false,
+  is_custom: false,
+  yarn_type: '',
+  color_options: [],
+  care_instructions: '',
+  tags: [],
 })
 
-function TagInput({ label, values, onChange, placeholder }) {
-  const [input, setInput] = useState('')
-  const add = () => {
-    const v = input.trim()
-    if (v && !values.includes(v)) {
-      onChange([...values, v])
-    }
-    setInput('')
-  }
+function Field({ label, children, helper }) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-yarn-dark mb-1.5">{label}</label>
-      <div className="flex flex-wrap gap-2 mb-2">
-        {values.map(v => (
-          <span key={v} className="flex items-center gap-1 bg-blush-100 text-yarn-blush text-sm px-3 py-1.5 rounded-full">
-            {v}
-            <button type="button" onClick={() => onChange(values.filter(x => x !== v))} className="hover:text-red-500 ml-0.5">
-              <MdClose size={12} />
-            </button>
-          </span>
-        ))}
-      </div>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() }}}
-          className="input-field flex-1 py-2.5 text-sm"
-          placeholder={placeholder}
-        />
-        <button type="button" onClick={add} className="px-4 py-2.5 bg-blush-100 text-yarn-blush rounded-xl text-sm font-medium hover:bg-blush-200 transition-colors">
-          Add
-        </button>
-      </div>
-    </div>
+    <label className="block text-sm font-semibold text-yarn-dark">
+      {label}
+      <div className="mt-2">{children}</div>
+      {helper && <p className="mt-1.5 text-xs font-normal text-gray-400">{helper}</p>}
+    </label>
   )
 }
 
-function ImageUrlInput({ images = [], onChange, onUpload, productId }) {
+function TagInput({ label, values, onChange, placeholder }) {
+  const [input, setInput] = useState('')
+
+  const add = () => {
+    const value = input.trim()
+    if (value && !values.includes(value)) onChange([...values, value])
+    setInput('')
+  }
+
+  return (
+    <Field label={label}>
+      <div className="flex min-h-11 flex-wrap gap-2 rounded-2xl border border-blush-200 bg-white p-2">
+        {values.map((value) => (
+          <span key={value} className="inline-flex items-center gap-1.5 rounded-full bg-blush-50 px-3 py-1.5 text-sm font-medium text-yarn-blush">
+            {value}
+            <button type="button" onClick={() => onChange(values.filter((item) => item !== value))} className="hover:text-red-500">
+              <X size={13} aria-hidden="true" />
+            </button>
+          </span>
+        ))}
+        <input
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              add()
+            }
+          }}
+          className="min-w-36 flex-1 bg-transparent px-2 py-1.5 text-sm outline-none"
+          placeholder={placeholder}
+        />
+        <button type="button" onClick={add} className="rounded-full bg-blush-100 px-3 py-1.5 text-sm font-semibold text-yarn-blush transition hover:bg-blush-200">
+          Add
+        </button>
+      </div>
+    </Field>
+  )
+}
+
+function ImageManager({ images = [], onChange, productId }) {
   const [urlInput, setUrlInput] = useState('')
   const [uploading, setUploading] = useState(false)
 
@@ -61,68 +95,104 @@ function ImageUrlInput({ images = [], onChange, onUpload, productId }) {
     setUrlInput('')
   }
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0]
-    if (!file) {
-      toast.error('Select a file to upload')
-      return
-    }
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
     setUploading(true)
     try {
-      const url = await productController.uploadProductImage(file, productId)
+      const url = await productController.uploadProductImage(file, productId || 'new-products')
       onChange([...images, url])
-      toast.success('Image uploaded!')
+      toast.success('Image uploaded')
     } catch (err) {
       toast.error('Upload failed: ' + err.message)
     } finally {
       setUploading(false)
+      event.target.value = ''
     }
   }
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-yarn-dark mb-1.5">Product Images</label>
-
-      {/* Image previews */}
-      <div className="grid grid-cols-3 gap-3 mb-3">
-        {images.map((img, i) => (
-          <div key={i} className="relative aspect-square bg-blush-50 rounded-xl overflow-hidden group">
-            <img src={img} alt="" className="w-full h-full object-cover" />
-            <button
-              type="button"
-              onClick={() => onChange(images.filter((_, j) => j !== i))}
-              className="absolute top-1.5 right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              <MdClose size={12} />
-            </button>
-            {i === 0 && <span className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-1.5 py-0.5 rounded">Main</span>}
-          </div>
-        ))}
-        {images.length < 6 && (
-          <label className="aspect-square bg-blush-50 border-2 border-dashed border-blush-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-yarn-blush hover:bg-blush-100 transition-all">
-            {uploading
-              ? <div className="w-6 h-6 border-2 border-yarn-blush border-t-transparent rounded-full animate-spin" />
-              : <><MdFileUpload size={20} className="text-blush-300 mb-1" /><span className="text-xs text-blush-300">Upload</span></>}
-            <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
-          </label>
-        )}
+    <div className="rounded-[24px] border border-blush-100 bg-white p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-3 border-b border-blush-100 pb-4">
+        <div>
+          <h3 className="font-display text-xl text-yarn-dark">Product images</h3>
+          <p className="text-sm text-gray-500">First image becomes the main product image.</p>
+        </div>
+        <ImagePlus className="text-yarn-blush" size={22} aria-hidden="true" />
       </div>
 
-      {/* URL input */}
-      <div className="flex gap-2">
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        {images.map((image, index) => (
+          <div key={`${image}-${index}`} className="group relative aspect-square overflow-hidden rounded-2xl bg-blush-50">
+            <img src={image} alt="" className="h-full w-full object-cover" />
+            {index === 0 && (
+              <span className="absolute bottom-2 left-2 rounded-full bg-yarn-dark/75 px-2.5 py-1 text-xs font-semibold text-white">Main</span>
+            )}
+            <button
+              type="button"
+              onClick={() => onChange(images.filter((_, imageIndex) => imageIndex !== index))}
+              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition group-hover:opacity-100"
+              aria-label="Remove image"
+            >
+              <Trash2 size={14} aria-hidden="true" />
+            </button>
+          </div>
+        ))}
+
+        <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blush-200 bg-gradient-to-br from-blush-50 to-[#fff4d8] text-center transition hover:border-yarn-blush">
+          {uploading ? (
+            <span className="h-7 w-7 rounded-full border-2 border-yarn-blush border-t-transparent animate-spin" />
+          ) : (
+            <>
+              <UploadCloud size={26} className="text-yarn-blush" aria-hidden="true" />
+              <span className="mt-2 text-sm font-semibold text-yarn-blush">Upload</span>
+              <span className="mt-1 text-xs text-gray-400">JPG or PNG</span>
+            </>
+          )}
+          <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+        </label>
+      </div>
+
+      <div className="mt-5 flex gap-2">
         <input
           type="url"
           value={urlInput}
-          onChange={(e) => setUrlInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addUrl() }}}
-          className="input-field flex-1 py-2.5 text-sm"
-          placeholder="Or paste an image URL..."
+          onChange={(event) => setUrlInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              addUrl()
+            }
+          }}
+          className="input-field py-2.5 text-sm"
+          placeholder="Paste image URL..."
         />
-        <button type="button" onClick={addUrl} className="px-4 py-2.5 bg-blush-100 text-yarn-blush rounded-xl text-sm font-medium hover:bg-blush-200 transition-colors">
-          <MdAdd size={16} />
+        <button type="button" onClick={addUrl} className="rounded-2xl bg-blush-100 px-4 text-yarn-blush transition hover:bg-blush-200">
+          <Plus size={18} aria-hidden="true" />
         </button>
       </div>
     </div>
+  )
+}
+
+function ToggleCard({ title, desc, checked, onChange }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`flex w-full items-center justify-between gap-4 rounded-2xl border p-4 text-left transition ${
+        checked ? 'border-yarn-blush bg-blush-50' : 'border-gray-100 bg-white hover:bg-gray-50'
+      }`}
+    >
+      <div>
+        <p className="font-semibold text-yarn-dark">{title}</p>
+        <p className="mt-1 text-sm text-gray-500">{desc}</p>
+      </div>
+      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${checked ? 'bg-yarn-blush text-white' : 'bg-gray-100 text-gray-400'}`}>
+        {checked && <Check size={15} aria-hidden="true" />}
+      </span>
+    </button>
   )
 }
 
@@ -133,33 +203,40 @@ export default function AdminProductForm() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [loading, setLoading] = useState(isEditing)
   const [saving, setSaving] = useState(false)
+  const { categories, loading: categoriesLoading } = useCategories({ activeOnly: true })
+
+  const activeCategories = useMemo(() => categories.filter((category) => category.is_active), [categories])
 
   useEffect(() => {
     if (!isEditing) return
     productController.getProduct(id)
-      .then(p => setForm({ ...p, price: p.price || '', compare_price: p.compare_price || '' }))
-      .catch(() => { toast.error('Product not found'); navigate('/admin/products') })
+      .then((product) => setForm({ ...product, price: product.price || '', compare_price: product.compare_price || '' }))
+      .catch(() => {
+        toast.error('Product not found')
+        navigate('/admin/products')
+      })
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, isEditing, navigate])
 
-  const set = (key, value) => setForm(f => ({ ...f, [key]: value }))
+  const set = (key, value) => setForm((current) => ({ ...current, [key]: value }))
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (event) => {
+    event.preventDefault()
     setSaving(true)
     try {
       const payload = {
         ...form,
         price: parseFloat(form.price),
         compare_price: form.compare_price ? parseFloat(form.compare_price) : null,
-        stock_qty: parseInt(form.stock_qty) || 0,
+        stock_qty: parseInt(form.stock_qty, 10) || 0,
       }
+
       if (isEditing) {
         await productController.updateProduct(id, payload)
-        toast.success('Product updated!')
+        toast.success('Product updated')
       } else {
         const created = await productController.createProduct(payload)
-        toast.success('Product created!')
+        toast.success('Product created')
         navigate(`/admin/products/${created.id}/edit`)
       }
     } catch (err) {
@@ -169,154 +246,229 @@ export default function AdminProductForm() {
     }
   }
 
-  if (loading) return (
-    <div className="flex items-center justify-center py-20">
-      <div className="w-8 h-8 border-4 border-yarn-blush border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="h-9 w-9 rounded-full border-4 border-yarn-blush border-t-transparent animate-spin" />
+      </div>
+    )
+  }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Link to="/admin/products" className="p-2 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors">
-          <ArrowLeft size={20} />
-        </Link>
-        <div>
-          <h2 className="font-display text-2xl text-yarn-dark">{isEditing ? 'Edit Product' : 'Add New Product'}</h2>
-          <p className="text-gray-400 text-sm">Fill in all details for your crochet item</p>
+    <div className="mx-auto max-w-7xl space-y-6">
+      <div className="flex flex-col gap-4 rounded-[28px] bg-gradient-to-br from-yarn-dark via-blush-900 to-yarn-blush p-6 text-white shadow-xl shadow-blush-200/60 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex items-start gap-4">
+          <Link to="/admin/products" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25">
+            <ArrowLeft size={19} aria-hidden="true" />
+          </Link>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blush-100">Product editor</p>
+            <h2 className="mt-2 font-display text-3xl sm:text-4xl">{isEditing ? 'Edit product' : 'Add new product'}</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-blush-100">
+              Add product details, images, category, inventory, and homepage visibility from one place.
+            </p>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-white/12 px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.16em] text-blush-100">Status</p>
+          <p className="mt-1 font-semibold capitalize">{form.status?.replace(/_/g, ' ')}</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic info */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
-          <h3 className="font-display text-lg text-yarn-dark border-b border-gray-100 pb-3">Basic Information</h3>
-
-          <div>
-            <label className="block text-sm font-medium text-yarn-dark mb-1.5">Product Name *</label>
-            <input type="text" value={form.name} onChange={(e) => set('name', e.target.value)}
-              className="input-field" placeholder="e.g. Rustic Crochet Market Bag" required />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-yarn-dark mb-1.5">Description</label>
-            <textarea value={form.description} onChange={(e) => set('description', e.target.value)}
-              className="input-field resize-none" rows={4} placeholder="Describe the product, its feel, dimensions, use..." />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-yarn-dark mb-1.5">Category *</label>
-              <select value={form.category} onChange={(e) => set('category', e.target.value)}
-                className="input-field" required>
-                <option value="">Select category</option>
-                {PRODUCT_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-yarn-dark mb-1.5">Status</label>
-              <select value={form.status} onChange={(e) => set('status', e.target.value)} className="input-field">
-                <option value="active">Active (Visible)</option>
-                <option value="draft">Draft (Hidden)</option>
-                <option value="out_of_stock">Out of Stock</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Pricing & Inventory */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
-          <h3 className="font-display text-lg text-yarn-dark border-b border-gray-100 pb-3">Pricing & Inventory</h3>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-yarn-dark mb-1.5">Price (₹) *</label>
-              <input type="number" value={form.price} onChange={(e) => set('price', e.target.value)}
-                className="input-field" placeholder="999" min="0" step="0.01" required />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-yarn-dark mb-1.5">Compare at (₹)</label>
-              <input type="number" value={form.compare_price || ''} onChange={(e) => set('compare_price', e.target.value)}
-                className="input-field" placeholder="1299" min="0" step="0.01" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-yarn-dark mb-1.5">Stock Qty</label>
-              <input type="number" value={form.stock_qty} onChange={(e) => set('stock_qty', e.target.value)}
-                className="input-field" min="0" />
-            </div>
-          </div>
-        </div>
-
-        {/* Images */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-          <h3 className="font-display text-lg text-yarn-dark border-b border-gray-100 pb-3 mb-4">Images</h3>
-          <ImageUrlInput images={form.images} onChange={(v) => set('images', v)} productId={id} />
-        </div>
-
-        {/* Product Details */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
-          <h3 className="font-display text-lg text-yarn-dark border-b border-gray-100 pb-3">Product Details</h3>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-yarn-dark mb-1.5">Yarn Type</label>
-              <input type="text" value={form.yarn_type} onChange={(e) => set('yarn_type', e.target.value)}
-                className="input-field" placeholder="e.g. Cotton, Wool, Acrylic" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-yarn-dark mb-1.5">Care Instructions</label>
-              <input type="text" value={form.care_instructions} onChange={(e) => set('care_instructions', e.target.value)}
-                className="input-field" placeholder="e.g. Hand wash cold" />
-            </div>
-          </div>
-
-          <TagInput
-            label="Color Options"
-            values={form.color_options}
-            onChange={(v) => set('color_options', v)}
-            placeholder="e.g. Dusty Rose, Sage Green..."
-          />
-
-          <TagInput
-            label="Tags"
-            values={form.tags}
-            onChange={(v) => set('tags', v)}
-            placeholder="e.g. gift, summer, boho..."
-          />
-        </div>
-
-        {/* Toggles */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm space-y-4">
-          <h3 className="font-display text-lg text-yarn-dark border-b border-gray-100 pb-3">Options</h3>
-
-          {[
-            { key: 'is_featured', label: 'Featured Product', desc: 'Show on homepage featured section' },
-            { key: 'is_custom', label: 'Customizable', desc: 'Allow customers to request custom variations' },
-          ].map(({ key, label, desc }) => (
-            <label key={key} className="flex items-center justify-between cursor-pointer p-3 rounded-xl hover:bg-gray-50 transition-colors">
+      <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[1fr_380px]">
+        <div className="space-y-6">
+          <section className="rounded-[24px] border border-blush-100 bg-white p-5 shadow-sm sm:p-6">
+            <div className="mb-5 flex items-center gap-3 border-b border-blush-100 pb-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blush-50 text-yarn-blush">
+                <Package size={21} aria-hidden="true" />
+              </div>
               <div>
-                <p className="font-medium text-yarn-dark text-sm">{label}</p>
-                <p className="text-xs text-gray-400">{desc}</p>
+                <h3 className="font-display text-xl text-yarn-dark">Basic information</h3>
+                <p className="text-sm text-gray-500">Name, category, description, and visibility.</p>
               </div>
-              <div
-                onClick={() => set(key, !form[key])}
-                className={`w-12 h-6 rounded-full transition-colors relative ${form[key] ? 'bg-yarn-blush' : 'bg-gray-200'}`}
-              >
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${form[key] ? 'translate-x-7' : 'translate-x-1'}`} />
+            </div>
+
+            <div className="grid gap-5">
+              <Field label="Product name *">
+                <input
+                  value={form.name}
+                  onChange={(event) => set('name', event.target.value)}
+                  className="input-field"
+                  placeholder="Daisy flower keychain"
+                  required
+                />
+              </Field>
+
+              <Field label="Description">
+                <textarea
+                  value={form.description}
+                  onChange={(event) => set('description', event.target.value)}
+                  className="input-field min-h-32 resize-y"
+                  placeholder="Describe the product, size, materials, use, and gifting details..."
+                />
+              </Field>
+
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field label="Category *">
+                  <select
+                    value={form.category}
+                    onChange={(event) => set('category', event.target.value)}
+                    className="input-field"
+                    required
+                  >
+                    <option value="">{categoriesLoading ? 'Loading categories...' : 'Select category'}</option>
+                    {activeCategories.map((category) => (
+                      <option key={category.value} value={category.value}>{category.label}</option>
+                    ))}
+                  </select>
+                </Field>
+
+                <Field label="Status">
+                  <select value={form.status} onChange={(event) => set('status', event.target.value)} className="input-field">
+                    <option value={PRODUCT_STATUS.ACTIVE}>Active (visible)</option>
+                    <option value={PRODUCT_STATUS.DRAFT}>Draft (hidden)</option>
+                    <option value={PRODUCT_STATUS.OUT_OF_STOCK}>Out of stock</option>
+                  </select>
+                </Field>
               </div>
-            </label>
-          ))}
+            </div>
+          </section>
+
+          <section className="rounded-[24px] border border-blush-100 bg-white p-5 shadow-sm sm:p-6">
+            <div className="mb-5 flex items-center gap-3 border-b border-blush-100 pb-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#fff4d8] text-yarn-blush">
+                <Tag size={21} aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl text-yarn-dark">Pricing and details</h3>
+                <p className="text-sm text-gray-500">Set prices, stock, yarn, care, colors, and tags.</p>
+              </div>
+            </div>
+
+            <div className="grid gap-5">
+              <div className="grid gap-5 md:grid-cols-3">
+                <Field label="Price (INR) *">
+                  <input
+                    type="number"
+                    value={form.price}
+                    onChange={(event) => set('price', event.target.value)}
+                    className="input-field"
+                    min="0"
+                    step="0.01"
+                    placeholder="499"
+                    required
+                  />
+                </Field>
+
+                <Field label="Compare at (INR)">
+                  <input
+                    type="number"
+                    value={form.compare_price || ''}
+                    onChange={(event) => set('compare_price', event.target.value)}
+                    className="input-field"
+                    min="0"
+                    step="0.01"
+                    placeholder="699"
+                  />
+                </Field>
+
+                <Field label="Stock quantity">
+                  <input
+                    type="number"
+                    value={form.stock_qty}
+                    onChange={(event) => set('stock_qty', event.target.value)}
+                    className="input-field"
+                    min="0"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field label="Yarn type">
+                  <input
+                    value={form.yarn_type}
+                    onChange={(event) => set('yarn_type', event.target.value)}
+                    className="input-field"
+                    placeholder="Cotton, acrylic, wool..."
+                  />
+                </Field>
+
+                <Field label="Care instructions">
+                  <input
+                    value={form.care_instructions}
+                    onChange={(event) => set('care_instructions', event.target.value)}
+                    className="input-field"
+                    placeholder="Hand wash cold, air dry..."
+                  />
+                </Field>
+              </div>
+
+              <TagInput
+                label="Color options"
+                values={form.color_options}
+                onChange={(value) => set('color_options', value)}
+                placeholder="Add color"
+              />
+
+              <TagInput
+                label="Tags"
+                values={form.tags}
+                onChange={(value) => set('tags', value)}
+                placeholder="Add tag"
+              />
+            </div>
+          </section>
         </div>
 
-        {/* Submit */}
-        <div className="flex gap-3 pb-8">
-          <button type="submit" disabled={saving} className="btn-primary flex-1 flex items-center justify-center gap-2 py-3.5 disabled:opacity-60">
-            {saving ? (
-              <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</>
-            ) : (isEditing ? 'Update Product' : 'Create Product')}
-          </button>
-          <Link to="/admin/products" className="btn-outline px-8 py-3.5">Cancel</Link>
-        </div>
+        <aside className="space-y-6">
+          <ImageManager images={form.images} onChange={(value) => set('images', value)} productId={id} />
+
+          <section className="rounded-[24px] border border-blush-100 bg-white p-5 shadow-sm">
+            <div className="mb-5 flex items-center gap-3 border-b border-blush-100 pb-4">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blush-50 text-yarn-blush">
+                <Sparkles size={21} aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className="font-display text-xl text-yarn-dark">Product options</h3>
+                <p className="text-sm text-gray-500">Homepage and custom settings.</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <ToggleCard
+                title="Featured product"
+                desc="Show this product in featured homepage sections."
+                checked={form.is_featured}
+                onChange={(value) => set('is_featured', value)}
+              />
+              <ToggleCard
+                title="Customizable"
+                desc="Mark this as available for custom variations."
+                checked={form.is_custom}
+                onChange={(value) => set('is_custom', value)}
+              />
+            </div>
+          </section>
+
+          <div className="sticky bottom-4 rounded-[24px] border border-blush-100 bg-white/95 p-4 shadow-xl shadow-gray-200/70 backdrop-blur">
+            <button type="submit" disabled={saving} className="btn-primary inline-flex w-full items-center justify-center gap-2 py-3.5 disabled:opacity-60">
+              {saving ? (
+                <>
+                  <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={17} aria-hidden="true" />
+                  {isEditing ? 'Update product' : 'Create product'}
+                </>
+              )}
+            </button>
+            <Link to="/admin/products" className="btn-outline mt-3 inline-flex w-full items-center justify-center py-3.5">
+              Cancel
+            </Link>
+          </div>
+        </aside>
       </form>
     </div>
   )

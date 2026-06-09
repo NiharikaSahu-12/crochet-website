@@ -3,13 +3,14 @@ import { Link } from 'react-router-dom'
 import { Plus, Edit2, Trash2, Star, Eye, EyeOff, Search } from 'lucide-react'
 import { useProducts } from '../../hooks/useProducts'
 import productController from '../../controllers/productController'
-import { PRODUCT_CATEGORIES } from '../../models/Product'
+import { useCategories } from '../../hooks/useCategories'
 import toast from 'react-hot-toast'
 
 export default function AdminProducts() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
   const { products, loading, refetch } = useProducts({ search: search || undefined, category: category || undefined })
+  const { categories } = useCategories({ activeOnly: true })
   const [deleting, setDeleting] = useState(null)
 
   const handleDelete = async (id, name) => {
@@ -73,7 +74,7 @@ export default function AdminProducts() {
           className="input-field py-2.5 text-sm w-auto"
         >
           <option value="">All Categories</option>
-          {PRODUCT_CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+          {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
       </div>
 

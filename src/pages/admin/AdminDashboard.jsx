@@ -1,126 +1,155 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
 import { FaBox, FaStar } from 'react-icons/fa'
-import { MdTrendingUp, MdAdd, MdArrowForward } from 'react-icons/md'
+import { MdInventory, MdTrendingUp } from 'react-icons/md'
+import { Activity, PackageCheck } from 'lucide-react'
 import productService from '../../services/productService'
 import { PRODUCT_STATUS } from '../../models/Product'
+import { useAuth } from '../../context/AuthContext'
 
-function StatCard({ icon: Icon, title, value, color, sub }) {
+function adminNameFromSession(session) {
+  const user = session?.user
+  const name = user?.user_metadata?.full_name || user?.user_metadata?.name
+  if (name) return name
+  if (user?.email) return user.email.split('@')[0]
+  return 'Admin'
+}
+
+function getPercent(value, total) {
+  if (!total) return 0
+  return Math.round((value / total) * 100)
+}
+
+function KpiCard({ icon: Icon, label, value, helper, accent }) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center mb-4`}>
-        <Icon size={22} className="text-white" />
+    <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-4">
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent}`}>
+          <Icon size={20} aria-hidden="true" />
+        </div>
+        <p className="font-display text-3xl font-semibold text-yarn-dark">{value}</p>
       </div>
-      <p className="text-3xl font-display font-bold text-yarn-dark">{value}</p>
-      <p className="text-gray-500 text-sm mt-1">{title}</p>
-      {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+      <p className="mt-4 text-sm font-semibold text-yarn-dark">{label}</p>
+      <p className="mt-1 text-xs text-gray-500">{helper}</p>
+    </div>
+  )
+}
+
+function RecentProducts({ loading, products }) {
+  return (
+    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+      <div className="flex items-center gap-3 border-b border-gray-100 p-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blush-50 text-yarn-blush">
+          <Activity size={19} aria-hidden="true" />
+        </div>
+        <div>
+          <h3 className="font-display text-xl text-yarn-dark">Recent Products</h3>
+          <p className="text-sm text-gray-500">Latest catalog entries</p>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="space-y-3 p-5">
+          {[1, 2, 3].map((item) => <div key={item} className="h-16 rounded-xl bg-gray-100 animate-pulse" />)}
+        </div>
+      ) : products.length === 0 ? (
+        <div className="p-10 text-center">
+          <PackageCheck size={28} className="mx-auto text-yarn-blush" aria-hidden="true" />
+          <p className="mt-3 font-display text-lg text-yarn-dark">No products yet</p>
+          <p className="mt-1 text-sm text-gray-500">Recent products will appear here.</p>
+        </div>
+      ) : (
+        <div className="divide-y divide-gray-100">
+          {products.map((product) => (
+            <div key={product.id} className="grid grid-cols-[48px_1fr_auto] items-center gap-3 p-4 transition hover:bg-blush-50/60">
+              <div className="h-12 w-12 overflow-hidden rounded-xl bg-blush-100">
+                {product.images?.[0] ? (
+                  <img src={product.images[0]} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-yarn-blush">Img</div>
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-yarn-dark">{product.name}</p>
+                <p className="mt-0.5 text-xs capitalize text-gray-400">{product.category?.replace(/_/g, ' ')}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-semibold text-yarn-blush">Rs {product.price.toLocaleString()}</p>
+                <p className="mt-0.5 text-xs capitalize text-gray-400">{product.status.replace(/_/g, ' ')}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ total: 0, active: 0, featured: 0, outOfStock: 0 })
-  const [recentProducts, setRecentProducts] = useState([])
+  const { session } = useAuth()
+  const adminName = adminNameFromSession(session)
+  const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([
-      productService.getAll(),
-      productService.getAll({ status: PRODUCT_STATUS.ACTIVE }),
-      productService.getAll({ featured: true }),
-    ]).then(([all, active, featured]) => {
-      setStats({
-        total: all.length,
-        active: active.length,
-        featured: featured.length,
-        outOfStock: all.filter(p => p.stock_qty === 0).length,
-      })
-      setRecentProducts(all.slice(0, 5))
-    }).catch(console.error).finally(() => setLoading(false))
+    productService.getAll()
+      .then(setProducts)
+      .catch(console.error)
+      .finally(() => setLoading(false))
   }, [])
 
+  const stats = useMemo(() => {
+    const isOut = (product) => product.status === PRODUCT_STATUS.OUT_OF_STOCK || product.stock_qty === 0
+    const total = products.length
+    const active = products.filter((product) => product.status === PRODUCT_STATUS.ACTIVE && !isOut(product)).length
+    const draft = products.filter((product) => product.status === PRODUCT_STATUS.DRAFT && !isOut(product)).length
+    const outOfStock = products.filter(isOut).length
+    const featured = products.filter((product) => product.is_featured).length
+    const lowStock = products.filter((product) => product.stock_qty > 0 && product.stock_qty <= 3).length
+
+    return { total, active, draft, outOfStock, featured, lowStock }
+  }, [products])
+
+  const recentProducts = products.slice(0, 5)
+  const catalogMessage = loading
+    ? 'Loading catalog data'
+    : stats.total
+      ? `${stats.active} active, ${stats.draft} draft, ${stats.outOfStock} out of stock`
+      : 'Catalog is empty'
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-display text-2xl text-yarn-dark">Dashboard</h2>
-          <p className="text-gray-500 text-sm mt-0.5">Welcome back to TheCozzyLoops admin!</p>
+    <div className="space-y-5">
+      <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-yarn-blush to-yarn-gold text-white shadow-sm">
+              <span className="font-display text-2xl font-semibold">{adminName.charAt(0).toUpperCase()}</span>
+            </div>
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-yarn-blush">Dashboard</p>
+              <h2 className="mt-1 font-display text-3xl text-yarn-dark">Welcome, {adminName}</h2>
+              <p className="mt-1 text-sm text-gray-500">{catalogMessage}</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-gradient-to-br from-blush-50 to-[#fff4d8] px-5 py-4 text-right">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">Catalog health</p>
+            <p className="mt-1 font-display text-2xl font-semibold text-yarn-dark">
+              {loading ? 'Loading' : stats.outOfStock || stats.lowStock ? 'Review stock' : 'Ready'}
+            </p>
+          </div>
         </div>
-        <Link to="/admin/products/new" className="btn-primary inline-flex items-center gap-2 text-sm py-2.5">
-          <MdAdd size={16} /> Add Product
-        </Link>
-      </div>
+      </section>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={FaBox} title="Total Products" value={loading ? '—' : stats.total} color="bg-blue-500" />
-        <StatCard icon={MdTrendingUp} title="Active Products" value={loading ? '—' : stats.active} color="bg-green-500" />
-        <StatCard icon={FaStar} title="Featured" value={loading ? '—' : stats.featured} color="bg-yellow-500" />
-        <StatCard icon={FaBox} title="Out of Stock" value={loading ? '—' : stats.outOfStock} color="bg-red-400" sub="Need restocking" />
-      </div>
+      <section className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        <KpiCard icon={FaBox} label="Total Products" value={loading ? '-' : stats.total} helper="All catalog items" accent="bg-blush-50 text-yarn-blush" />
+        <KpiCard icon={MdTrendingUp} label="Active Products" value={loading ? '-' : stats.active} helper="Visible in shop" accent="bg-green-50 text-green-600" />
+        <KpiCard icon={FaStar} label="Featured Picks" value={loading ? '-' : stats.featured} helper="Homepage products" accent="bg-[#fff4d8] text-yarn-gold" />
+        <KpiCard icon={MdInventory} label="Stock Alerts" value={loading ? '-' : stats.lowStock + stats.outOfStock} helper="Low or out of stock" accent="bg-red-50 text-red-500" />
+      </section>
 
-      {/* Quick actions */}
-      <div className="grid sm:grid-cols-2 gap-4">
-        <Link to="/admin/products/new" className="bg-gradient-to-br from-yarn-blush to-blush-700 text-white rounded-2xl p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
-          <MdAdd size={24} className="mb-3" />
-          <h3 className="font-display text-lg font-semibold">Add New Product</h3>
-          <p className="text-blush-100 text-sm mt-1">Upload images, set price & details</p>
-        </Link>
-        <Link to="/admin/products" className="bg-white border border-gray-100 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
-          <FaBox size={24} className="mb-3 text-yarn-blush" />
-          <h3 className="font-display text-lg font-semibold text-yarn-dark">Manage Products</h3>
-          <p className="text-gray-400 text-sm mt-1">Edit, delete, toggle visibility</p>
-        </Link>
-      </div>
-
-      {/* Recent products */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="font-display text-lg text-yarn-dark">Recent Products</h3>
-          <Link to="/admin/products" className="text-sm text-yarn-blush hover:underline flex items-center gap-1">
-            View All <MdArrowForward size={14} />
-          </Link>
-        </div>
-        {loading ? (
-          <div className="p-6 space-y-3">
-            {[1,2,3].map(i => <div key={i} className="h-12 bg-gray-100 rounded-xl animate-pulse" />)}
-          </div>
-        ) : recentProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-4xl mb-3">🧶</div>
-            <p className="text-gray-400">No products yet. Add your first one!</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-gray-50">
-            {recentProducts.map(p => (
-              <div key={p.id} className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
-                <div className="w-12 h-12 rounded-xl bg-blush-100 overflow-hidden flex-shrink-0">
-                  {p.images?.[0] ? (
-                    <img src={p.images[0]} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xl">🧶</div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-yarn-dark text-sm truncate">{p.name}</p>
-                  <p className="text-xs text-gray-400 capitalize">{p.category?.replace(/_/g, ' ')}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-yarn-blush text-sm">₹{p.price.toLocaleString()}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    p.status === 'active' ? 'bg-green-100 text-green-600' :
-                    p.status === 'draft' ? 'bg-gray-100 text-gray-500' :
-                    'bg-red-100 text-red-500'
-                  }`}>{p.status}</span>
-                </div>
-                <Link to={`/admin/products/${p.id}/edit`} className="text-yarn-blush hover:text-blush-700 text-xs font-medium ml-2">
-                  Edit
-                </Link>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <section>
+        <RecentProducts loading={loading} products={recentProducts} />
+      </section>
     </div>
   )
 }

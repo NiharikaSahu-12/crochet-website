@@ -1,114 +1,80 @@
 import { Link } from 'react-router-dom'
-import { FaInstagram, FaStar } from 'react-icons/fa'
-import { MdArrowForward } from 'react-icons/md'
-import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE } from '../../utils/instagram'
+import { ShoppingBag, Sparkles, Wand2 } from 'lucide-react'
+import CustomOrderButton from './CustomOrderButton'
+
+const productShots = [
+  { src: '/images/flower_bookmark.jpg', label: 'Daisy bookmarks' },
+  { src: '/images/flower_keychain.jpg', label: 'Flower keychains' },
+  { src: '/images/bow_keychain.jpg', label: 'Bow charms' },
+]
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute inset-0 bg-mesh" />
-      <div className="absolute top-20 right-10 w-72 h-72 bg-blush-200/80 rounded-full blur-3xl animate-pulse-soft" />
-      <div className="absolute bottom-20 left-10 w-96 h-96 bg-yarn-gold/40 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1.5s' }} />
-      
-      {/* Floating yarn emojis — hidden on small screens to prevent overflow */}
-      <div className="hidden sm:block absolute top-32 left-[5%] text-6xl animate-float opacity-60" style={{ animationDelay: '0s' }}>🧶</div>
-      <div className="hidden sm:block absolute top-48 right-[8%] text-5xl animate-float opacity-50" style={{ animationDelay: '2s' }}>🪡</div>
-      <div className="hidden md:block absolute bottom-32 left-[12%] text-3xl animate-float opacity-40" style={{ animationDelay: '1s' }}>💕</div>
-      <div className="hidden md:block absolute bottom-48 right-[15%] text-4xl animate-float opacity-50" style={{ animationDelay: '3s' }}>✨</div>
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Text */}
+    <section className="relative overflow-hidden bg-gradient-to-br from-blush-50 via-[#fff7df] to-rose-mist">
+      <div className="absolute left-0 top-14 h-40 w-40 rounded-full bg-yarn-gold/30 blur-3xl" />
+      <div className="absolute bottom-10 right-0 h-56 w-56 rounded-full bg-yarn-pink/40 blur-3xl" />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="grid lg:grid-cols-[0.95fr_1.05fr] gap-12 lg:gap-16 items-center">
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 bg-blush-100 text-yarn-blush px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <FaStar size={14} />
+            <div className="inline-flex items-center gap-2 rounded-full border border-blush-200 bg-white/85 px-4 py-2 text-sm font-semibold text-yarn-blush shadow-sm">
+              <Sparkles size={16} aria-hidden="true" />
               Handcrafted with love
             </div>
 
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl text-yarn-dark leading-[1.1] mb-4">
-              Warm Loops,
-              <br />
-              <span className="text-gradient italic">Cozy Hearts</span>
+            <h1 className="mt-6 font-display text-4xl sm:text-5xl lg:text-6xl leading-tight text-yarn-dark">
+              Warm Loops, <span className="text-gradient italic">Cozy Hearts.</span>
             </h1>
 
-            <p className="font-bold text-lg text-yarn-blush mb-6 block">— TheCozzyLoops</p>
-
-            <p className="text-gray-600 text-lg leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
-              Every piece is handmade with premium yarn and endless love. 
-              Discover keychains, home décor, accessories, and custom orders crafted just for you.
+            <p className="mt-5 max-w-xl mx-auto lg:mx-0 text-base sm:text-lg leading-8 text-[#6b5551]">
+              TheCozzyLoops crafts keychains, bookmarks, flowers, accessories, and custom gifts with soft yarn,
+              careful finishing, and gift-ready details.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to="/shop" className="btn-primary inline-flex items-center justify-center gap-2 text-base px-8 py-4">
-                Shop Now
-                <MdArrowForward size={18} />
+            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+              <Link to="/shop" className="btn-primary inline-flex items-center justify-center gap-2 px-7 py-4">
+                <ShoppingBag size={18} aria-hidden="true" />
+                Shop pieces
               </Link>
-              <a
-                href={INSTAGRAM_DM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-outline inline-flex items-center justify-center gap-2 text-base px-8 py-4"
-              >
-                <FaInstagram size={18} />
-                Custom Order
-              </a>
+              <CustomOrderButton className="btn-outline inline-flex items-center justify-center gap-2 px-7 py-4 bg-white">
+                <Wand2 size={18} aria-hidden="true" />
+                Request custom
+              </CustomOrderButton>
             </div>
 
-            {/* Stats */}
-            <div className="flex items-center gap-8 mt-12 justify-center lg:justify-start">
+            <div className="mt-10 grid grid-cols-3 gap-3 max-w-md mx-auto lg:mx-0">
               {[
-                { num: '50+', label: 'Happy Customers' },
-                { num: '50+', label: 'Unique Designs' },
-                { num: '5★', label: 'Rated' },
-              ].map(({ num, label }) => (
-                <div key={label} className="text-center">
-                  <p className="font-display text-2xl font-bold text-yarn-blush">{num}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+                ['Made by hand', 'No factory stock'],
+                ['Custom colors', 'Matched to you'],
+                ['Gift-ready', 'Packed with care'],
+              ].map(([title, text]) => (
+                <div key={title} className="rounded-2xl border border-white/80 bg-white/65 p-3 text-left shadow-sm">
+                  <p className="text-sm font-semibold text-yarn-dark">{title}</p>
+                  <p className="mt-1 text-xs leading-5 text-[#8a716b]">{text}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Visual */}
-          <div className="relative flex justify-center lg:justify-end mt-8 lg:mt-0">
-            <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96">
-              {/* Decorative rings */}
-              <div className="absolute inset-0 rounded-full border-2 border-dashed border-blush-200 animate-spin" style={{ animationDuration: '30s' }} />
-              <div className="absolute inset-6 rounded-full border border-yarn-gold/30" />
-              
-              {/* Center logo / illustration */}
-              <div className="absolute inset-8 rounded-full bg-gradient-to-br from-blush-100 to-blush-200 flex items-center justify-center shadow-2xl overflow-hidden">
+          <div className="relative">
+            <div className="grid grid-cols-[1fr_0.62fr] gap-3 sm:gap-4 items-stretch">
+              <div className="relative min-h-[420px] overflow-hidden rounded-[28px] bg-gradient-to-br from-blush-100 to-yarn-gold/30 p-2 shadow-2xl shadow-blush-200/40">
                 <img
-                  src="/logo.jpeg"
-                  alt="TheCozzyLoops"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none'
-                    e.target.nextSibling.style.display = 'flex'
-                  }}
+                  src="/images/crochet-main.jpg"
+                  alt="Crochet flower pot handmade by TheCozzyLoops"
+                  className="h-full w-full rounded-[22px] object-cover"
                 />
-                {/* <div className="w-full h-full items-center justify-center flex-col hidden">
-                  <div className="text-6xl mb-2">🧶</div>
-                  <p className="font-display font-bold text-yarn-dark text-xl">TheCozzyLoops</p>
-                  <p className="font-script text-yarn-blush">Handmade Crochet</p>
-                </div> */}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-yarn-dark/80 to-transparent p-5 sm:p-6 text-left">
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blush-100">Signature gift</p>
+                  <p className="mt-1 font-display text-2xl text-white">Crochet blooms</p>
+                </div>
               </div>
 
-              {/* Floating cards */}
-              <div className="hidden sm:flex absolute -top-4 -right-4 bg-white rounded-2xl shadow-lg px-4 py-3 items-center gap-2 animate-float" style={{ animationDelay: '0.5s' }}>
-                <span className="text-2xl">❤️</span>
-                <div>
-                  <p className="text-xs font-semibold text-yarn-dark">Made with love</p>
-                  <p className="text-xs text-gray-400">Every stitch counts</p>
-                </div>
-              </div>
-              <div className="hidden sm:flex absolute -bottom-4 -left-4 bg-white rounded-2xl shadow-lg px-4 py-3 items-center gap-2 animate-float" style={{ animationDelay: '2s' }}>
-                <span className="text-2xl">🌿</span>
-                <div>
-                  <p className="text-xs font-semibold text-yarn-dark">Natural Yarns</p>
-                  <p className="text-xs text-gray-400">Premium quality</p>
-                </div>
+              <div className="grid gap-3 sm:gap-4">
+                {productShots.map((shot) => (
+                  <div key={shot.label} className="overflow-hidden rounded-2xl bg-gradient-to-br from-white to-blush-100 p-1 shadow-lg shadow-blush-100/80">
+                    <img src={shot.src} alt={shot.label} className="aspect-square h-full w-full object-cover" />
+                  </div>
+                ))}
               </div>
             </div>
           </div>

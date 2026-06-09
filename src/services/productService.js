@@ -41,9 +41,10 @@ export const productService = {
   },
 
   async update(id, updates) {
+    const { id: _id, created_at, updated_at, ...payload } = updates
     const { data, error } = await supabase
       .from(TABLE)
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update({ ...payload, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single()

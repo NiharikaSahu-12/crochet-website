@@ -3,8 +3,145 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { MdArrowBack, MdChevronLeft, MdChevronRight } from 'react-icons/md'
 import { FaInstagram, FaHeart, FaRegHeart, FaShare, FaStar, FaWhatsapp } from 'react-icons/fa'
 import productController from '../../controllers/productController'
-import { openInstagramDM, WHATSAPP_NUMBER, getWhatsAppOrderUrl } from '../../utils/instagram'
+import { INSTAGRAM_DM_URL, WHATSAPP_NUMBER, buildProductOrderMessage, getWhatsAppOrderUrl } from '../../utils/instagram'
 import { isOnSale, discountPercent, PRODUCT_CATEGORIES } from '../../models/Product'
+
+const EMPTY_ORDER = {
+  name: '',
+  contact: '',
+  quantity: 1,
+  color: '',
+  customization: '',
+  delivery: '',
+}
+
+function ProductOrderModal({ product, channel, onClose }) {
+  const [details, setDetails] = useState(EMPTY_ORDER)
+  const colorOptions = product.color_options || []
+  const canCustomize = product.is_custom
+
+  const set = (key, value) => setDetails((current) => ({ ...current, [key]: value }))
+
+  const submitOrder = async (event) => {
+    event.preventDefault()
+
+    if (channel === 'whatsapp') {
+      window.open(getWhatsAppOrderUrl(product, WHATSAPP_NUMBER, details), '_blank', 'noopener,noreferrer')
+      onClose()
+      return
+    }
+
+    const message = buildProductOrderMessage(product, details)
+    try {
+      await navigator.clipboard.writeText(message)
+      alert('Order details copied. Paste them in Instagram DM after it opens.')
+    } catch {
+      alert(message)
+    }
+    window.open(INSTAGRAM_DM_URL, '_blank', 'noopener,noreferrer')
+    onClose()
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6">
+      <button type="button" className="absolute inset-0 bg-yarn-dark/70 backdrop-blur-sm" onClick={onClose} aria-label="Close order form" />
+      <div className="relative max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-[28px] border border-white bg-gradient-to-br from-white via-blush-50 to-[#fff4d8] p-5 shadow-2xl sm:p-7">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-yarn-blush">Order details</p>
+            <h2 className="mt-2 font-display text-3xl text-yarn-dark">{product.name}</h2>
+            <p className="mt-2 text-sm text-gray-500">
+              Fill this once so we know who ordered and exactly which product/details they selected.
+            </p>
+          </div>
+          <button type="button" onClick={onClose} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-yarn-dark shadow-sm hover:bg-blush-100">
+            x
+          </button>
+        </div>
+
+        <form onSubmit={submitOrder} className="mt-6 grid gap-4">
+          <div className="rounded-2xl bg-white/80 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Product</p>
+            <p className="mt-1 font-semibold text-yarn-dark">{product.name}</p>
+            <p className="text-sm text-yarn-blush">Rs {Number(product.price || 0).toLocaleString()}</p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-sm font-semibold text-yarn-dark">
+              Your name *
+              <input value={details.name} onChange={(e) => set('name', e.target.value)} className="input-field mt-2" placeholder="Customer name" required />
+            </label>
+            <label className="text-sm font-semibold text-yarn-dark">
+              Phone or Instagram *
+              <input value={details.contact} onChange={(e) => set('contact', e.target.value)} className="input-field mt-2" placeholder="@username or phone" required />
+            </label>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-sm font-semibold text-yarn-dark">
+              Quantity
+              <input type="number" min="1" value={details.quantity} onChange={(e) => set('quantity', e.target.value)} className="input-field mt-2" />
+            </label>
+            <label className="text-sm font-semibold text-yarn-dark">
+              Preferred color
+              {canCustomize ? (
+                <input
+                  value={details.color}
+                  onChange={(e) => set('color', e.target.value)}
+                  className="input-field mt-2"
+                  placeholder="Write preferred color"
+                />
+              ) : colorOptions.length > 0 ? (
+                <select
+                  value={details.color}
+                  onChange={(e) => set('color', e.target.value)}
+                  className="input-field mt-2"
+                  required
+                >
+                  <option value="">Select color</option>
+                  {colorOptions.map((color) => (
+                    <option key={color} value={color}>{color}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  value={details.color}
+                  onChange={(e) => set('color', e.target.value)}
+                  className="input-field mt-2"
+                  placeholder="Preferred color"
+                />
+              )}
+            </label>
+          </div>
+
+          {canCustomize && (
+            <label className="text-sm font-semibold text-yarn-dark">
+              Customization
+              <textarea
+                value={details.customization}
+                onChange={(e) => set('customization', e.target.value)}
+                className="input-field mt-2 min-h-24 resize-y"
+                placeholder="Any color, size, name, charm, gift note, or custom request..."
+              />
+            </label>
+          )}
+
+          <label className="text-sm font-semibold text-yarn-dark">
+            Delivery note
+            <input value={details.delivery} onChange={(e) => set('delivery', e.target.value)} className="input-field mt-2" placeholder="City, needed date, pickup/delivery note..." />
+          </label>
+
+          <button type="submit" className={`inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 font-semibold text-white transition ${
+            channel === 'whatsapp' ? 'bg-green-500 hover:bg-green-600' : 'bg-yarn-blush hover:bg-blush-700'
+          }`}>
+            {channel === 'whatsapp' ? <FaWhatsapp size={18} /> : <FaInstagram size={18} />}
+            Continue to {channel === 'whatsapp' ? 'WhatsApp' : 'Instagram'}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
 
 export default function ProductDetailPage() {
   const { id } = useParams()
@@ -13,6 +150,7 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true)
   const [imgIdx, setImgIdx] = useState(0)
   const [wishlisted, setWishlisted] = useState(false)
+  const [orderChannel, setOrderChannel] = useState(null)
 
   useEffect(() => {
     productController.getProduct(id)
@@ -195,7 +333,7 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => !outOfStock && openInstagramDM(product)}
+                onClick={() => !outOfStock && setOrderChannel('instagram')}
                 disabled={outOfStock}
                 className="btn-primary flex items-center justify-center gap-2 py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
               >
@@ -213,15 +351,14 @@ export default function ProductDetailPage() {
                   WhatsApp
                 </button>
               ) : (
-                <a
-                  href={getWhatsAppOrderUrl(product, WHATSAPP_NUMBER)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => setOrderChannel('whatsapp')}
                   className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-4 rounded-xl flex items-center justify-center gap-2 transition-all"
                 >
                   <FaWhatsapp size={18} />
                   WhatsApp
-                </a>
+                </button>
               )}
             </div>
 
@@ -238,6 +375,10 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      {orderChannel && (
+        <ProductOrderModal product={product} channel={orderChannel} onClose={() => setOrderChannel(null)} />
+      )}
     </div>
   )
 }

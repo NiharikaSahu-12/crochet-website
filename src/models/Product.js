@@ -1,12 +1,12 @@
-// models/Product.js — defines the Product schema shape and helpers
+// models/Product.js - defines product and category schema shapes and helpers
 
 export const PRODUCT_CATEGORIES = [
-  { value: 'bags', label: 'Bags & Totes' },
-  { value: 'home_decor', label: 'Home Décor' },
-  { value: 'accessories', label: 'Accessories' },
-  { value: 'baby', label: 'Baby & Kids' },
-  { value: 'seasonal', label: 'Seasonal' },
-  { value: 'custom', label: 'Custom Orders' },
+  { value: 'flowers', label: 'Crochet Flowers', description: 'Single crochet stems and floral keepsakes.', sort_order: 1, is_active: true },
+  { value: 'bouquets', label: 'Crochet Bouquets', description: 'Gift-ready handmade bouquets.', sort_order: 2, is_active: true },
+  { value: 'keychains', label: 'Crochet Keychains', description: 'Small charms and everyday accessories.', sort_order: 3, is_active: true },
+  { value: 'scrunchies', label: 'Crochet Scrunchies', description: 'Soft handmade hair accessories.', sort_order: 4, is_active: true },
+  { value: 'gifts', label: 'Handmade Gifts', description: 'Personalized crochet gifts.', sort_order: 5, is_active: true },
+  { value: 'custom', label: 'Custom Orders', description: 'Made-to-order crochet requests.', sort_order: 6, is_active: true },
 ]
 
 export const PRODUCT_STATUS = {
@@ -14,6 +14,17 @@ export const PRODUCT_STATUS = {
   DRAFT: 'draft',
   OUT_OF_STOCK: 'out_of_stock',
 }
+
+export const createCategoryDTO = (raw = {}) => ({
+  id: raw.id || null,
+  value: raw.value || raw.slug || '',
+  label: raw.label || raw.name || '',
+  description: raw.description || '',
+  sort_order: raw.sort_order ?? 0,
+  is_active: raw.is_active ?? true,
+  created_at: raw.created_at || null,
+  updated_at: raw.updated_at || null,
+})
 
 export const createProductDTO = (raw = {}) => ({
   id: raw.id || null,

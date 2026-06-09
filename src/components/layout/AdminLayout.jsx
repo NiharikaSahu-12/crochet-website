@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { MdDashboard, MdLogout, MdChevronRight, MdClose } from 'react-icons/md'
+import { MdCategory, MdDashboard, MdLogout, MdChevronRight, MdClose } from 'react-icons/md'
 import { FaBox, FaBars } from 'react-icons/fa'
 import { RiAdminFill } from "react-icons/ri";
 import { useAuth } from '../../context/AuthContext'
@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 const ADMIN_NAV = [
   { to: '/admin', label: 'Dashboard', icon: MdDashboard, exact: true },
   { to: '/admin/products', label: 'Products', icon: FaBox },
+  { to: '/admin/categories', label: 'Categories', icon: MdCategory },
 ]
 
 export default function AdminLayout() {

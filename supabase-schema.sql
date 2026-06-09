@@ -3,6 +3,18 @@
 -- Run this in your Supabase SQL Editor
 -- =============================================
 
+-- Categories Table
+CREATE TABLE IF NOT EXISTS categories (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  value TEXT NOT NULL UNIQUE,
+  label TEXT NOT NULL,
+  description TEXT,
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Products Table
 CREATE TABLE IF NOT EXISTS products (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -25,7 +37,19 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 -- Enable Row Level Security
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+
+-- Public can read active categories
+CREATE POLICY "Public can view active categories"
+  ON categories FOR SELECT
+  USING (is_active = true);
+
+-- Authenticated users (admins) can do everything with categories
+CREATE POLICY "Admins can manage categories"
+  ON categories FOR ALL
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
 
 -- Public can read active products
 CREATE POLICY "Public can view active products"
@@ -35,7 +59,8 @@ CREATE POLICY "Public can view active products"
 -- Authenticated users (admins) can do everything
 CREATE POLICY "Admins can manage products"
   ON products FOR ALL
-  USING (auth.role() = 'authenticated');
+  USING (auth.role() = 'authenticated')
+  WITH CHECK (auth.role() = 'authenticated');
 
 -- Storage Bucket for product images
 -- Run this in Supabase Dashboard > Storage or use the SQL editor:
@@ -72,9 +97,18 @@ CREATE TRIGGER update_products_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- Sample data (optional - remove if not needed)
--- INSERT INTO products (name, description, price, compare_price, category, stock_qty, status, is_featured, yarn_type, tags)
--- VALUES
---   ('Boho Market Bag', 'A beautiful handcrafted cotton market bag perfect for groceries or beach days.', 850, 1100, 'bags', 3, 'active', true, 'Cotton', ARRAY['boho', 'summer', 'gift']),
---   ('Mini Succulent Pot Cover', 'Cozy crochet cover for small plant pots. Adds warmth to your desk or shelf.', 350, NULL, 'home_decor', 5, 'active', true, 'Jute', ARRAY['home', 'plants', 'gift']),
---   ('Baby Lovey Blanket', 'Soft and snuggly lovey blanket for little ones. Made with baby-safe yarn.', 1200, NULL, 'baby', 2, 'active', true, 'Baby Soft Acrylic', ARRAY['baby', 'gift', 'nursery']);
+CREATE TRIGGER update_categories_updated_at
+  BEFORE UPDATE ON categories
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- Default categories
+INSERT INTO categories (value, label, description, sort_order, is_active)
+VALUES
+  ('flowers', 'Crochet Flowers', 'Single crochet stems and floral keepsakes.', 1, true),
+  ('bouquets', 'Crochet Bouquets', 'Gift-ready handmade bouquets.', 2, true),
+  ('keychains', 'Crochet Keychains', 'Small charms and everyday accessories.', 3, true),
+  ('scrunchies', 'Crochet Scrunchies', 'Soft handmade hair accessories.', 4, true),
+  ('gifts', 'Handmade Gifts', 'Personalized crochet gifts.', 5, true),
+  ('custom', 'Custom Orders', 'Made-to-order crochet requests.', 6, true)
+ON CONFLICT (value) DO NOTHING;
