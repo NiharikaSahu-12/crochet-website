@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Search, X, SlidersHorizontal, ArrowUpDown, Wand2, Sparkles } from 'lucide-react'
 import ProductCard from '../../components/shop/ProductCard'
 import { useProducts } from '../../hooks/useProducts'

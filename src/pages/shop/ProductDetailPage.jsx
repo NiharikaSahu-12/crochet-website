@@ -27,7 +27,7 @@ export default function ProductDetailPage() {
     setLoading(true)
 
     productController
-      .getProductById(id)
+      .getProduct(id)
       .then((data) => {
         if (!isMounted) return
         setProduct(data)
@@ -35,7 +35,7 @@ export default function ProductDetailPage() {
           setSelectedColor(data.color_options[0])
         }
         // Load related items
-        return productController.getAllProducts({ category: data.category })
+        return productController.listProducts({ category: data.category })
       })
       .then((all) => {
         if (!isMounted) return

@@ -35,7 +35,7 @@ function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
-  const { cartCount, wishlist, setIsCartOpen, setIsWishlistOpen } = useShop()
+  const { cartCount, wishlist, setIsCartOpen, setIsWishlistOpen, openCustomStudio } = useShop()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
