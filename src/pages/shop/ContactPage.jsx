@@ -1,128 +1,411 @@
-import { ArrowUpRight, CheckCircle2, Clock, Mail, MapPin, MessageCircle, Send, Sparkles, Wand2 } from 'lucide-react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { 
+  Mail, Phone, MapPin, Send, MessageCircle, HelpCircle, 
+  Sparkles, Wand2, Check, Copy, Clock, Gift, Heart, 
+  Info, ArrowRight, CheckCircle2, ChevronDown, Truck, ShieldCheck
+} from 'lucide-react'
 import { FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import CustomOrderButton from '../../components/shop/CustomOrderButton'
-import { INSTAGRAM_DM_URL, INSTAGRAM_HANDLE, WHATSAPP_NUMBER, EMAIL, getWhatsAppOrderUrl } from '../../utils/instagram'
+import { INSTAGRAM_HANDLE, INSTAGRAM_DM_URL, WHATSAPP_NUMBER, EMAIL } from '../../utils/instagram'
+import toast from 'react-hot-toast'
 
-const contactMethods = [
-  {
-    title: 'Instagram',
-    value: `@${INSTAGRAM_HANDLE}`,
-    href: INSTAGRAM_DM_URL,
-    icon: FaInstagram,
-    external: true,
-    tone: 'bg-blush-50 text-yarn-blush border-blush-100',
-  },
-  {
-    title: 'WhatsApp',
-    value: 'Chat now',
-    href: getWhatsAppOrderUrl(null, WHATSAPP_NUMBER),
-    icon: FaWhatsapp,
-    external: true,
-    tone: 'bg-green-50 text-green-700 border-green-100',
-  },
-  {
-    title: 'Email',
-    value: EMAIL,
-    href: `mailto:${EMAIL}`,
-    icon: Mail,
-    external: false,
-    tone: 'bg-[#fff4d8] text-yarn-dark border-yarn-gold/20',
-  },
+const INQUIRY_TOPICS = [
+  'Order Status & Tracking',
+  'Product Question or Sizing',
+  'Bulk & Event Gifting (Weddings, Birthdays, Giveaways)',
+  'Shipping & Delivery Question',
+  'Care & Washing Help',
+  'Other / General Question',
 ]
 
-const checklist = [
-  'Product name or reference idea',
-  'Preferred colors and quantity',
-  'Needed date or delivery city',
+const SHOP_FAQS = [
+  {
+    q: 'How do I track my order?',
+    a: 'Once your order is ready and dispatched, we send an express tracking link on WhatsApp and email. You can also message us directly on WhatsApp with your name or order details anytime.',
+  },
+  {
+    q: 'How long does delivery take?',
+    a: 'Ready-to-ship items are dispatched within 24 to 48 hours. Express delivery usually takes 3 to 5 business days across major Indian cities, and 5 to 7 days for regional locations.',
+  },
+  {
+    q: 'How do I care for and wash my crochet items?',
+    a: 'Spot clean with a damp cloth and mild soap whenever possible. For deeper cleaning, gently hand wash in cold water with mild detergent. Roll in a clean towel to absorb excess water, reshape by hand, and air dry flat. Avoid machine drying or wringing.',
+  },
+  {
+    q: 'Do you offer bulk discounts for weddings or party favors?',
+    a: 'Yes! We frequently make bookmarks, keychains, and mini flower pots for wedding return gifts, birthday parties, and corporate gifting. Contact us with your quantity and date for a special bulk discount.',
+  },
+  {
+    q: 'Where are you based and do you ship internationally?',
+    a: 'Our crochet studio is based in Bhubaneswar, Odisha, India. We ship all across India. For international orders, please send us a direct message on WhatsApp or Instagram with your location so we can arrange international courier shipping.',
+  },
+  {
+    q: 'What is your return or exchange policy?',
+    a: 'Because each piece is handmade in slow batches, we do not accept general returns. However, if your package arrives damaged or there is an issue with your piece, please contact us within 48 hours with photos and we will gladly make it right with a replacement.',
+  },
 ]
 
 export default function ContactPage() {
+  const [form, setForm] = useState({
+    name: '',
+    contact: '',
+    topic: 'Order Status & Tracking',
+    orderId: '',
+    message: '',
+  })
+
+  const [submitted, setSubmitted] = useState(false)
+  const [openFaqIndex, setOpenFaqIndex] = useState(null)
+
+  const buildMessage = () => {
+    return [
+      `💬 *INQUIRY FOR THE COZYLOOPS*`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `*Name:* ${form.name || 'Friend'}`,
+      `*Contact:* ${form.contact || 'Direct Chat'}`,
+      `*Topic:* ${form.topic}`,
+      form.orderId.trim() ? `*Order ID:* ${form.orderId.trim()}` : null,
+      `*Message:* ${form.message || '(No message provided)'}`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `Hi Niharika! Could you please help me with this inquiry?`,
+    ].filter(Boolean).join('\n')
+  }
+
+  const handleSendWhatsApp = (e) => {
+    e.preventDefault()
+    if (!form.name.trim()) {
+      toast.error('Please enter your name!')
+      return
+    }
+    if (!form.message.trim()) {
+      toast.error('Please enter your message!')
+      return
+    }
+
+    const text = buildMessage()
+    const encoded = encodeURIComponent(text)
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank')
+    setSubmitted(true)
+    toast.success('Opening WhatsApp chat!')
+  }
+
+  const handleCopyMessage = () => {
+    if (!form.message.trim()) {
+      toast.error('Please type a message first!')
+      return
+    }
+    const text = buildMessage()
+    navigator.clipboard.writeText(text)
+    toast.success('Inquiry copied to clipboard!')
+  }
+
   return (
-    <div className="bg-gradient-to-b from-[#fffaf6] via-white to-blush-50">
-      <section className="max-w-6xl mx-auto px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="inline-flex items-center gap-2 rounded-full border border-blush-200 bg-white px-4 py-2 text-sm font-semibold text-yarn-blush shadow-sm">
-            <Send size={16} aria-hidden="true" />
-            Contact
-          </p>
-          <h1 className="mt-5 font-display text-4xl leading-tight text-yarn-dark sm:text-5xl">
-            Reach out for orders, questions, or custom crochet ideas.
+    <div className="bg-canvas min-h-screen">
+      {/* 1. Header Banner */}
+      <section className="bg-canvas-subtle border-b border-canvas-border py-14 sm:py-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-terracotta-100/70 border border-terracotta-200/80 text-terracotta-800 text-xs font-mono uppercase tracking-editorial mb-4">
+            <MessageCircle size={13} className="text-terracotta-600" />
+            <span>Customer Care &amp; Support</span>
+          </div>
+
+          <h1 className="font-editorial text-4xl sm:text-5xl lg:text-6xl font-bold text-ink tracking-tight">
+            We’re Here to Help
           </h1>
-          <p className="mt-4 text-sm leading-7 text-[#6b5551] sm:text-base">
-            Pick one channel below. For custom work, use the form so every detail reaches us clearly.
+
+          <p className="mt-4 text-base sm:text-lg text-ink-muted leading-relaxed font-light">
+            Have questions about an order, delivery times, bulk event favors, or washing tips? Reach out directly via WhatsApp, Instagram, or the inquiry form below.
           </p>
         </div>
+      </section>
 
-        <div className="mt-10 grid gap-3 md:grid-cols-3">
-          {contactMethods.map(({ title, value, href, icon: Icon, external, tone }) => (
+      {/* 2. Custom Orders Notice Banner */}
+      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-10">
+        <div className="bg-gradient-to-r from-terracotta-50 to-amber-50/50 border border-terracotta-200/90 rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
+          <div className="flex items-center gap-4 text-center sm:text-left">
+            <div className="w-12 h-12 rounded-2xl bg-terracotta-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Wand2 size={20} />
+            </div>
+            <div>
+              <h4 className="font-editorial font-bold text-ink text-lg">
+                Looking for a Custom Crochet Design?
+              </h4>
+              <p className="text-sm text-ink-muted mt-0.5 font-light">
+                We have a dedicated Custom Orders Studio where you can choose flower styles, yarn textures, and color combinations.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/custom-orders"
+            className="btn-primary whitespace-nowrap"
+          >
+            <span>Open Custom Studio</span>
+            <ArrowRight size={15} />
+          </Link>
+        </div>
+      </section>
+
+      {/* 3. Main Contact Section (Channels + Inquiry Form) */}
+      <section className="py-14 sm:py-20 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="grid lg:grid-cols-12 gap-10 items-start">
+
+          {/* Left Column: Direct Contact Info Cards */}
+          <div className="lg:col-span-5 space-y-4">
+            <div>
+              <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Quick Channels</span>
+              <h2 className="font-editorial text-2xl font-bold text-ink mt-0.5">Get in Touch Directly</h2>
+              <p className="text-xs text-ink-muted mt-1">
+                For the fastest answer, send a message directly to Niharika on WhatsApp.
+              </p>
+            </div>
+
+            {/* WhatsApp Card */}
             <a
-              key={title}
-              href={href}
-              target={external ? '_blank' : undefined}
-              rel={external ? 'noopener noreferrer' : undefined}
-              className={`group flex items-center justify-between gap-4 rounded-2xl border ${tone} px-5 py-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi Niharika! I have a question about The CozyLoops.')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block p-5 rounded-2xl bg-white border border-canvas-border hover:border-[#25D366] transition-all group shadow-2xs"
             >
-              <span className="flex items-center gap-3 min-w-0">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm">
-                  <Icon size={19} aria-hidden="true" />
-                </span>
-                <span className="min-w-0 text-left">
-                  <span className="block font-display text-lg text-yarn-dark">{title}</span>
-                  <span className="block truncate text-xs font-semibold opacity-75">{value}</span>
-                </span>
-              </span>
-              <ArrowUpRight size={17} className="shrink-0 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section className="max-w-6xl mx-auto px-4 pb-16 sm:px-6 lg:px-8 lg:pb-20">
-        <div className="grid overflow-hidden rounded-[30px] border border-blush-100 bg-white shadow-xl shadow-blush-100/70 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="bg-gradient-to-br from-yarn-dark via-blush-900 to-yarn-blush p-6 text-white sm:p-8">
-            <Sparkles size={28} className="text-blush-200" aria-hidden="true" />
-            <h2 className="mt-5 font-display text-3xl sm:text-4xl">Custom orders</h2>
-            <p className="mt-4 max-w-md text-sm leading-7 text-blush-100">
-              For personalized pieces, send the important details first. It saves back-and-forth and helps us confirm faster.
-            </p>
-            <CustomOrderButton className="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-4 font-semibold text-yarn-dark transition hover:bg-blush-50">
-              <Wand2 size={18} aria-hidden="true" />
-              Open custom form
-            </CustomOrderButton>
-          </div>
-
-          <div className="p-6 sm:p-8">
-            <h3 className="font-display text-2xl text-yarn-dark">Before you message</h3>
-            <div className="mt-5 space-y-3">
-              {checklist.map((item) => (
-                <div key={item} className="flex items-center gap-3 rounded-2xl bg-blush-50/70 px-4 py-3">
-                  <CheckCircle2 size={18} className="shrink-0 text-green-600" aria-hidden="true" />
-                  <p className="text-sm font-medium text-yarn-dark">{item}</p>
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-full bg-[#25D366]/10 text-[#25D366] flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <FaWhatsapp size={22} />
                 </div>
-              ))}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="font-editorial font-bold text-ink text-base group-hover:text-[#25D366] transition-colors">
+                      WhatsApp Chat
+                    </span>
+                    <span className="text-[10px] font-mono bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded">
+                      Fastest
+                    </span>
+                  </div>
+                  <p className="text-xs text-ink-muted mt-0.5">+91 94399 22002</p>
+                  <p className="text-[11px] text-ink-muted/80 mt-1">Replies usually within 1 hour</p>
+                </div>
+              </div>
+            </a>
+
+            {/* Instagram Card */}
+            <a
+              href={INSTAGRAM_DM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block p-5 rounded-2xl bg-white border border-canvas-border hover:border-terracotta-500 transition-all group shadow-2xs"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <FaInstagram size={22} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="font-editorial font-bold text-ink text-base group-hover:text-pink-600 transition-colors">
+                    Instagram DM
+                  </span>
+                  <p className="text-xs text-ink-muted mt-0.5">@{INSTAGRAM_HANDLE}</p>
+                  <p className="text-[11px] text-ink-muted/80 mt-1">Photos, behind-the-scenes & drops</p>
+                </div>
+              </div>
+            </a>
+
+            {/* Email Card */}
+            <a
+              href={`mailto:${EMAIL}`}
+              className="block p-5 rounded-2xl bg-white border border-canvas-border hover:border-ink transition-all group shadow-2xs"
+            >
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-full bg-canvas-subtle text-ink flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <Mail size={20} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span className="font-editorial font-bold text-ink text-base">
+                    Email Inquiry
+                  </span>
+                  <p className="text-xs text-ink-muted mt-0.5">{EMAIL}</p>
+                  <p className="text-[11px] text-ink-muted/80 mt-1">For bulk orders & brand collaborations</p>
+                </div>
+              </div>
+            </a>
+
+            {/* Studio Hours & Location */}
+            <div className="p-5 rounded-2xl bg-canvas-subtle border border-canvas-border space-y-3">
+              <div className="flex items-start gap-3 text-xs text-ink-muted">
+                <Clock size={16} className="text-terracotta-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-ink block">Working Hours</span>
+                  <span>Monday – Saturday: 9:00 AM – 8:00 PM IST</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 text-xs text-ink-muted">
+                <MapPin size={16} className="text-terracotta-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-ink block">Studio Location</span>
+                  <span>Bhubaneswar, Odisha, India • Delivering Nationwide & Worldwide</span>
+                </div>
+              </div>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-blush-100 bg-white p-4">
-                <Clock size={19} className="text-yarn-blush" aria-hidden="true" />
-                <p className="mt-3 font-semibold text-yarn-dark">Reply time</p>
-                <p className="mt-1 text-sm leading-6 text-gray-500">We reply fastest on Instagram or WhatsApp.</p>
-              </div>
-              <div className="rounded-2xl border border-blush-100 bg-white p-4">
-                <MapPin size={19} className="text-yarn-blush" aria-hidden="true" />
-                <p className="mt-3 font-semibold text-yarn-dark">Delivery note</p>
-                <p className="mt-1 text-sm leading-6 text-gray-500">Mention your city and needed date for gifts.</p>
-              </div>
-            </div>
           </div>
+
+          {/* Right Column: Contact Message Form */}
+          <div className="lg:col-span-7 bg-white rounded-2xl p-6 sm:p-8 border border-canvas-border shadow-xs">
+            <div className="mb-6">
+              <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Message Form</span>
+              <h2 className="font-editorial text-2xl font-bold text-ink mt-0.5">Send Us a Note</h2>
+              <p className="text-xs text-ink-muted mt-1">
+                Fill out the details and click send. It will format your message so you can easily send it on WhatsApp or copy it.
+              </p>
+            </div>
+
+            <form onSubmit={handleSendWhatsApp} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono uppercase text-ink-muted mb-1.5">
+                    Your Name <span className="text-terracotta-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g. Ananya Sen"
+                    className="input-field text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono uppercase text-ink-muted mb-1.5">
+                    Phone / WhatsApp or Email
+                  </label>
+                  <input
+                    type="text"
+                    value={form.contact}
+                    onChange={(e) => setForm((prev) => ({ ...prev, contact: e.target.value }))}
+                    placeholder="e.g. +91 98765 43210"
+                    className="input-field text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-mono uppercase text-ink-muted mb-1.5">
+                    Inquiry Topic
+                  </label>
+                  <select
+                    value={form.topic}
+                    onChange={(e) => setForm((prev) => ({ ...prev, topic: e.target.value }))}
+                    className="input-field text-sm bg-white"
+                  >
+                    {INQUIRY_TOPICS.map((topic) => (
+                      <option key={topic} value={topic}>{topic}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono uppercase text-ink-muted mb-1.5">
+                    Order ID (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={form.orderId}
+                    onChange={(e) => setForm((prev) => ({ ...prev, orderId: e.target.value }))}
+                    placeholder="e.g. CL-2026-104"
+                    className="input-field text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono uppercase text-ink-muted mb-1.5">
+                  Your Message <span className="text-terracotta-600">*</span>
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={form.message}
+                  onChange={(e) => setForm((prev) => ({ ...prev, message: e.target.value }))}
+                  placeholder="How can we help you? Feel free to ask about sizing, delivery dates, or special requests..."
+                  className="input-field text-sm resize-none"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                <button
+                  type="submit"
+                  className="flex-1 py-3 px-5 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs transition-colors"
+                >
+                  <FaWhatsapp size={17} />
+                  <span>Send on WhatsApp</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleCopyMessage}
+                  className="py-3 px-5 rounded-xl border border-canvas-border hover:bg-canvas-subtle text-ink font-medium text-xs flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <Copy size={13} />
+                  <span>Copy Message</span>
+                </button>
+              </div>
+
+              {submitted && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 flex items-center gap-2">
+                  <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+                  <span>Thank you! WhatsApp is opened. We will get back to you shortly.</span>
+                </div>
+              )}
+            </form>
+          </div>
+
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="rounded-[28px] border border-blush-100 bg-gradient-to-r from-blush-50 via-white to-[#fff4d8] p-6 text-center">
-          <MessageCircle size={24} className="mx-auto text-yarn-blush" aria-hidden="true" />
-          <p className="mt-3 font-display text-2xl text-yarn-dark">Please send clear order details in one message.</p>
-          <p className="mt-2 text-sm text-gray-500">That helps us identify who ordered and what they selected.</p>
+      {/* 4. Customer Care & FAQs Accordion */}
+      <section className="py-16 bg-white border-t border-canvas-border">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700">
+              Frequently Asked Questions
+            </p>
+            <h2 className="font-editorial text-3xl font-bold text-ink mt-1">
+              Help & Information
+            </h2>
+            <p className="text-xs text-ink-muted mt-2">
+              Common questions about delivery, washing, and how our crochet works.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {SHOP_FAQS.map((faq, idx) => {
+              const isOpen = openFaqIndex === idx
+              return (
+                <div 
+                  key={idx}
+                  className="rounded-xl border border-canvas-border overflow-hidden transition-all shadow-2xs"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    className="w-full text-left p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-canvas-subtle/40 transition-colors"
+                  >
+                    <span className="font-editorial font-semibold text-ink text-base">
+                      {faq.q}
+                    </span>
+                    <ChevronDown 
+                      size={18} 
+                      className={`text-ink-muted shrink-0 transition-transform ${isOpen ? 'rotate-180 text-terracotta-600' : ''}`} 
+                    />
+                  </button>
+                  {isOpen && (
+                    <div className="px-5 pb-5 text-sm text-ink-muted leading-relaxed border-t border-canvas-border/50 pt-3">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </section>
     </div>

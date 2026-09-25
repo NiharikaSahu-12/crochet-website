@@ -1,132 +1,208 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Flower2, Gift, Home, PackageCheck, RefreshCw, Send, ShoppingBag, Sparkles, Star, Wand2 } from 'lucide-react'
+import { ArrowRight, Wand2, Sparkles, Heart, Flower2, Bookmark, Key, Gift, Check, ShieldCheck, Star } from 'lucide-react'
 import HeroSection from '../../components/shop/HeroSection'
 import ProductCard from '../../components/shop/ProductCard'
-import CustomOrderButton from '../../components/shop/CustomOrderButton'
 import { useFeaturedProducts } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
+import { useShop } from '../../context/ShopContext'
 
-const categoryIcons = {
-  bags: ShoppingBag,
-  home_decor: Home,
-  accessories: Sparkles,
-  baby: Gift,
-  seasonal: Flower2,
-  custom: Wand2,
-}
-
-const featureCards = [
-  { icon: Star, title: 'Hand finished', desc: 'Clean seams, tidy details, and careful shaping on every piece.', tone: 'from-blush-50 to-rose-mist' },
-  { icon: PackageCheck, title: 'Packed safely', desc: 'Orders are wrapped to protect texture, shape, and gifting details.', tone: 'from-[#fff4d8] to-blush-50' },
-  { icon: Send, title: 'Easy ordering', desc: 'Pick from the shop or send a reference for a custom request.', tone: 'from-rose-mist to-white' },
-  { icon: RefreshCw, title: 'Made to order', desc: 'Fresh pieces can be adjusted by color, size, and occasion.', tone: 'from-blush-100 to-[#fff4d8]' },
+const CATEGORIES_SHOWCASE = [
+  {
+    id: 'bouquets',
+    name: 'Bouquets & Pots',
+    desc: 'Everlasting flowers',
+    image: '/images/hero_bouquet.jpg',
+    to: '/shop?category=bouquets',
+  },
+  {
+    id: 'potted',
+    name: 'Potted Blooms',
+    desc: 'Desk & tabletop decor',
+    image: '/images/potted_bloom.jpg',
+    to: '/shop?category=bouquets',
+  },
+  {
+    id: 'flowers',
+    name: 'Floral Bookmarks',
+    desc: 'Handmade for book lovers',
+    image: '/images/floral_bookmark_hd.jpg',
+    to: '/shop?category=flowers',
+  },
+  {
+    id: 'keychains',
+    name: 'Keychains & Charms',
+    desc: 'Bows, sunflowers & daisies',
+    image: '/images/flower_keychain.jpg',
+    to: '/shop?category=keychains',
+  },
+  {
+    id: 'gifts',
+    name: 'Plush & Gifts',
+    desc: 'Amigurumi & gift boxes',
+    image: '/images/amigurumi_bunny.jpg',
+    to: '/shop?category=gifts',
+  },
+  {
+    id: 'custom',
+    name: 'Custom Orders',
+    desc: 'Pick your dream colors',
+    image: '/images/gift_packaging.jpg',
+    to: '/custom-orders',
+  },
 ]
 
-function cleanCategoryLabel(label) {
-  return label.replace(/Home D.*cor/, 'Home Decor')
-}
+const ATELIER_PILLARS = [
+  {
+    step: '01',
+    title: '100% Handcrafted',
+    desc: 'Each petal, leafy stem, and bow is crocheted stitch-by-stitch by hand with tight, lasting tension.',
+  },
+  {
+    step: '02',
+    title: 'Ultra-Soft Milk Cotton',
+    desc: 'Selected for gentle softness, smooth velvety stitch definition, and vibrant, non-fading pastel dyes.',
+  },
+  {
+    step: '03',
+    title: 'Heirloom Keepsakes',
+    desc: 'Everlasting floral blooms that stay fresh and radiant forever without water or sunlight.',
+  },
+  {
+    step: '04',
+    title: 'Aesthetic Gift Boxed',
+    desc: 'Every piece is packaged with tissue wrap, wax seal stamp, and a free handwritten calligraphy card.',
+  },
+]
 
-function CategoryCard({ category }) {
-  const Icon = categoryIcons[category.value] || Sparkles
-
-  return (
-    <Link
-      to={`/shop?category=${category.value}`}
-      className="group rounded-2xl border border-blush-100 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-yarn-blush hover:shadow-lg"
-    >
-      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-gradient-to-br from-blush-100 to-yarn-gold/30 text-yarn-blush transition-colors group-hover:from-yarn-blush group-hover:to-yarn-gold group-hover:text-white">
-        <Icon size={21} aria-hidden="true" />
-      </div>
-      <p className="mt-4 font-semibold text-yarn-dark">{cleanCategoryLabel(category.label)}</p>
-      <p className="mt-2 flex items-center gap-1 text-sm text-[#8a716b]">
-        Explore <ArrowRight size={14} aria-hidden="true" />
-      </p>
-    </Link>
-  )
-}
-
-function FeatureCard({ icon: Icon, title, desc, tone }) {
-  return (
-    <div className={`rounded-2xl border border-white bg-gradient-to-br ${tone} p-5 shadow-sm`}>
-      <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white text-yarn-blush shadow-sm">
-        <Icon size={20} aria-hidden="true" />
-      </div>
-      <h3 className="font-display text-lg font-semibold text-yarn-dark">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[#75625d]">{desc}</p>
-    </div>
-  )
-}
+const COMMUNITY_STORIES = [
+  {
+    quote: 'The pastel tulip bouquet arrived in the most gorgeous gift box with a wax seal. The flowers look so sweet on my work desk!',
+    author: 'Aadya M.',
+    location: 'Mumbai',
+    item: 'Pastel Tulip Bouquet',
+    stars: 5,
+  },
+  {
+    quote: 'I ordered a custom potted sunflower for my sister’s graduation. Niharika captured every single color preference perfectly. 10/10!',
+    author: 'Sneha R.',
+    location: 'Bengaluru',
+    item: 'Custom Potted Bloom',
+    stars: 5,
+  },
+  {
+    quote: 'The daisy bookmark is an absolute work of art. The stem is thin enough that it doesn’t damage book spines. Ordering more for my book club!',
+    author: 'Kavya T.',
+    location: 'Pune',
+    item: 'Floral Stem Bookmark',
+    stars: 5,
+  },
+]
 
 export default function HomePage() {
   const { products, loading } = useFeaturedProducts()
-  const { categories } = useCategories({ activeOnly: true })
 
   return (
-    <div className="bg-gradient-to-b from-[#fffaf6] via-white to-blush-50">
+    <div className="bg-canvas">
+      {/* 1. Hero Section */}
       <HeroSection />
 
-      <section className="border-y border-blush-100 bg-gradient-to-r from-white via-blush-50 to-[#fff6df] py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featureCards.map((feature) => (
-              <FeatureCard key={feature.title} {...feature} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      {/* 2. Visual Categories Showcase with High-Res Photography */}
+      <section className="py-20 sm:py-24 border-b border-canvas-border">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-yarn-blush">Shop by type</p>
-              <h2 className="mt-3 font-display text-3xl sm:text-4xl text-yarn-dark">Find the right handmade piece</h2>
+              <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
+                Curated Collections
+              </p>
+              <h2 className="mt-2 font-editorial text-3xl sm:text-4xl lg:text-5xl font-bold text-ink">
+                Shop by Category
+              </h2>
             </div>
-            <Link to="/shop" className="inline-flex items-center gap-2 font-semibold text-yarn-blush hover:text-blush-700">
-              View all products <ArrowRight size={17} aria-hidden="true" />
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink hover:text-terracotta-700 transition-colors pb-1 border-b border-ink/20 hover:border-terracotta-700"
+            >
+              <span>Explore All Pieces</span>
+              <ArrowRight size={14} />
             </Link>
           </div>
 
-          <div className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {categories.map((cat) => (
-              <CategoryCard key={cat.value} category={cat} />
+          {/* Photographic category cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
+            {CATEGORIES_SHOWCASE.map((cat) => (
+              <Link
+                key={cat.id}
+                to={cat.to}
+                className="group relative rounded-2xl overflow-hidden aspect-[3/4] bg-stone-100 border border-canvas-border shadow-xs hover:shadow-card transition-all duration-300 flex flex-col justify-end p-4 text-white"
+              >
+                {/* Background image */}
+                <img
+                  src={cat.image}
+                  alt={cat.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                />
+
+                {/* Subtle dark gradient overlay for crystal readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/30 to-transparent transition-opacity group-hover:opacity-90" />
+
+                {/* Text overlay */}
+                <div className="relative z-10">
+                  <h3 className="font-editorial text-sm sm:text-base font-bold leading-tight">
+                    {cat.name}
+                  </h3>
+                  <p className="text-[11px] text-white/80 font-light mt-0.5 truncate">
+                    {cat.desc}
+                  </p>
+                </div>
+              </Link>
             ))}
           </div>
+
         </div>
       </section>
 
-      <section className="bg-gradient-to-br from-blush-50 via-[#fff4d8] to-rose-mist py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      {/* 3. Featured Products Collection */}
+      <section className="py-20 sm:py-28 border-b border-canvas-border bg-white">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-yarn-blush">Featured picks</p>
-              <h2 className="mt-3 font-display text-3xl sm:text-4xl text-yarn-dark">Ready-to-love favorites</h2>
+              <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
+                Handcrafted Favorites
+              </p>
+              <h2 className="mt-2 font-editorial text-3xl sm:text-4xl lg:text-5xl font-bold text-ink">
+                Featured Handmade Pieces
+              </h2>
             </div>
-            <Link to="/shop" className="inline-flex items-center gap-2 font-semibold text-yarn-blush hover:text-blush-700">
-              Shop the collection <ArrowRight size={17} aria-hidden="true" />
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink hover:text-terracotta-700 transition-colors pb-1 border-b border-ink/20 hover:border-terracotta-700"
+            >
+              <span>View Full Shop</span>
+              <ArrowRight size={14} />
             </Link>
           </div>
 
           {loading ? (
-            <div className="mt-9 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="overflow-hidden rounded-2xl bg-white animate-pulse">
-                  <div className="aspect-[3/4] bg-blush-100" />
-                  <div className="space-y-2 p-4">
-                    <div className="h-3 w-1/2 rounded bg-blush-100" />
-                    <div className="h-5 w-3/4 rounded bg-blush-100" />
-                    <div className="h-4 w-1/3 rounded bg-blush-100" />
-                  </div>
-                </div>
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="aspect-[4/5] bg-canvas-subtle rounded-2xl animate-pulse" />
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="mt-9 rounded-2xl border border-dashed border-blush-200 bg-white/80 p-10 text-center shadow-sm">
-              <p className="font-display text-2xl text-yarn-dark">Featured products are coming soon.</p>
-              <p className="mt-2 text-[#75625d]">Custom orders are still open through Instagram, WhatsApp, or email.</p>
+            <div className="bg-canvas-subtle rounded-3xl border border-canvas-border p-12 text-center max-w-xl mx-auto">
+              <p className="font-editorial text-xl text-ink">New products coming soon!</p>
+              <p className="text-xs text-ink-muted mt-2">
+                Custom orders are always open! Click below to order your favorite piece.
+              </p>
+              <Link to="/custom-orders" className="btn-primary mt-6 text-xs px-6 py-3">
+                Make a Custom Order
+              </Link>
             </div>
           ) : (
-            <div className="mt-9 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
               {products.slice(0, 8).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -135,27 +211,173 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 overflow-hidden rounded-[28px] bg-gradient-to-br from-yarn-dark via-blush-900 to-yarn-blush shadow-2xl shadow-blush-200/50 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="min-h-[320px]">
+      {/* 4. Atelier Pillars / Handcrafted Values */}
+      <section className="border-b border-canvas-border bg-canvas-subtle py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+            {ATELIER_PILLARS.map((p) => (
+              <div key={p.step} className="space-y-2.5">
+                <span className="font-mono text-xs font-bold text-terracotta-700 tracking-wider">
+                  {p.step}
+                </span>
+                <h3 className="font-editorial text-xl font-bold text-ink">
+                  {p.title}
+                </h3>
+                <p className="text-sm text-ink-muted leading-relaxed font-light">
+                  {p.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Custom Orders Studio Banner */}
+      <section className="py-20 sm:py-28 border-b border-canvas-border">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="bg-ink text-white rounded-3xl overflow-hidden border border-canvas-border shadow-float grid lg:grid-cols-12">
+            
+            <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16 flex flex-col justify-between space-y-8">
+              <div className="space-y-4">
+                <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-400 font-semibold">
+                  Custom Orders &amp; Studio
+                </span>
+                <h2 className="font-editorial text-3xl sm:text-5xl font-bold leading-tight text-white">
+                  Have a specific color or dream crochet idea?
+                </h2>
+                <p className="text-base sm:text-lg text-white/70 leading-relaxed font-light max-w-xl">
+                  Choose your favorite shades, flower species, yarn texture, and personalized initial charm. We craft one-of-a-kind bouquets, desk blooms, and favors for your special moments.
+                </p>
+              </div>
+
+              <div className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-4">
+                <Link
+                  to="/custom-orders"
+                  className="btn-primary bg-terracotta-600 hover:bg-terracotta-700 px-7 py-3.5"
+                >
+                  <Wand2 size={16} />
+                  <span>Open Custom Orders Studio</span>
+                </Link>
+
+                <Link
+                  to="/contact"
+                  className="text-xs uppercase tracking-wider font-semibold text-white/80 hover:text-white flex items-center gap-1.5 transition-colors py-3"
+                >
+                  <span>Chat with Niharika</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 relative min-h-[320px] lg:min-h-full">
               <img
-                src="/images/about_1.jpg"
-                alt="Display of handmade crochet flower pieces"
-                className="h-full w-full object-cover"
+                src="/images/gift_packaging.jpg"
+                alt="Handmade crochet gift packaging with wax seal by TheCozzyLoops"
+                className="w-full h-full object-cover"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent lg:hidden" />
             </div>
-            <div className="flex flex-col justify-center p-6 sm:p-10 lg:p-12">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blush-200">Custom orders</p>
-              <h2 className="mt-3 font-display text-3xl sm:text-4xl text-white">Have a color, gift, or idea in mind?</h2>
-              <p className="mt-4 max-w-xl text-base leading-8 text-blush-100">
-                Send a reference, choose your preferred palette, and we will help turn it into a crochet piece that feels personal.
-              </p>
-              <CustomOrderButton className="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-4 font-semibold text-yarn-dark transition hover:bg-blush-50">
-                <Wand2 size={18} aria-hidden="true" />
-                Start custom order
-              </CustomOrderButton>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Customer Stories */}
+      <section className="py-20 sm:py-28 bg-white border-b border-canvas-border">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700 font-semibold">
+              Loved by Customers
+            </span>
+            <h2 className="mt-2 font-editorial text-3xl sm:text-4xl lg:text-5xl font-bold text-ink">
+              Stories from Our Community
+            </h2>
+            <p className="mt-3 text-sm text-ink-muted">
+              Real notes from book lovers, gift givers, and crochet enthusiasts across India.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {COMMUNITY_STORIES.map((story) => (
+              <div
+                key={story.author}
+                className="bg-canvas rounded-2xl p-8 border border-canvas-border shadow-xs flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex gap-1 text-amber-500 mb-5">
+                    {[...Array(story.stars)].map((_, i) => (
+                      <Star key={i} size={15} fill="#D97706" />
+                    ))}
+                  </div>
+                  <p className="font-editorial text-base text-ink leading-relaxed italic">
+                    "{story.quote}"
+                  </p>
+                </div>
+
+                <div className="mt-8 pt-5 border-t border-canvas-border flex items-center justify-between text-xs">
+                  <div>
+                    <span className="font-bold text-ink">{story.author}</span>
+                    <span className="text-ink-muted"> · {story.location}</span>
+                  </div>
+                  <span className="font-mono text-[11px] text-terracotta-700 font-medium">
+                    {story.item}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* 7. Instagram & Atelier Visual Gallery */}
+      <section className="py-16 sm:py-20 bg-canvas">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <span className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
+                Daily Stitches
+              </span>
+              <h3 className="font-editorial text-2xl font-bold text-ink mt-0.5">
+                Follow @thecozzyloops
+              </h3>
             </div>
+            <a
+              href="https://instagram.com/thecozzyloops"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-semibold uppercase tracking-wider text-ink hover:text-terracotta-700 transition-colors"
+            >
+              Follow on Instagram →
+            </a>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+            {[
+              { src: '/images/hero_bouquet.jpg', alt: 'Crochet tulip bouquet' },
+              { src: '/images/potted_bloom.jpg', alt: 'Crochet sunflower plant' },
+              { src: '/images/floral_bookmark_hd.jpg', alt: 'Crochet daisy bookmark' },
+              { src: '/images/amigurumi_bunny.jpg', alt: 'Crochet bunny plush' },
+              { src: '/images/gift_packaging.jpg', alt: 'Crochet packaging' },
+            ].map((img, i) => (
+              <a
+                key={i}
+                href="https://instagram.com/thecozzyloops"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative rounded-2xl overflow-hidden aspect-square border border-canvas-border shadow-xs"
+              >
+                <img
+                  src={img.src}
+                  alt={img.alt}
+                  className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+                />
+                <div className="absolute inset-0 bg-ink/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium">
+                  <span>View on Instagram</span>
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </section>

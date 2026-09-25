@@ -1,384 +1,462 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { MdArrowBack, MdChevronLeft, MdChevronRight } from 'react-icons/md'
-import { FaInstagram, FaHeart, FaRegHeart, FaShare, FaStar, FaWhatsapp } from 'react-icons/fa'
+import { ArrowLeft, Heart, ShoppingBag, Wand2, ShieldCheck, Sparkles, Plus, Minus, Check, Copy, Share2, Flower2 } from 'lucide-react'
+import { FaWhatsapp, FaInstagram } from 'react-icons/fa'
 import productController from '../../controllers/productController'
-import { INSTAGRAM_DM_URL, WHATSAPP_NUMBER, buildProductOrderMessage, getWhatsAppOrderUrl } from '../../utils/instagram'
-import { isOnSale, discountPercent, PRODUCT_CATEGORIES } from '../../models/Product'
-
-const EMPTY_ORDER = {
-  name: '',
-  contact: '',
-  quantity: 1,
-  color: '',
-  customization: '',
-  delivery: '',
-}
-
-function ProductOrderModal({ product, channel, onClose }) {
-  const [details, setDetails] = useState(EMPTY_ORDER)
-  const colorOptions = product.color_options || []
-  const canCustomize = product.is_custom
-
-  const set = (key, value) => setDetails((current) => ({ ...current, [key]: value }))
-
-  const submitOrder = async (event) => {
-    event.preventDefault()
-
-    if (channel === 'whatsapp') {
-      window.open(getWhatsAppOrderUrl(product, WHATSAPP_NUMBER, details), '_blank', 'noopener,noreferrer')
-      onClose()
-      return
-    }
-
-    const message = buildProductOrderMessage(product, details)
-    try {
-      await navigator.clipboard.writeText(message)
-      alert('Order details copied. Paste them in Instagram DM after it opens.')
-    } catch {
-      alert(message)
-    }
-    window.open(INSTAGRAM_DM_URL, '_blank', 'noopener,noreferrer')
-    onClose()
-  }
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-6">
-      <button type="button" className="absolute inset-0 bg-yarn-dark/70 backdrop-blur-sm" onClick={onClose} aria-label="Close order form" />
-      <div className="relative max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-[28px] border border-white bg-gradient-to-br from-white via-blush-50 to-[#fff4d8] p-5 shadow-2xl sm:p-7">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-yarn-blush">Order details</p>
-            <h2 className="mt-2 font-display text-3xl text-yarn-dark">{product.name}</h2>
-            <p className="mt-2 text-sm text-gray-500">
-              Fill this once so we know who ordered and exactly which product/details they selected.
-            </p>
-          </div>
-          <button type="button" onClick={onClose} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-yarn-dark shadow-sm hover:bg-blush-100">
-            x
-          </button>
-        </div>
-
-        <form onSubmit={submitOrder} className="mt-6 grid gap-4">
-          <div className="rounded-2xl bg-white/80 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">Product</p>
-            <p className="mt-1 font-semibold text-yarn-dark">{product.name}</p>
-            <p className="text-sm text-yarn-blush">Rs {Number(product.price || 0).toLocaleString()}</p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="text-sm font-semibold text-yarn-dark">
-              Your name *
-              <input value={details.name} onChange={(e) => set('name', e.target.value)} className="input-field mt-2" placeholder="Customer name" required />
-            </label>
-            <label className="text-sm font-semibold text-yarn-dark">
-              Phone or Instagram *
-              <input value={details.contact} onChange={(e) => set('contact', e.target.value)} className="input-field mt-2" placeholder="@username or phone" required />
-            </label>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="text-sm font-semibold text-yarn-dark">
-              Quantity
-              <input type="number" min="1" value={details.quantity} onChange={(e) => set('quantity', e.target.value)} className="input-field mt-2" />
-            </label>
-            <label className="text-sm font-semibold text-yarn-dark">
-              Preferred color
-              {canCustomize ? (
-                <input
-                  value={details.color}
-                  onChange={(e) => set('color', e.target.value)}
-                  className="input-field mt-2"
-                  placeholder="Write preferred color"
-                />
-              ) : colorOptions.length > 0 ? (
-                <select
-                  value={details.color}
-                  onChange={(e) => set('color', e.target.value)}
-                  className="input-field mt-2"
-                  required
-                >
-                  <option value="">Select color</option>
-                  {colorOptions.map((color) => (
-                    <option key={color} value={color}>{color}</option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  value={details.color}
-                  onChange={(e) => set('color', e.target.value)}
-                  className="input-field mt-2"
-                  placeholder="Preferred color"
-                />
-              )}
-            </label>
-          </div>
-
-          {canCustomize && (
-            <label className="text-sm font-semibold text-yarn-dark">
-              Customization
-              <textarea
-                value={details.customization}
-                onChange={(e) => set('customization', e.target.value)}
-                className="input-field mt-2 min-h-24 resize-y"
-                placeholder="Any color, size, name, charm, gift note, or custom request..."
-              />
-            </label>
-          )}
-
-          <label className="text-sm font-semibold text-yarn-dark">
-            Delivery note
-            <input value={details.delivery} onChange={(e) => set('delivery', e.target.value)} className="input-field mt-2" placeholder="City, needed date, pickup/delivery note..." />
-          </label>
-
-          <button type="submit" className={`inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 font-semibold text-white transition ${
-            channel === 'whatsapp' ? 'bg-green-500 hover:bg-green-600' : 'bg-yarn-blush hover:bg-blush-700'
-          }`}>
-            {channel === 'whatsapp' ? <FaWhatsapp size={18} /> : <FaInstagram size={18} />}
-            Continue to {channel === 'whatsapp' ? 'WhatsApp' : 'Instagram'}
-          </button>
-        </form>
-      </div>
-    </div>
-  )
-}
+import ProductCard from '../../components/shop/ProductCard'
+import { useShop } from '../../context/ShopContext'
+import { isOnSale, discountPercent } from '../../models/Product'
+import { WHATSAPP_NUMBER, INSTAGRAM_DM_URL } from '../../utils/instagram'
+import toast from 'react-hot-toast'
 
 export default function ProductDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { addToCart, isInWishlist, toggleWishlist, setIsCartOpen, openCustomStudio } = useShop()
+
   const [product, setProduct] = useState(null)
+  const [related, setRelated] = useState([])
   const [loading, setLoading] = useState(true)
-  const [imgIdx, setImgIdx] = useState(0)
-  const [wishlisted, setWishlisted] = useState(false)
-  const [orderChannel, setOrderChannel] = useState(null)
+  const [selectedImageIdx, setSelectedImageIdx] = useState(0)
+  const [selectedColor, setSelectedColor] = useState('')
+  const [quantity, setQuantity] = useState(1)
+  const [activeTab, setActiveTab] = useState('materials')
 
   useEffect(() => {
-    productController.getProduct(id)
-      .then(setProduct)
-      .catch(() => navigate('/shop'))
-      .finally(() => setLoading(false))
+    let isMounted = true
+    setLoading(true)
+
+    productController
+      .getProductById(id)
+      .then((data) => {
+        if (!isMounted) return
+        setProduct(data)
+        if (data?.color_options?.length) {
+          setSelectedColor(data.color_options[0])
+        }
+        // Load related items
+        return productController.getAllProducts({ category: data.category })
+      })
+      .then((all) => {
+        if (!isMounted) return
+        if (Array.isArray(all)) {
+          setRelated(all.filter((p) => p.id !== id).slice(0, 4))
+        }
+      })
+      .catch((err) => {
+        console.error('Error loading product:', err)
+      })
+      .finally(() => {
+        if (isMounted) setLoading(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
   }, [id])
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-10 h-10 border-4 border-yarn-blush border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
-  if (!product) return null
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-canvas py-16 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-terracotta-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
 
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-canvas py-20 text-center px-4">
+        <div className="max-w-md mx-auto bg-white p-8 rounded-3xl border border-canvas-border">
+          <p className="font-editorial text-2xl font-bold text-ink">Item Not Found</p>
+          <p className="text-xs text-ink-muted mt-2">
+            This item may be sold out or currently unavailable.
+          </p>
+          <Link to="/shop" className="btn-primary mt-6 text-xs px-6 py-3">
+            Back to Shop
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const images = product.images?.length > 0 ? product.images : ['/images/crochet-main.jpg']
+  const currentImg = images[selectedImageIdx] || images[0]
   const onSale = isOnSale(product)
   const discount = discountPercent(product)
-  const outOfStock = !product.stock_qty || product.stock_qty <= 0
-  const images = product.images?.length ? product.images : [null]
-  const catLabel = PRODUCT_CATEGORIES.find(c => c.value === product.category)?.label || product.category
+  const isSaved = isInWishlist(product.id)
+  const colors = product.color_options || []
 
-  const share = () => {
+  const handleAddToCart = () => {
+    addToCart(product, {
+      quantity,
+      selectedColor: selectedColor || colors[0] || '',
+    })
+    setIsCartOpen(true)
+  }
+
+  const handleWhatsAppOrder = () => {
+    const text = encodeURIComponent(
+      `Hi! I would like to order the "${product.name}" (₹${product.price})\nQuantity: ${quantity}\nColor: ${selectedColor || 'Standard'}\nCould you confirm dispatch availability?`
+    )
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${text}`, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleInstagramOrder = async () => {
+    const text = `Hi! I would like to order the "${product.name}" (₹${product.price})\nQuantity: ${quantity}\nColor: ${selectedColor || 'Standard'}`
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success('Details copied! Opening Instagram DM...')
+    } catch {
+      toast.success('Opening Instagram DM...')
+    }
+    window.open(INSTAGRAM_DM_URL, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleShare = async () => {
     if (navigator.share) {
-      navigator.share({ title: product.name, url: window.location.href })
+      try {
+        await navigator.share({
+          title: product.name,
+          text: `Check out this handmade crochet piece from TheCozzyLoops: ${product.name}`,
+          url: window.location.href,
+        })
+      } catch {
+        // user cancelled
+      }
     } else {
-      navigator.clipboard.writeText(window.location.href)
+      try {
+        await navigator.clipboard.writeText(window.location.href)
+        toast.success('Product link copied to clipboard!')
+      } catch {
+        toast.error('Could not copy link')
+      }
     }
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-400 mb-8">
-        <Link to="/" className="hover:text-yarn-blush transition-colors">Home</Link>
-        <span>/</span>
-        <Link to="/shop" className="hover:text-yarn-blush transition-colors">Shop</Link>
-        <span>/</span>
-        <span className="text-yarn-dark font-medium line-clamp-1">{product.name}</span>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-12">
-        {/* Images */}
-        <div className="space-y-4">
-          <div className="relative aspect-square bg-blush-50 rounded-3xl overflow-hidden shadow-lg">
-            {images[imgIdx] ? (
-              <img src={images[imgIdx]} alt={product.name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blush-100 to-blush-200">
-                <div className="text-center">
-                  <div className="text-8xl mb-3">🧶</div>
-                  <p className="text-blush-400 font-medium">No image available</p>
-                </div>
-              </div>
-            )}
-
-            {images.length > 1 && (
-              <>
-                <button onClick={() => setImgIdx(i => (i - 1 + images.length) % images.length)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow hover:bg-white transition-colors">
-                  <MdChevronLeft size={20} />
-                </button>
-                <button onClick={() => setImgIdx(i => (i + 1) % images.length)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center shadow hover:bg-white transition-colors">
-                  <MdChevronRight size={20} />
-                </button>
-              </>
-            )}
-
-            {onSale && (
-              <div className="absolute top-4 left-4 bg-red-500 text-white font-bold px-3 py-1.5 rounded-full">
-                -{discount}% OFF
-              </div>
-            )}
+    <div className="bg-canvas min-h-screen py-10 sm:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center justify-between text-xs text-ink-muted mb-8 font-mono">
+          <div className="flex items-center gap-2">
+            <Link to="/" className="hover:text-ink">Home</Link>
+            <span>/</span>
+            <Link to="/shop" className="hover:text-ink">Shop</Link>
+            <span>/</span>
+            <span className="text-ink truncate max-w-[200px]">{product.name}</span>
           </div>
 
-          {/* Thumbnails */}
-          {images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-2">
-              {images.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setImgIdx(i)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
-                    i === imgIdx ? 'border-yarn-blush shadow-md' : 'border-transparent opacity-60 hover:opacity-100'
-                  }`}
-                >
-                  {img ? <img src={img} alt="" className="w-full h-full object-cover" /> : 
-                    <div className="w-full h-full bg-blush-100 flex items-center justify-center text-2xl">🧶</div>}
-                </button>
-              ))}
-            </div>
-          )}
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1.5 hover:text-ink transition-colors font-sans text-xs"
+          >
+            <ArrowLeft size={14} />
+            <span>Back</span>
+          </button>
         </div>
 
-        {/* Info */}
-        <div className="flex flex-col">
-          <div className="flex items-start justify-between gap-4 mb-3">
-            <div>
-              <span className="text-xs text-yarn-blush font-medium uppercase tracking-widest">{catLabel}</span>
-              <h1 className="font-display text-3xl md:text-4xl text-yarn-dark mt-1 leading-tight">{product.name}</h1>
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setWishlisted(w => !w)}
-                aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-                className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
-                  wishlisted ? 'bg-red-50 border-red-200 text-red-500' : 'border-blush-200 text-gray-500 hover:border-red-200 hover:text-red-500'
-                }`}
-              >
-                {wishlisted ? <FaHeart size={18} /> : <FaRegHeart size={18} />}
-              </button>
-              <button onClick={share}
-                className="w-10 h-10 rounded-full border border-blush-200 text-gray-400 hover:border-yarn-blush hover:text-yarn-blush flex items-center justify-center transition-all">
-                <FaShare size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* Price */}
-          <div className="flex items-baseline gap-3 mb-6">
-            <span className="font-display text-4xl font-bold text-yarn-blush">₹{product.price.toLocaleString()}</span>
-            {onSale && <span className="text-gray-400 line-through text-xl">₹{product.compare_price?.toLocaleString()}</span>}
-          </div>
-
-          {/* Status */}
-          <div className="mb-6">
-            {!outOfStock ? (
-              <span className="inline-flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1.5 rounded-full text-sm font-medium">
-                <span className="w-2 h-2 bg-green-500 rounded-full" /> In Stock ({product.stock_qty} available)
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 text-red-500 bg-red-50 px-3 py-1.5 rounded-full text-sm font-medium">
-                <span className="w-2 h-2 bg-red-400 rounded-full" /> Sold Out
-              </span>
-            )}
-          </div>
-
-          {/* Description */}
-          {product.description && (
-            <div className="mb-6">
-              <h3 className="font-display font-semibold text-yarn-dark mb-2">Description</h3>
-              <p className="text-gray-600 leading-relaxed">{product.description}</p>
-            </div>
-          )}
-
-          {/* Details grid */}
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            {product.yarn_type && (
-              <div className="bg-blush-50 rounded-xl p-3">
-                <p className="text-xs text-gray-400 mb-0.5">Yarn Type</p>
-                <p className="font-medium text-yarn-dark text-sm">🧵 {product.yarn_type}</p>
-              </div>
-            )}
-            {product.color_options?.length > 0 && (
-              <div className="bg-blush-50 rounded-xl p-3">
-                <p className="text-xs text-gray-400 mb-0.5">Colors</p>
-                <p className="font-medium text-yarn-dark text-sm">🎨 {product.color_options.join(', ')}</p>
-              </div>
-            )}
-            {product.care_instructions && (
-              <div className="bg-blush-50 rounded-xl p-3 col-span-2">
-                <p className="text-xs text-gray-400 mb-0.5">Care Instructions</p>
-                <p className="font-medium text-yarn-dark text-sm">💧 {product.care_instructions}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Tags */}
-          {product.tags?.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-8">
-              {product.tags.map(tag => (
-                <span key={tag} className="bg-blush-100 text-yarn-blush text-xs px-3 py-1.5 rounded-full">#{tag}</span>
-              ))}
-            </div>
-          )}
-
-          {/* CTA */}
-          <div className="space-y-3 mt-auto">
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => !outOfStock && setOrderChannel('instagram')}
-                disabled={outOfStock}
-                className="btn-primary flex items-center justify-center gap-2 py-4 text-base disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
-              >
-                <FaInstagram size={18} />
-                Instagram
-              </button>
-
-              {outOfStock ? (
-                <button
-                  type="button"
-                  disabled
-                  className="bg-green-500 text-white font-medium px-4 py-4 rounded-xl flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
-                >
-                  <FaWhatsapp size={18} />
-                  WhatsApp
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setOrderChannel('whatsapp')}
-                  className="bg-green-500 hover:bg-green-600 text-white font-medium px-4 py-4 rounded-xl flex items-center justify-center gap-2 transition-all"
-                >
-                  <FaWhatsapp size={18} />
-                  WhatsApp
-                </button>
+        {/* Primary Product Layout */}
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-14">
+          {/* Visual Column */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="relative aspect-[4/5] bg-white rounded-3xl overflow-hidden border border-canvas-border shadow-lifted">
+              <img
+                src={currentImg}
+                alt={product.name}
+                className="w-full h-full object-cover"
+              />
+              {onSale && (
+                <div className="absolute top-4 left-4 bg-ink text-white font-mono text-xs uppercase tracking-wider px-3 py-1 rounded-md font-semibold">
+                  SAVE {discount}%
+                </div>
+              )}
+              {product.stock_qty === 0 && (
+                <div className="absolute top-4 left-4 bg-stone-600 text-white font-mono text-xs uppercase tracking-wider px-3 py-1 rounded-md font-semibold">
+                  Made to Order
+                </div>
               )}
             </div>
 
-            {product.is_custom && (
-              <div className="flex items-center gap-2 bg-yarn-gold/10 border border-yarn-gold/30 rounded-xl p-3">
-                <FaStar size={16} className="text-yarn-gold flex-shrink-0" />
-                <p className="text-sm text-yarn-dark">This item can be customized! Mention your preferences in your message.</p>
+            {/* Gallery Thumbnails */}
+            {images.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-1">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImageIdx(idx)}
+                    className={`w-20 h-24 rounded-xl overflow-hidden border-2 bg-white transition-all shrink-0 ${
+                      selectedImageIdx === idx
+                        ? 'border-terracotta-600 shadow-subtle'
+                        : 'border-canvas-border opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
               </div>
             )}
 
-            <Link to="/shop" className="w-full btn-outline flex items-center justify-center gap-2 py-3">
-              <MdArrowBack size={16} /> Continue Shopping
-            </Link>
+            {/* Quality Stamp */}
+            <div className="p-5 rounded-2xl bg-white border border-canvas-border flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-terracotta-50 flex items-center justify-center text-terracotta-700 shrink-0">
+                <Flower2 size={20} />
+              </div>
+              <div className="text-xs space-y-1">
+                <div className="font-semibold text-ink">Handmade in Small Batches</div>
+                <p className="text-ink-muted leading-relaxed">
+                  Every stitch is carefully crocheted by hand to keep its shape. 
+                  Packed nicely in eco-friendly gift paper with a handwritten note card.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Details Column */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+            <div>
+              {/* Category & Status */}
+              <div className="flex items-center justify-between text-xs font-mono uppercase tracking-editorial text-terracotta-700">
+                <span>{product.category?.replace(/_/g, ' ')}</span>
+                <span className="text-ink-subtle">
+                  {product.stock_qty > 0 ? `${product.stock_qty} in stock` : 'Made to order: 3-5 days'}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h1 className="mt-2 font-editorial text-3xl sm:text-4xl font-bold text-ink leading-tight">
+                {product.name}
+              </h1>
+
+              {/* Price */}
+              <div className="mt-4 flex items-baseline gap-3">
+                <span className="font-mono text-3xl font-bold text-ink">
+                  ₹{Number(product.price).toLocaleString()}
+                </span>
+                {onSale && (
+                  <span className="font-mono text-base text-ink-subtle line-through">
+                    ₹{Number(product.compare_price).toLocaleString()}
+                  </span>
+                )}
+                <span className="text-xs text-ink-muted">· Taxes Included</span>
+              </div>
+
+              {/* Description */}
+              <p className="mt-4 text-sm text-ink-muted leading-relaxed font-light">
+                {product.description}
+              </p>
+
+              {/* Color Swatch Options */}
+              {colors.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-canvas-border">
+                  <div className="flex items-center justify-between text-xs font-semibold text-ink uppercase tracking-wider mb-2.5">
+                    <span>Choose Color:</span>
+                    <span className="font-mono text-terracotta-700 font-normal">
+                      {selectedColor || colors[0]}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {colors.map((c) => {
+                      const active = (selectedColor || colors[0]) === c
+                      return (
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() => setSelectedColor(c)}
+                          className={`text-xs px-3.5 py-2 rounded-xl border transition-all ${
+                            active
+                              ? 'border-terracotta-600 bg-terracotta-50 text-terracotta-900 font-semibold shadow-xs'
+                              : 'border-canvas-border bg-white text-ink-muted hover:border-ink/20'
+                          }`}
+                        >
+                          {c}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Quantity Counter */}
+              <div className="mt-6 flex items-center gap-4">
+                <span className="text-xs font-semibold text-ink uppercase tracking-wider">
+                  Quantity:
+                </span>
+                <div className="flex items-center border border-canvas-border rounded-xl bg-white shadow-xs">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-2 hover:bg-canvas-subtle rounded-l-xl text-ink-muted transition-colors"
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus size={14} />
+                  </button>
+                  <span className="px-3.5 text-sm font-mono font-medium text-ink">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="p-2 hover:bg-canvas-subtle rounded-r-xl text-ink-muted transition-colors"
+                    aria-label="Increase quantity"
+                  >
+                    <Plus size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-8 space-y-3">
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={handleAddToCart}
+                    className="flex-1 btn-primary py-3.5 text-sm shadow-subtle"
+                  >
+                    <ShoppingBag size={17} />
+                    <span>Add to Bag</span>
+                  </button>
+
+                  <button
+                    onClick={() => toggleWishlist(product.id)}
+                    className={`p-3.5 rounded-full border transition-all ${
+                      isSaved
+                        ? 'border-terracotta-600 bg-terracotta-50 text-terracotta-600'
+                        : 'border-canvas-border bg-white text-ink-muted hover:text-ink hover:border-ink/30'
+                    }`}
+                    aria-label="Save to favorites"
+                    title="Wishlist"
+                  >
+                    <Heart size={18} className={isSaved ? 'fill-terracotta-600' : ''} />
+                  </button>
+
+                  <button
+                    onClick={handleShare}
+                    className="p-3.5 rounded-full border border-canvas-border bg-white text-ink-muted hover:text-ink hover:border-ink/30 transition-all"
+                    aria-label="Share product"
+                    title="Share"
+                  >
+                    <Share2 size={18} />
+                  </button>
+                </div>
+
+                {/* Instant Order Channels */}
+                <div className="grid grid-cols-2 gap-2.5 pt-1">
+                  <button
+                    onClick={handleWhatsAppOrder}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white font-medium text-xs py-3 px-3 rounded-xl transition-all shadow-xs"
+                  >
+                    <FaWhatsapp size={15} />
+                    <span>Order on WhatsApp</span>
+                  </button>
+
+                  <button
+                    onClick={handleInstagramOrder}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 text-white font-medium text-xs py-3 px-3 rounded-xl transition-all shadow-xs"
+                  >
+                    <FaInstagram size={15} />
+                    <span>Order on Instagram</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Custom order trigger */}
+              <div className="mt-5 p-3.5 rounded-2xl bg-canvas-subtle border border-canvas-border flex items-center justify-between text-xs">
+                <span className="text-ink-muted">Want different colors or ribbon styles?</span>
+                <button
+                  onClick={() => openCustomStudio({ name: product.name, category: product.category })}
+                  className="font-semibold text-terracotta-700 hover:text-terracotta-800 flex items-center gap-1"
+                >
+                  <Wand2 size={13} />
+                  <span>Customize</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Tabbed Specs */}
+            <div className="pt-6 border-t border-canvas-border">
+              <div className="flex gap-4 border-b border-canvas-border text-xs uppercase tracking-wider font-semibold">
+                <button
+                  onClick={() => setActiveTab('materials')}
+                  className={`pb-2 transition-all relative ${
+                    activeTab === 'materials'
+                      ? 'text-ink border-b-2 border-ink'
+                      : 'text-ink-subtle hover:text-ink'
+                  }`}
+                >
+                  Yarn & Care
+                </button>
+                <button
+                  onClick={() => setActiveTab('gifting')}
+                  className={`pb-2 transition-all relative ${
+                    activeTab === 'gifting'
+                      ? 'text-ink border-b-2 border-ink'
+                      : 'text-ink-subtle hover:text-ink'
+                  }`}
+                >
+                  Gift Packaging
+                </button>
+                <button
+                  onClick={() => setActiveTab('shipping')}
+                  className={`pb-2 transition-all relative ${
+                    activeTab === 'shipping'
+                      ? 'text-ink border-b-2 border-ink'
+                      : 'text-ink-subtle hover:text-ink'
+                  }`}
+                >
+                  Shipping
+                </button>
+              </div>
+
+              <div className="py-4 text-xs text-ink-muted leading-relaxed">
+                {activeTab === 'materials' && (
+                  <div className="space-y-2">
+                    <p><strong className="text-ink">Yarn:</strong> {product.yarn_type || '100% Soft Milk Cotton Yarn'}</p>
+                    <p><strong className="text-ink">Care:</strong> {product.care_instructions || 'Spot clean with cold water and mild soap. Gently reshape with your hands and let it air dry flat.'}</p>
+                    <p><strong className="text-ink">Gentle:</strong> Very soft and safe for sensitive skin.</p>
+                  </div>
+                )}
+                {activeTab === 'gifting' && (
+                  <div className="space-y-2">
+                    <p>Every item arrives nicely wrapped in recyclable paper packaging with cotton string.</p>
+                    <p>Includes a free handwritten gift note card. You can write your message when viewing your bag!</p>
+                  </div>
+                )}
+                {activeTab === 'shipping' && (
+                  <div className="space-y-2">
+                    <p>Ready items are shipped within 24 to 48 hours across India with a tracking link.</p>
+                    <p>Custom colors and personalized orders take 3 to 5 days to make before shipping.</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {orderChannel && (
-        <ProductOrderModal product={product} channel={orderChannel} onClose={() => setOrderChannel(null)} />
-      )}
+        {/* Related Items */}
+        {related.length > 0 && (
+          <div className="mt-20 pt-12 border-t border-canvas-border">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700">
+                  More Cute Items
+                </span>
+                <h2 className="mt-1 font-editorial text-2xl sm:text-3xl font-bold text-ink">
+                  You Might Also Like
+                </h2>
+              </div>
+              <Link
+                to="/shop"
+                className="text-xs font-semibold uppercase tracking-wider text-ink hover:text-terracotta-700"
+              >
+                See All
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+              {related.map((item) => (
+                <ProductCard key={item.id} product={item} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

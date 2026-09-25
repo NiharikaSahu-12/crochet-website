@@ -1,7 +1,7 @@
-export const INSTAGRAM_HANDLE = import.meta.env.VITE_INSTAGRAM_HANDLE
+export const INSTAGRAM_HANDLE = import.meta.env.VITE_INSTAGRAM_HANDLE || 'thecozzyloops'
 export const INSTAGRAM_DM_URL = `https://ig.me/m/${INSTAGRAM_HANDLE}`
-export const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER
-export const EMAIL = import.meta.env.VITE_EMAIL
+export const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '919876543210'
+export const EMAIL = import.meta.env.VITE_EMAIL || 'thecozzyloops@gmail.com'
 
 export const openInstagramDM = () => {
   window.open(INSTAGRAM_DM_URL, '_blank', 'noopener,noreferrer')

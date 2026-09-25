@@ -1,0 +1,7 @@
+{
+  "name": "TheCozzyLoops – Handmade Crochet",
+  "description": "Warm Loops, Cozy Hearts – Handmade crochet products with love",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,5 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Edit2, FolderPlus, Plus, Save, Search, Trash2, X } from 'lucide-react'
+import { 
+  FolderTree, 
+  Plus, 
+  Save, 
+  Search, 
+  Trash2, 
+  X, 
+  Edit2, 
+  Eye, 
+  EyeOff, 
+  Layers,
+  Sparkles,
+  CheckCircle2
+} from 'lucide-react'
 import categoryController from '../../controllers/categoryController'
 import { useCategories } from '../../hooks/useCategories'
 import toast from 'react-hot-toast'
@@ -23,8 +36,8 @@ export default function AdminCategories() {
     const term = search.trim().toLowerCase()
     if (!term) return categories
     return categories.filter((category) =>
-      [category.label, category.value, category.description].some((value) =>
-        value?.toLowerCase().includes(term)
+      [category.label, category.value, category.description].some((val) =>
+        val?.toLowerCase().includes(term)
       )
     )
   }, [categories, search])
@@ -50,6 +63,7 @@ export default function AdminCategories() {
       sort_order: category.sort_order || '',
       is_active: category.is_active,
     })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleSubmit = async (event) => {
@@ -58,29 +72,31 @@ export default function AdminCategories() {
     try {
       if (editing) {
         await categoryController.updateCategory(editing, form)
-        toast.success('Category updated')
+        toast.success('Category updated successfully')
       } else {
         await categoryController.createCategory(form)
-        toast.success('Category added')
+        toast.success('New category added to catalog')
       }
       resetForm()
       refetch()
     } catch (err) {
-      toast.error(err.message)
+      toast.error(err.message || 'Failed to save category')
     } finally {
       setSaving(false)
     }
   }
 
   const handleDelete = async (category) => {
-    if (!confirm(`Delete "${category.label}"? Existing products using this category will keep their category value.`)) return
+    if (!window.confirm(`Delete category "${category.label}"? Existing products using this tag will keep their assignment.`)) {
+      return
+    }
     try {
       await categoryController.deleteCategory(category.id)
       toast.success('Category deleted')
       if (editing === category.id) resetForm()
       refetch()
     } catch (err) {
-      toast.error(err.message)
+      toast.error(err.message || 'Failed to delete category')
     }
   }
 
@@ -90,195 +106,284 @@ export default function AdminCategories() {
         ...category,
         is_active: !category.is_active,
       })
-      toast.success(category.is_active ? 'Category hidden' : 'Category activated')
+      toast.success(category.is_active ? 'Category hidden from filters' : 'Category made visible')
       refetch()
     } catch (err) {
-      toast.error(err.message)
+      toast.error(err.message || 'Failed to toggle category')
     }
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+      {/* Header Banner */}
+      <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-yarn-blush">Catalog setup</p>
-          <h2 className="mt-2 font-display text-3xl text-yarn-dark">Categories</h2>
-          <p className="mt-1 text-sm text-gray-500">Add and manage product categories used in product forms and filters.</p>
+          <div className="flex items-center gap-2">
+            <h1 className="font-editorial text-2xl lg:text-3xl font-semibold text-ink">Catalog Categories</h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-canvas-subtle border border-canvas-border text-xs font-mono font-medium text-ink-muted">
+              {categories.length} total
+            </span>
+          </div>
+          <p className="text-xs text-ink-subtle mt-1">
+            Organize products into collections like Bouquets, Potted Blooms, Bookmarks, and Accessories.
+          </p>
         </div>
-        <div className="rounded-2xl bg-gradient-to-br from-yarn-blush to-yarn-gold px-5 py-4 text-white shadow-lg shadow-blush-200/60">
-          <p className="text-3xl font-display font-semibold">{categories.length}</p>
-          <p className="text-sm text-white/85">total categories</p>
+
+        <div className="flex items-center gap-3">
+          <div className="px-3.5 py-1.5 rounded-xl bg-canvas-subtle border border-canvas-border text-xs text-ink-muted flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>{categories.filter(c => c.is_active).length} Active</span>
+          </div>
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[380px_1fr]">
-        <form onSubmit={handleSubmit} className="rounded-[24px] border border-blush-100 bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-3 border-b border-blush-100 pb-4">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blush-50 text-yarn-blush">
-              <FolderPlus size={21} aria-hidden="true" />
-            </div>
-            <div>
-              <h3 className="font-display text-xl text-yarn-dark">{editing ? 'Edit category' : 'Add category'}</h3>
-              <p className="text-xs text-gray-500">Create clean category names for products.</p>
-            </div>
-          </div>
+      {/* Main Grid: Form on Left, List on Right */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Category Form (5 cols on lg) */}
+        <div className="lg:col-span-5">
+          <form 
+            onSubmit={handleSubmit} 
+            className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5 sticky top-24"
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-canvas-border">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-terracotta-50 text-terracotta-600 flex items-center justify-center">
+                  <FolderTree size={17} />
+                </div>
+                <div>
+                  <h3 className="font-editorial text-lg font-semibold text-ink">
+                    {editing ? 'Edit Collection' : 'Create Collection'}
+                  </h3>
+                  <p className="text-[11px] text-ink-subtle">
+                    {editing ? 'Updating existing category definition' : 'Add new classification for products'}
+                  </p>
+                </div>
+              </div>
 
-          <div className="mt-5 space-y-4">
-            <label className="block text-sm font-semibold text-yarn-dark">
-              Category name *
-              <input
-                value={form.label}
-                onChange={(e) => set('label', e.target.value)}
-                className="input-field mt-2"
-                placeholder="Flower Bouquets"
-                required
-              />
-            </label>
-
-            <label className="block text-sm font-semibold text-yarn-dark">
-              Category value *
-              <input
-                value={form.value}
-                onChange={(e) => set('value', categoryController.slugify(e.target.value))}
-                className="input-field mt-2"
-                placeholder="flower_bouquets"
-                required
-              />
-            </label>
-
-            <label className="block text-sm font-semibold text-yarn-dark">
-              Description
-              <textarea
-                value={form.description}
-                onChange={(e) => set('description', e.target.value)}
-                className="input-field mt-2 min-h-24 resize-y"
-                placeholder="Short note for this category..."
-              />
-            </label>
-
-            <div className="grid grid-cols-[1fr_auto] gap-4">
-              <label className="block text-sm font-semibold text-yarn-dark">
-                Sort order
-                <input
-                  type="number"
-                  value={form.sort_order}
-                  onChange={(e) => set('sort_order', e.target.value)}
-                  className="input-field mt-2"
-                  placeholder="10"
-                />
-              </label>
-              <label className="flex min-w-28 cursor-pointer flex-col justify-end text-sm font-semibold text-yarn-dark">
-                Active
+              {editing && (
                 <button
                   type="button"
-                  onClick={() => set('is_active', !form.is_active)}
-                  className={`mt-2 h-12 rounded-2xl px-4 text-sm font-semibold transition ${
-                    form.is_active ? 'bg-yarn-blush text-white' : 'bg-gray-100 text-gray-500'
-                  }`}
+                  onClick={resetForm}
+                  className="text-xs text-ink-subtle hover:text-ink flex items-center gap-1"
                 >
-                  {form.is_active ? 'Yes' : 'No'}
+                  <X size={13} /> Reset
                 </button>
-              </label>
-            </div>
-          </div>
-
-          <div className="mt-6 flex gap-3">
-            <button type="submit" disabled={saving} className="btn-primary inline-flex flex-1 items-center justify-center gap-2 disabled:opacity-60">
-              {saving ? (
-                <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-              ) : editing ? (
-                <Save size={16} aria-hidden="true" />
-              ) : (
-                <Plus size={16} aria-hidden="true" />
               )}
-              {editing ? 'Save changes' : 'Add category'}
-            </button>
-            {editing && (
-              <button type="button" onClick={resetForm} className="btn-outline inline-flex items-center justify-center gap-2 px-5">
-                <X size={16} aria-hidden="true" />
-                Cancel
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1.5">
+                  Collection Name <span className="text-terracotta-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.label}
+                  onChange={(e) => set('label', e.target.value)}
+                  className="input-field text-xs"
+                  placeholder="e.g. Flower Bouquets"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1.5">
+                  URL Slug Key <span className="text-terracotta-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={form.value}
+                  onChange={(e) => set('value', categoryController.slugify(e.target.value))}
+                  className="input-field text-xs font-mono"
+                  placeholder="flower_bouquets"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1.5">
+                  Description
+                </label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => set('description', e.target.value)}
+                  rows={3}
+                  className="input-field text-xs resize-y"
+                  placeholder="Brief note or shopper guide for this collection..."
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1.5">
+                    Sort Priority
+                  </label>
+                  <input
+                    type="number"
+                    value={form.sort_order}
+                    onChange={(e) => set('sort_order', e.target.value)}
+                    className="input-field text-xs font-mono"
+                    placeholder="10"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-1.5">
+                    Visibility
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => set('is_active', !form.is_active)}
+                    className={`w-full py-2.5 px-3 rounded-xl border text-xs font-medium transition-colors flex items-center justify-center gap-1.5 ${
+                      form.is_active 
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                        : 'bg-zinc-100 text-zinc-600 border-zinc-200'
+                    }`}
+                  >
+                    {form.is_active ? <Eye size={14} /> : <EyeOff size={14} />}
+                    <span>{form.is_active ? 'Active' : 'Hidden'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 flex gap-2">
+              <button
+                type="submit"
+                disabled={saving}
+                className="flex-1 btn-primary py-2.5 text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 shadow-subtle disabled:opacity-50"
+              >
+                {saving ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : editing ? (
+                  <>
+                    <Save size={14} />
+                    <span>Save Changes</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus size={14} />
+                    <span>Add Category</span>
+                  </>
+                )}
+              </button>
+
+              {editing && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="btn-outline px-4 py-2.5 text-xs"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+
+        {/* Category List (7 cols on lg) */}
+        <div className="lg:col-span-7 space-y-4">
+          {/* Search Bar */}
+          <div className="bg-white p-3.5 rounded-2xl border border-canvas-border shadow-xs flex items-center gap-3">
+            <Search size={16} className="text-ink-subtle ml-1" />
+            <input
+              type="text"
+              placeholder="Search collections by label or slug..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-transparent text-xs text-ink placeholder:text-ink-subtle outline-none"
+            />
+            {search && (
+              <button 
+                type="button" 
+                onClick={() => setSearch('')}
+                className="text-ink-subtle hover:text-ink p-1"
+              >
+                <X size={14} />
               </button>
             )}
           </div>
-        </form>
 
-        <div className="rounded-[24px] border border-blush-100 bg-white shadow-sm">
-          <div className="flex flex-col gap-3 border-b border-blush-100 p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="font-display text-xl text-yarn-dark">Category list</h3>
-              <p className="text-sm text-gray-500">Edit names, sort order, and active state.</p>
-            </div>
-            <div className="relative">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="input-field py-2.5 pl-10 text-sm"
-                placeholder="Search categories..."
-              />
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="space-y-3 p-5">
-              {[1, 2, 3, 4].map((item) => (
-                <div key={item} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
-              ))}
-            </div>
-          ) : filteredCategories.length === 0 ? (
-            <div className="p-10 text-center">
-              <p className="font-display text-xl text-yarn-dark">No categories found</p>
-              <p className="mt-1 text-sm text-gray-500">Try a different search or add a category.</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {filteredCategories.map((category) => (
-                <div key={category.id} className="grid gap-4 p-5 transition hover:bg-blush-50/50 md:grid-cols-[1fr_auto] md:items-center">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h4 className="font-display text-lg text-yarn-dark">{category.label}</h4>
-                      <span className="rounded-full bg-blush-50 px-2.5 py-1 text-xs font-medium text-yarn-blush">
-                        {category.value}
-                      </span>
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                        category.is_active ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        {category.is_active ? 'Active' : 'Hidden'}
-                      </span>
+          {/* List Card */}
+          <div className="bg-white rounded-2xl border border-canvas-border shadow-xs overflow-hidden">
+            {loading ? (
+              <div className="p-6 space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-16 bg-canvas-subtle rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : filteredCategories.length === 0 ? (
+              <div className="p-12 text-center">
+                <FolderTree size={24} className="mx-auto text-ink-subtle mb-2" />
+                <p className="font-editorial text-lg text-ink font-semibold">No categories found</p>
+                <p className="text-xs text-ink-subtle mt-1">
+                  {search ? 'Try adjusting your search query.' : 'Use the form to create your first collection.'}
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-canvas-border">
+                {filteredCategories.map((category) => (
+                  <div 
+                    key={category.id}
+                    className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-canvas-subtle/40 transition-colors group"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h4 className="font-medium text-sm text-ink">{category.label}</h4>
+                        <span className="px-2 py-0.5 rounded-md bg-canvas-subtle border border-canvas-border text-[11px] font-mono text-ink-muted">
+                          {category.value}
+                        </span>
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-medium border ${
+                          category.is_active 
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                            : 'bg-zinc-100 text-zinc-600 border-zinc-200'
+                        }`}>
+                          {category.is_active ? 'Active' : 'Hidden'}
+                        </span>
+                      </div>
+                      {category.description && (
+                        <p className="text-xs text-ink-subtle mt-1 line-clamp-2">
+                          {category.description}
+                        </p>
+                      )}
+                      <div className="mt-2 flex items-center gap-3 text-[11px] text-ink-subtle">
+                        <span>Sort Order: <strong className="font-mono text-ink">{category.sort_order || 0}</strong></span>
+                      </div>
                     </div>
-                    <p className="mt-1 text-sm text-gray-500">{category.description || 'No description added.'}</p>
-                    <p className="mt-2 text-xs text-gray-400">Sort order: {category.sort_order || 0}</p>
-                  </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => toggleActive(category)}
-                      className="rounded-xl bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-600 transition hover:bg-blush-100 hover:text-yarn-blush"
-                    >
-                      {category.is_active ? 'Hide' : 'Show'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => startEdit(category)}
-                      className="rounded-xl bg-blue-50 p-2.5 text-blue-500 transition hover:bg-blue-100"
-                      aria-label={`Edit ${category.label}`}
-                    >
-                      <Edit2 size={16} aria-hidden="true" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(category)}
-                      className="rounded-xl bg-red-50 p-2.5 text-red-500 transition hover:bg-red-100"
-                      aria-label={`Delete ${category.label}`}
-                    >
-                      <Trash2 size={16} aria-hidden="true" />
-                    </button>
+                    <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                      <button
+                        type="button"
+                        onClick={() => toggleActive(category)}
+                        className="p-2 rounded-xl text-ink-subtle hover:text-ink hover:bg-canvas-subtle transition-colors"
+                        title={category.is_active ? 'Hide collection from store' : 'Activate collection in store'}
+                      >
+                        {category.is_active ? <Eye size={15} /> : <EyeOff size={15} />}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => startEdit(category)}
+                        className="p-2 rounded-xl text-ink-subtle hover:text-ink hover:bg-canvas-subtle transition-colors"
+                        title="Edit collection"
+                      >
+                        <Edit2 size={15} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(category)}
+                        className="p-2 rounded-xl text-ink-subtle hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                        title="Delete collection"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

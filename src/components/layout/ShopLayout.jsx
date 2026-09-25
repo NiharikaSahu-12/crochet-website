@@ -1,197 +1,361 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { FaBars, FaInstagram, FaHeart, FaEnvelope, FaWhatsapp } from 'react-icons/fa'
-import { MdClose } from 'react-icons/md'
-import { INSTAGRAM_HANDLE, INSTAGRAM_DM_URL, EMAIL, WHATSAPP_NUMBER, getWhatsAppOrderUrl } from '../../utils/instagram'
+import { Search, ShoppingBag, Heart, Menu, X, Wand2, Sparkles, ArrowRight, ShieldCheck, RefreshCw, Feather } from 'lucide-react'
+import { FaInstagram, FaWhatsapp } from 'react-icons/fa'
+import { useShop } from '../../context/ShopContext'
+import { INSTAGRAM_HANDLE, WHATSAPP_NUMBER, EMAIL } from '../../utils/instagram'
+import CartDrawer from '../shop/CartDrawer'
+import WishlistDrawer from '../shop/WishlistDrawer'
+import QuickLookModal from '../shop/QuickLookModal'
+import CustomStudioModal from '../shop/CustomStudioModal'
 
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
-  { to: '/shop', label: 'Shop' },
-  { to: '/about', label: 'About' },
-  { to: '/contact', label: 'Contact' },
+  { to: '/shop', label: 'Shop All' },
+  { to: '/custom-orders', label: 'Custom Orders' },
+  { to: '/about', label: 'About Us' },
+  { to: '/contact', label: 'Contact & Help' },
 ]
 
+function AnnouncementBar() {
+  return (
+    <div className="bg-ink text-white/90 text-[11px] font-mono tracking-editorial uppercase py-2.5 px-4 text-center border-b border-white/10 overflow-hidden">
+      <div className="flex items-center justify-center gap-3">
+        <span>100% Handcrafted with Hook</span>
+        <span className="text-terracotta-400">·</span>
+        <span className="hidden sm:inline">Complimentary Handwritten Card &amp; Wax Seal</span>
+        <span className="hidden sm:inline text-terracotta-400">·</span>
+        <span>Custom Colors &amp; Bouquets Available</span>
+      </div>
+    </div>
+  )
+}
+
 function Navbar() {
-  const [open, setOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const { cartCount, wishlist, setIsCartOpen, setIsWishlistOpen } = useShop()
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handler)
-    return () => window.removeEventListener('scroll', handler)
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => setOpen(false), [location])
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [location])
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled ? 'glass shadow-sm border-b border-blush-100' : 'bg-transparent'
+    <header className={`sticky top-0 z-40 transition-all duration-300 ${
+      scrolled 
+        ? 'glass-header border-b border-canvas-border shadow-xs' 
+        : 'bg-canvas/95 border-b border-canvas-border/60'
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="flex items-center justify-between h-20">
+          
+          {/* Brand Logo & Name */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-yarn-blush/30 group-hover:ring-yarn-blush transition-all duration-300">
-              <img src="/logo.jpeg" alt="TheCozzyLoops" className="w-full h-full object-cover"
+            <div className="w-9 h-9 rounded-full overflow-hidden border border-canvas-border group-hover:border-terracotta-500 transition-colors shadow-2xs">
+              <img 
+                src="/logo.jpeg" 
+                alt="TheCozzyLoops" 
+                className="w-full h-full object-cover"
                 onError={(e) => {
                   e.target.style.display = 'none'
                   e.target.nextSibling.style.display = 'flex'
                 }}
               />
-              <div className="w-full h-full bg-gradient-to-br from-yarn-pink to-yarn-blush items-center justify-center text-white font-display font-bold text-sm hidden">CL</div>
+              <div className="w-full h-full bg-terracotta-600 items-center justify-center text-white font-editorial font-bold text-sm hidden">
+                CL
+              </div>
             </div>
             <div>
-              <span className="font-display text-xl font-bold text-yarn-dark">
-                the<span className="text-yarn-blush">cozzyloops</span>
+              <span className="font-editorial text-2xl font-bold tracking-tight text-ink group-hover:text-terracotta-700 transition-colors">
+                TheCozzyLoops
               </span>
-              <p className="text-xs text-yarn-pink font-script leading-none hidden sm:block">Handmade Crochet</p>
             </div>
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map(({ to, label }) => (
-              <Link
-                key={to}
-                to={to}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  location.pathname === to
-                    ? 'bg-yarn-blush text-white shadow-sm'
-                    : 'text-yarn-dark hover:bg-blush-100 hover:text-yarn-blush'
-                }`}
-              >
-                {label}
-              </Link>
-            ))}
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center gap-8">
+            {NAV_LINKS.map(({ to, label }) => {
+              const active = location.pathname === to
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`text-sm tracking-wide transition-colors relative py-1.5 ${
+                    active 
+                      ? 'text-terracotta-700 font-semibold' 
+                      : 'text-ink-muted hover:text-ink font-normal'
+                  }`}
+                >
+                  {label}
+                  {active && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-terracotta-600 rounded-full" />
+                  )}
+                </Link>
+              )
+            })}
           </nav>
 
-          {/* Right icons */}
+          {/* Right Action Controls */}
           <div className="flex items-center gap-3">
-            <a
-              href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:flex items-center gap-2 btn-outline text-sm py-2 px-4"
-            >
-              <FaInstagram size={15} />
-              <span>Follow</span>
-            </a>
-
+            {/* Wishlist Button */}
             <button
-              onClick={() => setOpen(!open)}
-              className="md:hidden p-2 rounded-xl hover:bg-blush-100 text-yarn-dark transition-colors"
+              onClick={() => setIsWishlistOpen(true)}
+              className="p-2.5 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors relative"
+              aria-label="View saved items"
+              title="Saved Items"
             >
-              {open ? <MdClose size={22} /> : <FaBars size={22} />}
+              <Heart size={20} className={wishlist.length > 0 ? 'fill-terracotta-600 text-terracotta-600' : ''} />
+              {wishlist.length > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-terracotta-600 text-white font-mono text-[10px] flex items-center justify-center font-bold">
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
+
+            {/* Bag Button */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="inline-flex items-center gap-2 bg-ink hover:bg-ink-charcoal text-white px-4 py-2.5 rounded-full text-xs font-semibold transition-all shadow-xs"
+              aria-label="Open shopping bag"
+            >
+              <ShoppingBag size={15} />
+              <span>Bag</span>
+              <span className="font-mono bg-white/20 px-1.5 py-0.2 rounded-full text-[11px] ml-0.5">{cartCount}</span>
+            </button>
+
+            {/* Mobile Hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors ml-1"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
+
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <div className={`md:hidden transition-all duration-300 overflow-hidden ${open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-        <div className="glass border-t border-blush-100 px-4 py-4 space-y-1">
-          {NAV_LINKS.map(({ to, label }) => (
-            <Link
-              key={to}
-              to={to}
-              className={`block px-4 py-3 rounded-xl font-medium transition-colors ${
-                location.pathname === to ? 'bg-yarn-blush text-white' : 'text-yarn-dark hover:bg-blush-100'
-              }`}
+      {/* Mobile Menu Dropdown */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-canvas-border bg-white px-6 py-5 space-y-4 animate-fade-up">
+          <div className="space-y-2">
+            {NAV_LINKS.map(({ to, label }) => {
+              const active = location.pathname === to
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`block py-2 text-base transition-colors ${
+                    active ? 'text-terracotta-700 font-semibold' : 'text-ink-muted'
+                  }`}
+                >
+                  {label}
+                </Link>
+              )
+            })}
+          </div>
+
+          <div className="pt-3 border-t border-canvas-border flex flex-col gap-2.5">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false)
+                openCustomStudio()
+              }}
+              className="btn-primary w-full text-xs py-3"
             >
-              {label}
-            </Link>
-          ))}
-          <a
-            href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-3 text-yarn-blush font-medium"
-          >
-            <FaInstagram size={16} /> Follow on Instagram
-          </a>
+              <Wand2 size={15} />
+              <span>Make a Custom Order</span>
+            </button>
+
+            <div className="flex gap-2">
+              <a
+                href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 btn-outline text-xs py-2.5 flex items-center justify-center gap-1.5"
+              >
+                <FaInstagram size={14} />
+                <span>Instagram</span>
+              </a>
+
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366] hover:text-white rounded-full text-xs py-2.5 transition-colors font-medium"
+              >
+                <FaWhatsapp size={14} />
+                <span>WhatsApp</span>
+              </a>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </header>
   )
 }
 
-function Footer() {
+function ModernFooter() {
   return (
-    <footer style={{ background: '#1e0e06', color: '#e8cdb0', fontFamily: "'Lora', Georgia, serif", textAlign: 'left' }}>
-      <style>{`
-        .ft a { color: #e8cdb0; text-decoration: none; transition: color 0.2s; }
-        .ft a:hover { color: #f5b97a; }
-        .ft-label { font-size: 0.7rem; letter-spacing: 0.13em; text-transform: uppercase; color: #b07040; margin-bottom: 14px; text-align: left; }
-        .ft-link { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 5px 0; color: #cba882; text-align: left; }
-        .ft-link:hover { color: #f5b97a; }
-        .social-btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 999px; font-size: 0.85rem; font-family: 'Lora', serif; font-weight: 600; transition: all 0.2s; text-decoration: none; background: #3a1f0f; color: #f5b97a; border: 1.5px solid #6b3318; }
-        .social-btn:hover { color: #fff; }
-        .social-ig:hover { background: #e1306c; border-color: #e1306c; }
-        .social-wa:hover { background: #25A047; border-color: #25A047; }
-        .social-em:hover { background: #b85c2a; border-color: #b85c2a; }
-      `}</style>
-
-      <div className="ft max-w-[1200px] mx-auto px-5 sm:px-8 lg:px-16 pt-14 pb-10 text-left">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-
-          {/* Brand */}
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: '1.9rem', fontWeight: 900, color: '#fff' }}>
-              the<span style={{ color: '#e8854a' }}>cozzyloops</span>
+    <footer className="bg-[#121214] text-[#E4E4E7] border-t border-white/10 pt-20 pb-12">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-14 pb-16 border-b border-white/10">
+          
+          {/* Brand info */}
+          <div className="lg:col-span-5 space-y-5">
+            <div className="font-editorial text-3xl font-bold text-white tracking-tight">
+              TheCozzyLoops
             </div>
-            <div style={{ fontStyle: 'italic', color: '#c4956a', fontSize: '0.95rem', marginTop: 4 }}>
-              Warm loops, cozy hearts 🧶
-            </div>
-            <p style={{ fontSize: '0.88rem', lineHeight: 1.8, color: '#a07050', marginTop: '1rem', maxWidth: 240 }}>
-              Every piece is made by hand with love. No mass production — just slow, intentional craft.
+            <p className="text-xs font-mono tracking-editorial uppercase text-terracotta-400 font-medium">
+              Handmade Crochet Atelier · Odisha, India
             </p>
-            <div className="flex gap-2 mt-6 flex-wrap justify-start">
-              <a href={`https://instagram.com/${INSTAGRAM_HANDLE}`} target="_blank" rel="noopener noreferrer" className="social-btn social-ig">
-                <FaInstagram size={15} /> Instagram
+            <p className="text-sm text-zinc-400 leading-relaxed max-w-sm font-light">
+              Crafted with delicate loops, warm hearts, and ultra-soft milk cotton yarn. Every piece is an everlasting keepsake created to brighten your books, desks, and special gifts.
+            </p>
+
+            <div className="pt-2 flex items-center gap-3">
+              <a
+                href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white transition-colors"
+                aria-label="Instagram profile"
+              >
+                <FaInstagram size={17} />
               </a>
-              <a href={getWhatsAppOrderUrl(null, WHATSAPP_NUMBER)} target="_blank" rel="noopener noreferrer" className="social-btn social-wa">
-                <FaWhatsapp size={15} /> WhatsApp
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] transition-colors"
+                aria-label="WhatsApp direct chat"
+              >
+                <FaWhatsapp size={17} />
               </a>
-              <a href={`mailto:${EMAIL}`} className="social-btn social-em">
-                <FaEnvelope size={15} /> Email
+              <a
+                href={`mailto:${EMAIL}`}
+                className="text-xs text-zinc-400 hover:text-white transition-colors pl-2"
+              >
+                {EMAIL}
               </a>
             </div>
           </div>
 
-          {/* Pages */}
-          <div style={{ textAlign: 'left' }}>
-            <div className="ft-label">Pages</div>
-            {NAV_LINKS.map(({ to, label }) => (
-              <Link key={to} to={to} className="ft-link">
-                <span style={{ fontSize: 13 }}>→</span> {label}
-              </Link>
-            ))}
+          {/* Quick links */}
+          <div className="lg:col-span-2 space-y-4">
+            <h4 className="text-xs font-mono tracking-editorial uppercase text-white font-semibold">
+              Collections
+            </h4>
+            <ul className="space-y-2.5 text-sm text-zinc-400">
+              <li>
+                <Link to="/shop?category=bouquets" className="hover:text-white transition-colors">
+                  Bouquets &amp; Pots
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop?category=flowers" className="hover:text-white transition-colors">
+                  Floral Bookmarks
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop?category=keychains" className="hover:text-white transition-colors">
+                  Keychains &amp; Charms
+                </Link>
+              </li>
+              <li>
+                <Link to="/custom-orders" className="hover:text-white transition-colors text-terracotta-400 font-medium">
+                  Custom Orders Studio
+                </Link>
+              </li>
+              <li>
+                <Link to="/shop" className="hover:text-white transition-colors">
+                  All Handmade Pieces
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          {/* Contact */}
-          <div style={{ textAlign: 'left' }}>
-            <div className="ft-label">Reach us</div>
-            <a href={INSTAGRAM_DM_URL} target="_blank" rel="noopener noreferrer" className="ft-link" style={{ alignItems: 'flex-start' }}>
-              <FaInstagram size={15} style={{ marginTop: 2 }} /> <span>Message on<br />Instagram</span>
-            </a>
-            <a href={getWhatsAppOrderUrl(null, WHATSAPP_NUMBER)} target="_blank" rel="noopener noreferrer" className="ft-link" style={{ alignItems: 'flex-start' }}>
-              <FaWhatsapp size={15} style={{ marginTop: 2 }} /> <span>Order on<br />WhatsApp</span>
-            </a>
-            <a href={`mailto:${EMAIL}`} className="ft-link" style={{ alignItems: 'flex-start' }}>
-              <FaEnvelope size={15} style={{ marginTop: 2 }} /> <span>{EMAIL}</span>
-            </a>
+          {/* Ethos & Care */}
+          <div className="lg:col-span-2 space-y-4">
+            <h4 className="text-xs font-mono tracking-editorial uppercase text-white font-semibold">
+              Customer Care
+            </h4>
+            <ul className="space-y-2.5 text-sm text-zinc-400">
+              <li>
+                <Link to="/about" className="hover:text-white transition-colors">
+                  Our Story
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-white transition-colors">
+                  Care &amp; Washing Guide
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-white transition-colors">
+                  Shipping &amp; Delivery
+                </Link>
+              </li>
+              <li>
+                <Link to="/about#yarn-studio" className="hover:text-white transition-colors">
+                  Yarn Library
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-white transition-colors">
+                  Contact Niharika
+                </Link>
+              </li>
+            </ul>
           </div>
 
+          {/* Custom Gifting Card */}
+          <div className="lg:col-span-3 bg-white/5 rounded-2xl border border-white/10 p-6 space-y-3.5">
+            <div className="flex items-center gap-2 text-terracotta-400 text-xs font-mono uppercase tracking-wider font-semibold">
+              <Sparkles size={14} />
+              <span>Gifts &amp; Favors</span>
+            </div>
+            <p className="font-editorial text-lg text-white font-medium leading-snug">
+              Looking for wedding favors or event gifts?
+            </p>
+            <p className="text-xs text-zinc-400 leading-relaxed font-light">
+              We create bulk floral bouquets, personalized initial charms, and customized palette gift boxes.
+            </p>
+            <Link
+              to="/custom-orders"
+              className="mt-2 block text-center w-full py-3 px-4 rounded-xl bg-terracotta-600 hover:bg-terracotta-700 text-white text-xs font-semibold tracking-wide transition-colors shadow-xs"
+            >
+              Start a Custom Order
+            </Link>
+          </div>
         </div>
-      </div>
 
-      <div style={{ borderTop: '1px solid #3a1f0f', marginTop: '3rem' }} />
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 lg:px-16 py-5 flex justify-between flex-wrap gap-2 text-left">
-        <p style={{ fontSize: '0.8rem', color: '#6b4025', margin: 0 }}>© 2025 TheCozzyLoops. All rights reserved.</p>
-        <p style={{ fontSize: '0.8rem', color: '#6b4025', margin: 0, display: 'flex', alignItems: 'center', gap: 5 }}>
-          Made with <FaHeart size={12} color="#e8854a" /> and lots of yarn
-        </p>
+        {/* Bottom bar */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500 font-light">
+          <p>© {new Date().getFullYear()} TheCozzyLoops. All rights reserved. Handcrafted by Niharika.</p>
+          <div className="flex items-center gap-6">
+            <Link to="/about" className="hover:text-white transition-colors">
+              About
+            </Link>
+            <Link to="/custom-orders" className="hover:text-white transition-colors">
+              Custom Orders
+            </Link>
+            <Link to="/contact" className="hover:text-white transition-colors">
+              Contact &amp; FAQs
+            </Link>
+            <Link to="/admin/login" className="hover:text-white transition-colors font-mono opacity-50 hover:opacity-100">
+              Admin
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   )
@@ -199,12 +363,19 @@ function Footer() {
 
 export default function ShopLayout() {
   return (
-    <div className="min-h-screen bg-mesh flex flex-col">
+    <div className="min-h-screen flex flex-col bg-canvas text-ink selection:bg-terracotta-200 selection:text-terracotta-900">
+      <AnnouncementBar />
       <Navbar />
-      <main className="flex-1 pt-16 md:pt-20">
+      <main className="flex-1">
         <Outlet />
       </main>
-      <Footer />
+      <ModernFooter />
+
+      {/* Global Interactive Overlays */}
+      <CartDrawer />
+      <WishlistDrawer />
+      <QuickLookModal />
+      <CustomStudioModal />
     </div>
   )
 }

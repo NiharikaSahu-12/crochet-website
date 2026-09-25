@@ -12,6 +12,11 @@ import {
   Trash2,
   UploadCloud,
   X,
+  ExternalLink,
+  Wand2,
+  Layers,
+  Info,
+  DollarSign
 } from 'lucide-react'
 import productController from '../../controllers/productController'
 import { PRODUCT_STATUS, createProductDTO } from '../../models/Product'
@@ -35,63 +40,82 @@ const EMPTY_FORM = createProductDTO({
   tags: [],
 })
 
-function Field({ label, children, helper }) {
+function Field({ label, required, children, helper }) {
   return (
-    <label className="block text-sm font-semibold text-yarn-dark">
-      {label}
-      <div className="mt-2">{children}</div>
-      {helper && <p className="mt-1.5 text-xs font-normal text-gray-400">{helper}</p>}
-    </label>
+    <div className="space-y-1.5">
+      <label className="block text-xs font-semibold uppercase tracking-wider text-ink">
+        {label} {required && <span className="text-terracotta-600">*</span>}
+      </label>
+      {children}
+      {helper && <p className="text-[11px] text-ink-subtle">{helper}</p>}
+    </div>
   )
 }
 
-function TagInput({ label, values, onChange, placeholder }) {
+function TagInput({ label, values = [], onChange, placeholder }) {
   const [input, setInput] = useState('')
 
   const add = () => {
     const value = input.trim()
-    if (value && !values.includes(value)) onChange([...values, value])
+    if (value && !values.includes(value)) {
+      onChange([...values, value])
+    }
     setInput('')
   }
 
   return (
     <Field label={label}>
-      <div className="flex min-h-11 flex-wrap gap-2 rounded-2xl border border-blush-200 bg-white p-2">
+      <div className="flex min-h-[44px] flex-wrap items-center gap-1.5 rounded-xl border border-canvas-border bg-white p-2 focus-within:border-ink transition-colors">
         {values.map((value) => (
-          <span key={value} className="inline-flex items-center gap-1.5 rounded-full bg-blush-50 px-3 py-1.5 text-sm font-medium text-yarn-blush">
-            {value}
-            <button type="button" onClick={() => onChange(values.filter((item) => item !== value))} className="hover:text-red-500">
-              <X size={13} aria-hidden="true" />
+          <span 
+            key={value} 
+            className="inline-flex items-center gap-1 rounded-lg bg-canvas-subtle border border-canvas-border px-2.5 py-1 text-xs font-medium text-ink"
+          >
+            <span>{value}</span>
+            <button 
+              type="button" 
+              onClick={() => onChange(values.filter((item) => item !== value))} 
+              className="text-ink-subtle hover:text-rose-600 transition-colors"
+            >
+              <X size={12} />
             </button>
           </span>
         ))}
-        <input
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault()
-              add()
-            }
-          }}
-          className="min-w-36 flex-1 bg-transparent px-2 py-1.5 text-sm outline-none"
-          placeholder={placeholder}
-        />
-        <button type="button" onClick={add} className="rounded-full bg-blush-100 px-3 py-1.5 text-sm font-semibold text-yarn-blush transition hover:bg-blush-200">
-          Add
-        </button>
+        <div className="flex-1 flex items-center min-w-[140px]">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                add()
+              }
+            }}
+            className="w-full bg-transparent px-2 py-1 text-xs outline-none placeholder:text-ink-subtle"
+            placeholder={placeholder}
+          />
+          <button 
+            type="button" 
+            onClick={add} 
+            className="shrink-0 text-xs font-medium px-2 py-1 rounded bg-canvas-subtle hover:bg-canvas text-ink-muted transition-colors border border-canvas-border"
+          >
+            Add
+          </button>
+        </div>
       </div>
     </Field>
   )
 }
 
-function ImageManager({ images = [], onChange, productId }) {
+function ImageStudio({ images = [], onChange, productId }) {
   const [urlInput, setUrlInput] = useState('')
   const [uploading, setUploading] = useState(false)
 
   const addUrl = () => {
     const url = urlInput.trim()
-    if (url && !images.includes(url)) onChange([...images, url])
+    if (url && !images.includes(url)) {
+      onChange([...images, url])
+    }
     setUrlInput('')
   }
 
@@ -103,9 +127,9 @@ function ImageManager({ images = [], onChange, productId }) {
     try {
       const url = await productController.uploadProductImage(file, productId || 'new-products')
       onChange([...images, url])
-      toast.success('Image uploaded')
+      toast.success('Creation image uploaded')
     } catch (err) {
-      toast.error('Upload failed: ' + err.message)
+      toast.error('Upload failed: ' + (err.message || 'Error uploading image'))
     } finally {
       setUploading(false)
       event.target.value = ''
@@ -113,85 +137,117 @@ function ImageManager({ images = [], onChange, productId }) {
   }
 
   return (
-    <div className="rounded-[24px] border border-blush-100 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between gap-3 border-b border-blush-100 pb-4">
+    <div className="bg-white rounded-2xl border border-canvas-border p-5 shadow-xs space-y-4">
+      <div className="flex items-center justify-between pb-3 border-b border-canvas-border">
         <div>
-          <h3 className="font-display text-xl text-yarn-dark">Product images</h3>
-          <p className="text-sm text-gray-500">First image becomes the main product image.</p>
+          <h3 className="font-editorial text-lg font-semibold text-ink">Visual Gallery</h3>
+          <p className="text-xs text-ink-subtle">First image will serve as the primary storefront cover.</p>
         </div>
-        <ImagePlus className="text-yarn-blush" size={22} aria-hidden="true" />
+        <ImagePlus size={18} className="text-terracotta-600" />
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        {images.map((image, index) => (
-          <div key={`${image}-${index}`} className="group relative aspect-square overflow-hidden rounded-2xl bg-blush-50">
-            <img src={image} alt="" className="h-full w-full object-cover" />
+      {/* Grid of Images */}
+      <div className="grid grid-cols-2 gap-3">
+        {images.map((img, index) => (
+          <div 
+            key={`${img}-${index}`} 
+            className="group relative aspect-square rounded-xl overflow-hidden border border-canvas-border bg-canvas-subtle"
+          >
+            <img src={img} alt="" className="w-full h-full object-cover" />
+            
             {index === 0 && (
-              <span className="absolute bottom-2 left-2 rounded-full bg-yarn-dark/75 px-2.5 py-1 text-xs font-semibold text-white">Main</span>
+              <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-ink/80 text-white text-[10px] font-mono tracking-wider backdrop-blur-xs">
+                Cover
+              </span>
             )}
+
             <button
               type="button"
-              onClick={() => onChange(images.filter((_, imageIndex) => imageIndex !== index))}
-              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition group-hover:opacity-100"
-              aria-label="Remove image"
+              onClick={() => onChange(images.filter((_, i) => i !== index))}
+              className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-rose-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-xs"
+              title="Remove image"
             >
-              <Trash2 size={14} aria-hidden="true" />
+              <Trash2 size={13} />
             </button>
           </div>
         ))}
 
-        <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-blush-200 bg-gradient-to-br from-blush-50 to-[#fff4d8] text-center transition hover:border-yarn-blush">
+        {/* Upload Trigger Box */}
+        <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-canvas-border hover:border-terracotta-500 bg-canvas-subtle/50 text-center transition-colors p-3">
           {uploading ? (
-            <span className="h-7 w-7 rounded-full border-2 border-yarn-blush border-t-transparent animate-spin" />
+            <div className="w-6 h-6 border-2 border-terracotta-600 border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <UploadCloud size={26} className="text-yarn-blush" aria-hidden="true" />
-              <span className="mt-2 text-sm font-semibold text-yarn-blush">Upload</span>
-              <span className="mt-1 text-xs text-gray-400">JPG or PNG</span>
+              <div className="w-9 h-9 rounded-xl bg-white border border-canvas-border flex items-center justify-center text-terracotta-600 shadow-xs mb-2">
+                <UploadCloud size={18} />
+              </div>
+              <span className="text-xs font-semibold text-ink">Upload photo</span>
+              <span className="text-[10px] text-ink-subtle mt-0.5">JPG, PNG, WebP</span>
             </>
           )}
           <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
         </label>
       </div>
 
-      <div className="mt-5 flex gap-2">
-        <input
-          type="url"
-          value={urlInput}
-          onChange={(event) => setUrlInput(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault()
-              addUrl()
-            }
-          }}
-          className="input-field py-2.5 text-sm"
-          placeholder="Paste image URL..."
-        />
-        <button type="button" onClick={addUrl} className="rounded-2xl bg-blush-100 px-4 text-yarn-blush transition hover:bg-blush-200">
-          <Plus size={18} aria-hidden="true" />
-        </button>
+      {/* Paste URL Input */}
+      <div className="pt-2">
+        <label className="block text-[11px] font-mono uppercase tracking-wider text-ink-muted mb-1.5">
+          Or Add Photo by Online URL
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="url"
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                addUrl()
+              }
+            }}
+            className="input-field py-2 text-xs flex-1"
+            placeholder="https://images.unsplash.com/..."
+          />
+          <button 
+            type="button" 
+            onClick={addUrl} 
+            className="btn-outline px-3 py-2 text-xs shrink-0 inline-flex items-center gap-1"
+          >
+            <Plus size={13} /> Add
+          </button>
+        </div>
       </div>
     </div>
   )
 }
 
-function ToggleCard({ title, desc, checked, onChange }) {
+function ToggleOption({ title, desc, icon: Icon, checked, onChange }) {
   return (
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className={`flex w-full items-center justify-between gap-4 rounded-2xl border p-4 text-left transition ${
-        checked ? 'border-yarn-blush bg-blush-50' : 'border-gray-100 bg-white hover:bg-gray-50'
+      className={`w-full flex items-start justify-between gap-3 p-4 rounded-xl border text-left transition-all ${
+        checked 
+          ? 'border-terracotta-500 bg-terracotta-50/50 shadow-xs' 
+          : 'border-canvas-border bg-white hover:border-zinc-300'
       }`}
     >
-      <div>
-        <p className="font-semibold text-yarn-dark">{title}</p>
-        <p className="mt-1 text-sm text-gray-500">{desc}</p>
+      <div className="flex items-start gap-3">
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+          checked ? 'bg-terracotta-600 text-white' : 'bg-canvas-subtle text-ink-muted'
+        }`}>
+          <Icon size={16} />
+        </div>
+        <div>
+          <p className="text-xs font-semibold text-ink">{title}</p>
+          <p className="text-[11px] text-ink-subtle mt-0.5 leading-relaxed">{desc}</p>
+        </div>
       </div>
-      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${checked ? 'bg-yarn-blush text-white' : 'bg-gray-100 text-gray-400'}`}>
-        {checked && <Check size={15} aria-hidden="true" />}
-      </span>
+      <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
+        checked ? 'bg-terracotta-600 border-terracotta-600 text-white' : 'border-zinc-300 bg-white'
+      }`}>
+        {checked && <Check size={12} strokeWidth={3} />}
+      </div>
     </button>
   )
 }
@@ -205,14 +261,18 @@ export default function AdminProductForm() {
   const [saving, setSaving] = useState(false)
   const { categories, loading: categoriesLoading } = useCategories({ activeOnly: true })
 
-  const activeCategories = useMemo(() => categories.filter((category) => category.is_active), [categories])
+  const activeCategories = useMemo(() => categories.filter((c) => c.is_active), [categories])
 
   useEffect(() => {
     if (!isEditing) return
     productController.getProduct(id)
-      .then((product) => setForm({ ...product, price: product.price || '', compare_price: product.compare_price || '' }))
+      .then((product) => setForm({ 
+        ...product, 
+        price: product.price || '', 
+        compare_price: product.compare_price || '' 
+      }))
       .catch(() => {
-        toast.error('Product not found')
+        toast.error('Product not found in catalog')
         navigate('/admin/products')
       })
       .finally(() => setLoading(false))
@@ -233,14 +293,14 @@ export default function AdminProductForm() {
 
       if (isEditing) {
         await productController.updateProduct(id, payload)
-        toast.success('Product updated')
+        toast.success('Creation updated successfully')
       } else {
         const created = await productController.createProduct(payload)
-        toast.success('Product created')
+        toast.success('New creation added to atelier')
         navigate(`/admin/products/${created.id}/edit`)
       }
     } catch (err) {
-      toast.error(err.message)
+      toast.error(err.message || 'Failed to save product')
     } finally {
       setSaving(false)
     }
@@ -248,227 +308,303 @@ export default function AdminProductForm() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <div className="h-9 w-9 rounded-full border-4 border-yarn-blush border-t-transparent animate-spin" />
+      <div className="flex flex-col items-center justify-center py-28">
+        <div className="w-9 h-9 rounded-full border-2 border-terracotta-600 border-t-transparent animate-spin mb-3" />
+        <p className="text-xs text-ink-subtle font-mono uppercase tracking-wider">Loading atelier creation...</p>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <div className="flex flex-col gap-4 rounded-[28px] bg-gradient-to-br from-yarn-dark via-blush-900 to-yarn-blush p-6 text-white shadow-xl shadow-blush-200/60 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-start gap-4">
-          <Link to="/admin/products" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25">
-            <ArrowLeft size={19} aria-hidden="true" />
+    <div className="space-y-6">
+      {/* Top Header Card */}
+      <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <Link
+            to="/admin/products"
+            className="w-10 h-10 rounded-xl bg-canvas-subtle hover:bg-canvas flex items-center justify-center text-ink-muted hover:text-ink transition-colors border border-canvas-border shrink-0"
+            title="Return to products"
+          >
+            <ArrowLeft size={17} />
           </Link>
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blush-100">Product editor</p>
-            <h2 className="mt-2 font-display text-3xl sm:text-4xl">{isEditing ? 'Edit product' : 'Add new product'}</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-blush-100">
-              Add product details, images, category, inventory, and homepage visibility from one place.
-            </p>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-terracotta-600 font-semibold">
+                {isEditing ? 'Curator Edit' : 'New Workshop Piece'}
+              </span>
+            </div>
+            <h1 className="font-editorial text-2xl font-semibold text-ink mt-0.5">
+              {isEditing ? form.name || 'Edit Product' : 'Create New Product'}
+            </h1>
           </div>
         </div>
-        <div className="rounded-2xl bg-white/12 px-4 py-3">
-          <p className="text-xs uppercase tracking-[0.16em] text-blush-100">Status</p>
-          <p className="mt-1 font-semibold capitalize">{form.status?.replace(/_/g, ' ')}</p>
+
+        <div className="flex items-center gap-2">
+          {isEditing && (
+            <Link
+              to={`/shop/${id}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-outline text-xs px-3.5 py-2 inline-flex items-center gap-1.5"
+            >
+              <ExternalLink size={13} />
+              <span>Preview Live</span>
+            </Link>
+          )}
+          <span className={`text-xs px-3 py-1 rounded-full font-medium capitalize ${
+            form.status === 'active' 
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+              : form.status === 'draft' 
+              ? 'bg-zinc-100 text-zinc-600 border border-zinc-200' 
+              : 'bg-rose-50 text-rose-700 border border-rose-200'
+          }`}>
+            {form.status}
+          </span>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid gap-6 xl:grid-cols-[1fr_380px]">
-        <div className="space-y-6">
-          <section className="rounded-[24px] border border-blush-100 bg-white p-5 shadow-sm sm:p-6">
-            <div className="mb-5 flex items-center gap-3 border-b border-blush-100 pb-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blush-50 text-yarn-blush">
-                <Package size={21} aria-hidden="true" />
+      {/* Main 2-Column Form */}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Core Product Info (2 spans) */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Basic Info Card */}
+          <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
+            <div className="flex items-center gap-3 pb-3 border-b border-canvas-border">
+              <div className="w-8 h-8 rounded-lg bg-terracotta-50 text-terracotta-600 flex items-center justify-center">
+                <Package size={17} />
               </div>
               <div>
-                <h3 className="font-display text-xl text-yarn-dark">Basic information</h3>
-                <p className="text-sm text-gray-500">Name, category, description, and visibility.</p>
+                <h3 className="font-editorial text-lg font-semibold text-ink">Essential Details</h3>
+                <p className="text-xs text-ink-subtle">Core identity of this handcrafted piece</p>
               </div>
             </div>
 
-            <div className="grid gap-5">
-              <Field label="Product name *">
-                <input
-                  value={form.name}
-                  onChange={(event) => set('name', event.target.value)}
-                  className="input-field"
-                  placeholder="Daisy flower keychain"
+            <Field label="Creation Name" required helper="e.g., Everlasting Pastel Tulip & Daisy Bouquet">
+              <input
+                type="text"
+                required
+                value={form.name}
+                onChange={(e) => set('name', e.target.value)}
+                className="input-field text-sm"
+                placeholder="Name your crochet creation..."
+              />
+            </Field>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Category" required helper="Select the relevant atelier collection">
+                <select
                   required
-                />
+                  value={form.category}
+                  onChange={(e) => set('category', e.target.value)}
+                  className="input-field text-xs capitalize"
+                >
+                  <option value="">{categoriesLoading ? 'Loading...' : 'Select Category'}</option>
+                  {activeCategories.map((c) => (
+                    <option key={c.value} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
               </Field>
 
-              <Field label="Description">
-                <textarea
-                  value={form.description}
-                  onChange={(event) => set('description', event.target.value)}
-                  className="input-field min-h-32 resize-y"
-                  placeholder="Describe the product, size, materials, use, and gifting details..."
-                />
+              <Field label="Status" helper="Controls visibility in customer store">
+                <select
+                  value={form.status}
+                  onChange={(e) => set('status', e.target.value)}
+                  className="input-field text-xs capitalize"
+                >
+                  <option value={PRODUCT_STATUS.ACTIVE}>Active (Visible to Shoppers)</option>
+                  <option value={PRODUCT_STATUS.DRAFT}>Draft (Internal Workshop Only)</option>
+                  <option value={PRODUCT_STATUS.OUT_OF_STOCK}>Out of Stock</option>
+                </select>
               </Field>
-
-              <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Category *">
-                  <select
-                    value={form.category}
-                    onChange={(event) => set('category', event.target.value)}
-                    className="input-field"
-                    required
-                  >
-                    <option value="">{categoriesLoading ? 'Loading categories...' : 'Select category'}</option>
-                    {activeCategories.map((category) => (
-                      <option key={category.value} value={category.value}>{category.label}</option>
-                    ))}
-                  </select>
-                </Field>
-
-                <Field label="Status">
-                  <select value={form.status} onChange={(event) => set('status', event.target.value)} className="input-field">
-                    <option value={PRODUCT_STATUS.ACTIVE}>Active (visible)</option>
-                    <option value={PRODUCT_STATUS.DRAFT}>Draft (hidden)</option>
-                    <option value={PRODUCT_STATUS.OUT_OF_STOCK}>Out of stock</option>
-                  </select>
-                </Field>
-              </div>
             </div>
-          </section>
 
-          <section className="rounded-[24px] border border-blush-100 bg-white p-5 shadow-sm sm:p-6">
-            <div className="mb-5 flex items-center gap-3 border-b border-blush-100 pb-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#fff4d8] text-yarn-blush">
-                <Tag size={21} aria-hidden="true" />
+            <Field label="Description" helper="Describe size, hand-stitched textures, symbolism, and presentation">
+              <textarea
+                value={form.description}
+                onChange={(e) => set('description', e.target.value)}
+                rows={4}
+                className="input-field text-xs resize-y"
+                placeholder="Handcrafted with 100% premium milk cotton yarn, featuring delicate scalloped petals and a satin ribbon..."
+              />
+            </Field>
+          </div>
+
+          {/* Pricing & Inventory Card */}
+          <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
+            <div className="flex items-center gap-3 pb-3 border-b border-canvas-border">
+              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <DollarSign size={17} />
               </div>
               <div>
-                <h3 className="font-display text-xl text-yarn-dark">Pricing and details</h3>
-                <p className="text-sm text-gray-500">Set prices, stock, yarn, care, colors, and tags.</p>
+                <h3 className="font-editorial text-lg font-semibold text-ink">Pricing & Inventory</h3>
+                <p className="text-xs text-ink-subtle">Set retail prices, discounts, and ready-to-ship quantities</p>
               </div>
             </div>
 
-            <div className="grid gap-5">
-              <div className="grid gap-5 md:grid-cols-3">
-                <Field label="Price (INR) *">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <Field label="Retail Price (INR)" required helper="Amount charged to customer">
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-ink-muted">
+                    ₹
+                  </span>
                   <input
                     type="number"
-                    value={form.price}
-                    onChange={(event) => set('price', event.target.value)}
-                    className="input-field"
-                    min="0"
                     step="0.01"
-                    placeholder="499"
+                    min="0"
                     required
+                    value={form.price}
+                    onChange={(e) => set('price', e.target.value)}
+                    className="input-field pl-8 text-xs font-medium"
+                    placeholder="899"
                   />
-                </Field>
+                </div>
+              </Field>
 
-                <Field label="Compare at (INR)">
+              <Field label="Compare At Price (INR)" helper="Original price before discount">
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-ink-muted">
+                    ₹
+                  </span>
                   <input
                     type="number"
-                    value={form.compare_price || ''}
-                    onChange={(event) => set('compare_price', event.target.value)}
-                    className="input-field"
-                    min="0"
                     step="0.01"
-                    placeholder="699"
-                  />
-                </Field>
-
-                <Field label="Stock quantity">
-                  <input
-                    type="number"
-                    value={form.stock_qty}
-                    onChange={(event) => set('stock_qty', event.target.value)}
-                    className="input-field"
                     min="0"
+                    value={form.compare_price || ''}
+                    onChange={(e) => set('compare_price', e.target.value)}
+                    className="input-field pl-8 text-xs font-medium"
+                    placeholder="1099"
                   />
-                </Field>
-              </div>
+                </div>
+              </Field>
 
-              <div className="grid gap-5 md:grid-cols-2">
-                <Field label="Yarn type">
-                  <input
-                    value={form.yarn_type}
-                    onChange={(event) => set('yarn_type', event.target.value)}
-                    className="input-field"
-                    placeholder="Cotton, acrylic, wool..."
-                  />
-                </Field>
-
-                <Field label="Care instructions">
-                  <input
-                    value={form.care_instructions}
-                    onChange={(event) => set('care_instructions', event.target.value)}
-                    className="input-field"
-                    placeholder="Hand wash cold, air dry..."
-                  />
-                </Field>
-              </div>
-
-              <TagInput
-                label="Color options"
-                values={form.color_options}
-                onChange={(value) => set('color_options', value)}
-                placeholder="Add color"
-              />
-
-              <TagInput
-                label="Tags"
-                values={form.tags}
-                onChange={(value) => set('tags', value)}
-                placeholder="Add tag"
-              />
+              <Field label="Stock Quantity" helper="Available stock count">
+                <input
+                  type="number"
+                  min="0"
+                  value={form.stock_qty}
+                  onChange={(e) => set('stock_qty', e.target.value)}
+                  className="input-field text-xs font-medium"
+                  placeholder="5"
+                />
+              </Field>
             </div>
-          </section>
+          </div>
+
+          {/* Artisan Craft Specifications Card */}
+          <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
+            <div className="flex items-center gap-3 pb-3 border-b border-canvas-border">
+              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <Layers size={17} />
+              </div>
+              <div>
+                <h3 className="font-editorial text-lg font-semibold text-ink">Artisan Specifications</h3>
+                <p className="text-xs text-ink-subtle">Handmade yarn materials, care guide, and available palettes</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Yarn Type / Material" helper="e.g. 100% Milk Cotton, Cozy Chenille">
+                <input
+                  type="text"
+                  value={form.yarn_type}
+                  onChange={(e) => set('yarn_type', e.target.value)}
+                  className="input-field text-xs"
+                  placeholder="Soft Milk Cotton Yarn"
+                />
+              </Field>
+
+              <Field label="Care Instructions" helper="Washing and handling advice">
+                <input
+                  type="text"
+                  value={form.care_instructions}
+                  onChange={(e) => set('care_instructions', e.target.value)}
+                  className="input-field text-xs"
+                  placeholder="Spot clean with damp cloth, air dry in shade"
+                />
+              </Field>
+            </div>
+
+            <TagInput
+              label="Color Palette Options"
+              values={form.color_options}
+              onChange={(val) => set('color_options', val)}
+              placeholder="Type color (e.g. Peach Pink) & press Enter"
+            />
+
+            <TagInput
+              label="Discovery Tags"
+              values={form.tags}
+              onChange={(val) => set('tags', val)}
+              placeholder="Type tag (e.g. bouquet, gift, bestseller) & press Enter"
+            />
+          </div>
         </div>
 
-        <aside className="space-y-6">
-          <ImageManager images={form.images} onChange={(value) => set('images', value)} productId={id} />
+        {/* Right Column: Visuals & Actions (1 span) */}
+        <div className="space-y-6">
+          {/* Visual Gallery Studio */}
+          <ImageStudio
+            images={form.images}
+            onChange={(imgs) => set('images', imgs)}
+            productId={id}
+          />
 
-          <section className="rounded-[24px] border border-blush-100 bg-white p-5 shadow-sm">
-            <div className="mb-5 flex items-center gap-3 border-b border-blush-100 pb-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blush-50 text-yarn-blush">
-                <Sparkles size={21} aria-hidden="true" />
-              </div>
-              <div>
-                <h3 className="font-display text-xl text-yarn-dark">Product options</h3>
-                <p className="text-sm text-gray-500">Homepage and custom settings.</p>
-              </div>
+          {/* Curation & Homepage Highlights */}
+          <div className="bg-white rounded-2xl border border-canvas-border p-5 shadow-xs space-y-4">
+            <div className="pb-3 border-b border-canvas-border">
+              <h3 className="font-editorial text-lg font-semibold text-ink">Storefront Curation</h3>
+              <p className="text-xs text-ink-subtle">Promote in featured carousel and custom studios</p>
             </div>
 
             <div className="space-y-3">
-              <ToggleCard
-                title="Featured product"
-                desc="Show this product in featured homepage sections."
+              <ToggleOption
+                title="Featured Atelier Piece"
+                desc="Showcase in homepage top picks and hero highlight sections."
+                icon={Sparkles}
                 checked={form.is_featured}
-                onChange={(value) => set('is_featured', value)}
+                onChange={(val) => set('is_featured', val)}
               />
-              <ToggleCard
-                title="Customizable"
-                desc="Mark this as available for custom variations."
+
+              <ToggleOption
+                title="Customizable Studio Item"
+                desc="Flag as open for customer color, flower, or sizing customizations."
+                icon={Wand2}
                 checked={form.is_custom}
-                onChange={(value) => set('is_custom', value)}
+                onChange={(val) => set('is_custom', val)}
               />
             </div>
-          </section>
+          </div>
 
-          <div className="sticky bottom-4 rounded-[24px] border border-blush-100 bg-white/95 p-4 shadow-xl shadow-gray-200/70 backdrop-blur">
-            <button type="submit" disabled={saving} className="btn-primary inline-flex w-full items-center justify-center gap-2 py-3.5 disabled:opacity-60">
+          {/* Sticky Save / Cancel Action Bar */}
+          <div className="sticky bottom-6 bg-white/95 backdrop-blur-md rounded-2xl border border-canvas-border p-4 shadow-lifted space-y-2.5">
+            <button
+              type="submit"
+              disabled={saving}
+              className="w-full btn-primary py-3 text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 shadow-subtle disabled:opacity-50"
+            >
               {saving ? (
                 <>
-                  <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                  Saving...
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Saving Changes...</span>
                 </>
               ) : (
                 <>
-                  <Save size={17} aria-hidden="true" />
-                  {isEditing ? 'Update product' : 'Create product'}
+                  <Save size={15} />
+                  <span>{isEditing ? 'Save Updates' : 'Publish Creation'}</span>
                 </>
               )}
             </button>
-            <Link to="/admin/products" className="btn-outline mt-3 inline-flex w-full items-center justify-center py-3.5">
-              Cancel
+
+            <Link
+              to="/admin/products"
+              className="w-full btn-outline py-2.5 text-xs text-center block"
+            >
+              Cancel & Return
             </Link>
           </div>
-        </aside>
+        </div>
       </form>
     </div>
   )

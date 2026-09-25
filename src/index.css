@@ -3,61 +3,82 @@
 @tailwind utilities;
 
 @layer base {
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  * { 
+    box-sizing: border-box; 
+  }
+  html { 
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   body {
-    font-family: 'DM Sans', sans-serif;
-    background-color: #fdf8f5;
-    color: #3d2c2c;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #FAFAF9;
+    color: #18181B;
     overflow-x: hidden;
   }
-  h1, h2, h3, h4 { font-family: 'Playfair Display', Georgia, serif; }
+  h1, h2, h3, h4, .font-editorial { 
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+    font-feature-settings: "liga" 1, "kern" 1;
+    text-wrap: balance;
+  }
+  ::selection {
+    background-color: #F4D5CC;
+    color: #522115;
+  }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-yarn-blush text-white font-medium px-6 py-3 rounded-full 
-           transition-all duration-300 hover:bg-blush-700 hover:shadow-lg 
-           hover:-translate-y-0.5 active:translate-y-0;
+    @apply inline-flex items-center justify-center gap-2.5 bg-terracotta-600 text-white font-medium px-7 py-3.5 rounded-full 
+           transition-all duration-200 hover:bg-terracotta-700 active:scale-[0.98] tracking-wide text-sm
+           shadow-xs hover:shadow-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta-500 focus-visible:ring-offset-2;
+  }
+  .btn-dark {
+    @apply inline-flex items-center justify-center gap-2.5 bg-ink text-white font-medium px-7 py-3.5 rounded-full 
+           transition-all duration-200 hover:bg-ink-charcoal active:scale-[0.98] tracking-wide text-sm
+           shadow-xs hover:shadow-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2;
   }
   .btn-outline {
-    @apply border-2 border-yarn-blush text-yarn-blush font-medium px-6 py-3 
-           rounded-full transition-all duration-300 hover:bg-yarn-blush hover:text-white hover:shadow-lg;
+    @apply inline-flex items-center justify-center gap-2.5 border border-ink/20 text-ink bg-white/80 font-medium px-7 py-3.5 
+           rounded-full transition-all duration-200 hover:border-ink hover:bg-ink hover:text-white active:scale-[0.98] tracking-wide text-sm
+           shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2;
+  }
+  .btn-subtle {
+    @apply inline-flex items-center justify-center gap-2 bg-canvas-subtle text-ink font-medium px-5 py-2.5 
+           rounded-full transition-all duration-200 hover:bg-canvas-muted active:scale-[0.98] text-sm;
   }
   .card {
-    @apply bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden;
+    @apply bg-white rounded-2xl border border-canvas-border shadow-xs hover:shadow-lifted transition-all duration-300 overflow-hidden;
+  }
+  .card-static {
+    @apply bg-white rounded-2xl border border-canvas-border shadow-xs overflow-hidden;
   }
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl border border-blush-200 bg-white 
-           focus:outline-none focus:ring-2 focus:ring-yarn-blush focus:border-transparent
-           transition-all duration-200 text-yarn-dark placeholder-blush-300;
-  }
-  .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
+    @apply w-full px-4 py-3.5 rounded-xl border border-canvas-border bg-white 
+           focus:outline-none focus:ring-2 focus:ring-terracotta-500/20 focus:border-terracotta-600
+           transition-all duration-200 text-ink placeholder:text-ink-subtle/70 text-sm;
   }
 }
 
 @layer utilities {
-  .text-gradient {
-    background: linear-gradient(135deg, #c9877a, #c9a96e);
+  .text-gradient-atelier {
+    background: linear-gradient(135deg, #A7462E 0%, #B68442 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  .bg-mesh {
-    background-color: #fdf8f5;
-    background-image: 
-      radial-gradient(at 40% 20%, hsla(10, 50%, 90%, 0.5) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, hsla(35, 60%, 88%, 0.4) 0px, transparent 50%),
-      radial-gradient(at 0% 50%, hsla(355, 40%, 88%, 0.3) 0px, transparent 50%);
+  .bg-subtle-noise {
+    background-color: #FAFAF9;
   }
-  .glass {
-    background: rgba(255,255,255,0.75);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+  .glass-header {
+    background: rgba(250, 250, 249, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 }
 
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #fdf8f5; }
-::-webkit-scrollbar-thumb { background: #c9877a; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #FAFAF9; }
+::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #A1A1AA; }
