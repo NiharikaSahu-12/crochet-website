@@ -82,14 +82,14 @@ export default function CartDrawer() {
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-ink/40 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-night/40 backdrop-blur-sm transition-opacity" 
         onClick={() => setIsCartOpen(false)}
       />
 
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
         <div className="w-screen max-w-md bg-canvas border-l border-canvas-border shadow-float flex flex-col">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-canvas-border bg-white flex items-center justify-between">
+          <div className="px-6 py-5 border-b border-canvas-border bg-surface flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <ShoppingBag size={18} className="text-terracotta-600" />
               <h2 className="font-editorial text-xl font-semibold text-ink">Your Shopping Bag</h2>
@@ -149,7 +149,7 @@ export default function CartDrawer() {
               cart.map((item) => (
                 <div 
                   key={item.cartItemId} 
-                  className="flex gap-4 p-3 bg-white rounded-xl border border-canvas-border/80 shadow-xs"
+                  className="flex gap-4 p-3 bg-surface rounded-xl border border-canvas-border/80 shadow-xs"
                 >
                   <div className="w-20 h-24 rounded-lg bg-canvas-subtle overflow-hidden shrink-0">
                     <img 
@@ -236,7 +236,7 @@ export default function CartDrawer() {
                 </button>
 
                 {showGiftOptions && (
-                  <div className="mt-2 p-3 bg-white rounded-xl border border-canvas-border space-y-2.5">
+                  <div className="mt-2 p-3 bg-surface rounded-xl border border-canvas-border space-y-2.5">
                     <input
                       type="text"
                       placeholder="Person's Name (e.g. Diya)"
@@ -259,7 +259,7 @@ export default function CartDrawer() {
 
           {/* Footer & Checkout actions */}
           {cart.length > 0 && (
-            <div className="px-6 py-5 border-t border-canvas-border bg-white space-y-3">
+            <div className="px-6 py-5 border-t border-canvas-border bg-surface space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-ink-muted">Estimated Total</span>
                 <span className="font-mono text-lg font-bold text-ink">

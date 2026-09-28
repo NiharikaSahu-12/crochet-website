@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Wand2, Sparkles, Heart, Flower2, Bookmark, Key, Gift, Check, ShieldCheck, Star } from 'lucide-react'
 import HeroSection from '../../components/shop/HeroSection'
 import ProductCard from '../../components/shop/ProductCard'
+import Reveal from '../../components/ui/Reveal'
 import { useFeaturedProducts } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { useShop } from '../../context/ShopContext'
@@ -84,7 +85,7 @@ const COMMUNITY_STORIES = [
     stars: 5,
   },
   {
-    quote: 'I ordered a custom potted sunflower for my sister’s graduation. Niharika captured every single color preference perfectly. 10/10!',
+    quote: 'I ordered a custom potted sunflower for my sister’s graduation. TheCozzyLoops captured every single color preference perfectly. 10/10!',
     author: 'Sneha R.',
     location: 'Bengaluru',
     item: 'Custom Potted Bloom',
@@ -108,10 +109,10 @@ export default function HomePage() {
       <HeroSection />
 
       {/* 2. Visual Categories Showcase with High-Res Photography */}
-      <section className="py-20 sm:py-24 border-b border-canvas-border">
+      <section className="py-24 sm:py-32 border-b border-canvas-border">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+          <Reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
             <div>
               <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
                 Curated Collections
@@ -127,36 +128,37 @@ export default function HomePage() {
               <span>Explore All Pieces</span>
               <ArrowRight size={14} />
             </Link>
-          </div>
+          </Reveal>
 
           {/* Photographic category cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
-            {CATEGORIES_SHOWCASE.map((cat) => (
-              <Link
-                key={cat.id}
-                to={cat.to}
-                className="group relative rounded-2xl overflow-hidden aspect-[3/4] bg-stone-100 border border-canvas-border shadow-xs hover:shadow-card transition-all duration-300 flex flex-col justify-end p-4 text-white"
-              >
-                {/* Background image */}
-                <img
-                  src={cat.image}
-                  alt={cat.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
-                />
+            {CATEGORIES_SHOWCASE.map((cat, i) => (
+              <Reveal key={cat.id} delay={i * 0.06} duration={0.55}>
+                <Link
+                  to={cat.to}
+                  className="group relative rounded-3xl overflow-hidden aspect-[3/4] bg-canvas-muted border border-canvas-border shadow-xs hover:shadow-card transition-all duration-300 flex flex-col justify-end p-4 text-white hover:-translate-y-1"
+                >
+                  {/* Background image */}
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                  />
 
-                {/* Subtle dark gradient overlay for crystal readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/30 to-transparent transition-opacity group-hover:opacity-90" />
+                  {/* Subtle dark gradient overlay for crystal readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/30 to-transparent transition-opacity group-hover:opacity-90" />
 
-                {/* Text overlay */}
-                <div className="relative z-10">
-                  <h3 className="font-editorial text-sm sm:text-base font-bold leading-tight">
-                    {cat.name}
-                  </h3>
-                  <p className="text-[11px] text-white/80 font-light mt-0.5 truncate">
-                    {cat.desc}
-                  </p>
-                </div>
-              </Link>
+                  {/* Text overlay */}
+                  <div className="relative z-10">
+                    <h3 className="font-editorial text-sm sm:text-base font-bold leading-tight">
+                      {cat.name}
+                    </h3>
+                    <p className="text-[11px] text-white/80 font-light mt-0.5 truncate">
+                      {cat.desc}
+                    </p>
+                  </div>
+                </Link>
+              </Reveal>
             ))}
           </div>
 
@@ -164,10 +166,10 @@ export default function HomePage() {
       </section>
 
       {/* 3. Featured Products Collection */}
-      <section className="py-20 sm:py-28 border-b border-canvas-border bg-white">
+      <section className="py-24 sm:py-32 border-b border-canvas-border bg-surface">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+          <Reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
             <div>
               <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
                 Handcrafted Favorites
@@ -183,12 +185,12 @@ export default function HomePage() {
               <span>View Full Shop</span>
               <ArrowRight size={14} />
             </Link>
-          </div>
+          </Reveal>
 
           {loading ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-[4/5] bg-canvas-subtle rounded-2xl animate-pulse" />
+                <div key={i} className="aspect-[4/5] bg-canvas-subtle rounded-3xl animate-pulse" />
               ))}
             </div>
           ) : products.length === 0 ? (
@@ -203,8 +205,10 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-              {products.slice(0, 8).map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {products.slice(0, 8).map((product, i) => (
+                <Reveal key={product.id} delay={(i % 4) * 0.07} duration={0.55}>
+                  <ProductCard product={product} />
+                </Reveal>
               ))}
             </div>
           )}
@@ -212,11 +216,11 @@ export default function HomePage() {
       </section>
 
       {/* 4. Atelier Pillars / Handcrafted Values */}
-      <section className="border-b border-canvas-border bg-canvas-subtle py-16 sm:py-20">
+      <section className="border-b border-canvas-border bg-canvas-subtle py-20 sm:py-24">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-            {ATELIER_PILLARS.map((p) => (
-              <div key={p.step} className="space-y-2.5">
+            {ATELIER_PILLARS.map((p, i) => (
+              <Reveal key={p.step} delay={i * 0.08} className="space-y-2.5">
                 <span className="font-mono text-xs font-bold text-terracotta-700 tracking-wider">
                   {p.step}
                 </span>
@@ -226,16 +230,17 @@ export default function HomePage() {
                 <p className="text-sm text-ink-muted leading-relaxed font-light">
                   {p.desc}
                 </p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* 5. Custom Orders Studio Banner */}
-      <section className="py-20 sm:py-28 border-b border-canvas-border">
+      <section className="py-24 sm:py-32 border-b border-canvas-border">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="bg-ink text-white rounded-3xl overflow-hidden border border-canvas-border shadow-float grid lg:grid-cols-12">
+          <Reveal>
+          <div className="bg-elevated text-white rounded-3xl overflow-hidden border border-canvas-border shadow-float grid lg:grid-cols-12">
             
             <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16 flex flex-col justify-between space-y-8">
               <div className="space-y-4">
@@ -263,7 +268,7 @@ export default function HomePage() {
                   to="/contact"
                   className="text-xs uppercase tracking-wider font-semibold text-white/80 hover:text-white flex items-center gap-1.5 transition-colors py-3"
                 >
-                  <span>Chat with Niharika</span>
+                  <span>Chat with Us</span>
                   <ArrowRight size={14} />
                 </Link>
               </div>
@@ -275,18 +280,19 @@ export default function HomePage() {
                 alt="Handmade crochet gift packaging with wax seal by TheCozzyLoops"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent lg:hidden" />
+              <div className="absolute inset-0 bg-gradient-to-t from-night/80 via-transparent to-transparent lg:hidden" />
             </div>
 
           </div>
+          </Reveal>
         </div>
       </section>
 
       {/* 6. Customer Stories */}
-      <section className="py-20 sm:py-28 bg-white border-b border-canvas-border">
+      <section className="py-24 sm:py-32 bg-surface border-b border-canvas-border">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <Reveal className="text-center max-w-2xl mx-auto mb-16">
             <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700 font-semibold">
               Loved by Customers
             </span>
@@ -296,18 +302,19 @@ export default function HomePage() {
             <p className="mt-3 text-sm text-ink-muted">
               Real notes from book lovers, gift givers, and crochet enthusiasts across India.
             </p>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {COMMUNITY_STORIES.map((story) => (
-              <div
+            {COMMUNITY_STORIES.map((story, i) => (
+              <Reveal
                 key={story.author}
-                className="bg-canvas rounded-2xl p-8 border border-canvas-border shadow-xs flex flex-col justify-between"
+                delay={i * 0.09}
+                className="bg-canvas rounded-3xl p-8 border border-canvas-border shadow-xs hover:shadow-card transition-shadow flex flex-col justify-between h-full"
               >
                 <div>
                   <div className="flex gap-1 text-amber-500 mb-5">
-                    {[...Array(story.stars)].map((_, i) => (
-                      <Star key={i} size={15} fill="#D97706" />
+                    {[...Array(story.stars)].map((_, s) => (
+                      <Star key={s} size={15} fill="#D97706" />
                     ))}
                   </div>
                   <p className="font-editorial text-base text-ink leading-relaxed italic">
@@ -324,7 +331,7 @@ export default function HomePage() {
                     {story.item}
                   </span>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
 
@@ -332,9 +339,9 @@ export default function HomePage() {
       </section>
 
       {/* 7. Instagram & Atelier Visual Gallery */}
-      <section className="py-16 sm:py-20 bg-canvas">
+      <section className="py-20 sm:py-24 bg-canvas">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <Reveal className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <span className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
                 Daily Stitches
@@ -351,7 +358,7 @@ export default function HomePage() {
             >
               Follow on Instagram →
             </a>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
             {[
@@ -361,22 +368,23 @@ export default function HomePage() {
               { src: '/images/amigurumi_bunny.jpg', alt: 'Crochet bunny plush' },
               { src: '/images/gift_packaging.jpg', alt: 'Crochet packaging' },
             ].map((img, i) => (
-              <a
-                key={i}
-                href="https://instagram.com/thecozzyloops"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative rounded-2xl overflow-hidden aspect-square border border-canvas-border shadow-xs"
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
-                />
-                <div className="absolute inset-0 bg-ink/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium">
-                  <span>View on Instagram</span>
-                </div>
-              </a>
+              <Reveal key={i} delay={i * 0.06} duration={0.5}>
+                <a
+                  href="https://instagram.com/thecozzyloops"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative rounded-3xl overflow-hidden aspect-square border border-canvas-border shadow-xs block hover:-translate-y-1 transition-transform duration-300"
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+                  />
+                  <div className="absolute inset-0 bg-night/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-medium">
+                    <span>View on Instagram</span>
+                  </div>
+                </a>
+              </Reveal>
             ))}
           </div>
         </div>

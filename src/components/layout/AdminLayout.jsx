@@ -11,7 +11,8 @@ import {
   Plus, 
   Sparkles,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Star
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import authService from '../../services/authService'
@@ -21,6 +22,7 @@ const ADMIN_NAV = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { to: '/admin/products', label: 'Products & Inventory', icon: Package },
   { to: '/admin/categories', label: 'Categories', icon: FolderTree },
+  { to: '/admin/reviews', label: 'Reviews & Ratings', icon: Star },
 ]
 
 export default function AdminLayout() {
@@ -33,7 +35,7 @@ export default function AdminLayout() {
     try {
       await authService.signOut()
       navigate('/admin/login')
-      toast.success('Signed out of Atelier Console')
+      toast.success('Signed out of admin Console')
     } catch {
       toast.error('Sign out failed')
     }
@@ -42,7 +44,7 @@ export default function AdminLayout() {
   const isActive = (link) => 
     link.exact ? location.pathname === link.to : location.pathname.startsWith(link.to)
 
-  const currentNav = ADMIN_NAV.find(n => isActive(n)) || { label: 'Atelier Console' }
+  const currentNav = ADMIN_NAV.find(n => isActive(n)) || { label: 'Admin Console' }
   const adminEmail = session?.user?.email || 'admin@thecozzyloops.com'
   const adminInitial = adminEmail.charAt(0).toUpperCase()
 
@@ -50,7 +52,7 @@ export default function AdminLayout() {
     <div className="min-h-screen bg-canvas flex font-sans antialiased text-ink selection:bg-terracotta-100 selection:text-terracotta-900">
       {/* Sidebar Desktop & Mobile */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-ink text-white flex flex-col transition-all duration-300 ease-in-out border-r border-white/5
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-elevated text-white flex flex-col transition-all duration-300 ease-in-out border-r border-white/5
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:inset-auto`}
       >
         {/* Brand Header */}
@@ -63,7 +65,7 @@ export default function AdminLayout() {
               <p className="font-editorial text-lg tracking-wide text-white leading-none">TheCozzyLoops</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Atelier Studio</span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Admin Panel</span>
               </div>
             </div>
           </div>
@@ -74,18 +76,6 @@ export default function AdminLayout() {
           >
             <X size={18} />
           </button>
-        </div>
-
-        {/* Quick Action */}
-        <div className="px-5 pt-5 pb-2">
-          <Link
-            to="/admin/products/new"
-            onClick={() => setSidebarOpen(false)}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-terracotta-600 hover:bg-terracotta-500 text-white text-xs font-semibold uppercase tracking-wider transition-colors shadow-subtle"
-          >
-            <Plus size={15} />
-            <span>New Creation</span>
-          </Link>
         </div>
 
         {/* Navigation */}
@@ -149,7 +139,7 @@ export default function AdminLayout() {
             className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10 text-xs font-medium transition-colors"
           >
             <LogOut size={14} />
-            <span>Sign Out of Atelier</span>
+            <span>Sign Out of Admin</span>
           </button>
         </div>
       </aside>
@@ -157,7 +147,7 @@ export default function AdminLayout() {
       {/* Mobile Backdrop */}
       {sidebarOpen && (
         <div 
-          className="fixed inset-0 bg-ink/70 backdrop-blur-xs z-40 lg:hidden" 
+          className="fixed inset-0 bg-night/70 backdrop-blur-xs z-40 lg:hidden" 
           onClick={() => setSidebarOpen(false)} 
         />
       )}
@@ -176,7 +166,7 @@ export default function AdminLayout() {
             </button>
             <div>
               <div className="flex items-center gap-2 text-xs text-ink-subtle">
-                <span>Atelier Studio</span>
+                <span>Admin Panel</span>
                 <ChevronRight size={12} />
                 <span className="text-ink font-medium">{currentNav.label}</span>
               </div>
@@ -189,7 +179,7 @@ export default function AdminLayout() {
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-canvas-border bg-white text-ink-muted hover:text-ink hover:border-ink/20 text-xs font-medium transition-colors shadow-xs"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-canvas-border bg-surface text-ink-muted hover:text-ink hover:border-ink/20 text-xs font-medium transition-colors shadow-xs"
             >
               <ExternalLink size={13} />
               <span>View Store</span>
@@ -197,7 +187,7 @@ export default function AdminLayout() {
 
             <Link
               to="/admin/products/new"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-ink hover:bg-ink-charcoal text-white text-xs font-semibold uppercase tracking-wider transition-colors shadow-subtle"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-elevated hover:bg-elevated-2 text-white text-xs font-semibold uppercase tracking-wider transition-colors shadow-subtle"
             >
               <Plus size={14} />
               <span className="hidden sm:inline">Add Product</span>

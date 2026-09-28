@@ -5,6 +5,8 @@ const ShopContext = createContext(null)
 
 const CART_STORAGE_KEY = 'thecozzyloops_cart_items_v2'
 const WISHLIST_STORAGE_KEY = 'thecozzyloops_wishlist_ids_v2'
+const RECENT_STORAGE_KEY = 'thecozzyloops_recently_viewed_v1'
+const RECENT_LIMIT = 8
 
 export function ShopProvider({ children }) {
   const [cart, setCart] = useState(() => {
@@ -19,6 +21,15 @@ export function ShopProvider({ children }) {
   const [wishlist, setWishlist] = useState(() => {
     try {
       const stored = localStorage.getItem(WISHLIST_STORAGE_KEY)
+      return stored ? JSON.parse(stored) : []
+    } catch {
+      return []
+    }
+  })
+
+  const [recentlyViewed, setRecentlyViewed] = useState(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_STORAGE_KEY)
       return stored ? JSON.parse(stored) : []
     } catch {
       return []
@@ -46,6 +57,22 @@ export function ShopProvider({ children }) {
       console.warn('Failed to save wishlist to storage', err)
     }
   }, [wishlist])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(recentlyViewed))
+    } catch (err) {
+      console.warn('Failed to save recently viewed to storage', err)
+    }
+  }, [recentlyViewed])
+
+  const trackRecentlyViewed = (product) => {
+    if (!product?.id) return
+    setRecentlyViewed((prev) => {
+      const next = [product, ...prev.filter((p) => p.id !== product.id)]
+      return next.slice(0, RECENT_LIMIT)
+    })
+  }
 
   const addToCart = (product, { quantity = 1, selectedColor = '', customNote = '' } = {}) => {
     setCart((prev) => {
@@ -188,6 +215,8 @@ export function ShopProvider({ children }) {
         customStudioDefaults,
         openCustomStudio,
         closeCustomStudio,
+        recentlyViewed,
+        trackRecentlyViewed,
       }}
     >
       {children}

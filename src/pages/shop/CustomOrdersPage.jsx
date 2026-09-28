@@ -39,7 +39,7 @@ const YARN_PREFERENCES = [
   { id: 'milk_cotton', label: 'Soft Milk Cotton', desc: 'Smooth, durable, skin-friendly, sharp stitch definition (Most Popular)' },
   { id: 'chenille', label: 'Fluffy Chenille Velvet', desc: 'Extra squishy cloud texture, velvety soft and warm' },
   { id: 'bamboo', label: 'Bamboo Cotton Blend', desc: 'Silky, lightweight drape with gentle natural sheen' },
-  { id: 'any', label: 'Artisan Choice', desc: 'Let Niharika pick the yarn best suited for this exact design' },
+  { id: 'any', label: 'Artisan Choice', desc: 'Let we pick the yarn best suited for this exact design' },
 ]
 
 const OCCASIONS = [
@@ -176,7 +176,7 @@ export default function CustomOrdersPage() {
       `*Contact:* ${form.contact || 'WhatsApp'}`,
       form.additionalNotes.trim() ? `*Notes / Special Details:* ${form.additionalNotes.trim()}` : null,
       `━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `Hi Niharika! I would love to order this custom crochet piece from The CozyLoops. Could you please share availability and pricing?`,
+      `Hi! I would love to order this custom crochet piece from The CozyLoops. Could you please share availability and pricing?`,
     ].filter(Boolean).join('\n')
   }
 
@@ -188,14 +188,14 @@ export default function CustomOrdersPage() {
 
   const handleSendWhatsApp = () => {
     if (!form.name.trim()) {
-      toast.error('Please enter your name so Niharika knows who is asking!')
+      toast.error('Please enter your name so we know who is asking!')
       return
     }
     const text = buildCustomSummary()
     const encoded = encodeURIComponent(text)
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank')
     setSubmitted(true)
-    toast.success('Opening WhatsApp chat with Niharika!')
+    toast.success('Opening WhatsApp chat with Us!')
   }
 
   const handleSendInstagram = () => {
@@ -232,11 +232,11 @@ export default function CustomOrdersPage() {
           <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4 text-left">
             {[
               { num: '01', title: 'Pick Item & Colors', desc: 'Use our easy builder below' },
-              { num: '02', title: 'Send to Niharika', desc: 'Direct WhatsApp or Instagram' },
+              { num: '02', title: 'Send to Us', desc: 'Direct WhatsApp or Instagram' },
               { num: '03', title: 'Crafted with Love', desc: 'Stitched with soft milk cotton' },
               { num: '04', title: 'Gift Boxed & Sent', desc: 'Fast delivery with gift card' },
             ].map((step) => (
-              <div key={step.num} className="bg-white border border-canvas-border p-4 rounded-2xl shadow-xs">
+              <div key={step.num} className="bg-surface border border-canvas-border p-4 rounded-2xl shadow-xs">
                 <span className="font-mono text-xs font-bold text-terracotta-700">{step.num}</span>
                 <h4 className="font-editorial font-bold text-ink text-base mt-1">{step.title}</h4>
                 <p className="text-xs text-ink-muted mt-0.5 font-light">{step.desc}</p>
@@ -254,7 +254,7 @@ export default function CustomOrdersPage() {
           <div className="lg:col-span-7 space-y-10">
 
             {/* Step 1: Product Type */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 01</span>
@@ -274,7 +274,7 @@ export default function CustomOrdersPage() {
                       className={`text-left p-3.5 rounded-xl border transition-all relative flex items-start gap-3 ${
                         selected
                           ? 'bg-terracotta-50/60 border-terracotta-600 ring-1 ring-terracotta-600 shadow-xs'
-                          : 'bg-white hover:bg-canvas-subtle/50 border-canvas-border'
+                          : 'bg-surface hover:bg-canvas-subtle/50 border-canvas-border'
                       }`}
                     >
                       <span className="text-2xl mt-0.5 shrink-0">{type.icon}</span>
@@ -319,7 +319,7 @@ export default function CustomOrdersPage() {
             </div>
 
             {/* Step 2: Yarn Material */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 02</span>
@@ -338,7 +338,7 @@ export default function CustomOrdersPage() {
                       className={`text-left p-3.5 rounded-xl border transition-all ${
                         selected
                           ? 'bg-terracotta-50/60 border-terracotta-600 ring-1 ring-terracotta-600 shadow-xs'
-                          : 'bg-white hover:bg-canvas-subtle/50 border-canvas-border'
+                          : 'bg-surface hover:bg-canvas-subtle/50 border-canvas-border'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -355,7 +355,7 @@ export default function CustomOrdersPage() {
             </div>
 
             {/* Step 3: Color Preferences */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 03</span>
@@ -382,7 +382,7 @@ export default function CustomOrdersPage() {
                       className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-left text-xs transition-all ${
                         isSelected
                           ? 'bg-terracotta-50/70 border-terracotta-600 font-semibold text-ink shadow-2xs'
-                          : 'bg-white hover:bg-canvas-subtle/40 border-canvas-border text-ink-muted'
+                          : 'bg-surface hover:bg-canvas-subtle/40 border-canvas-border text-ink-muted'
                       }`}
                     >
                       <span
@@ -412,7 +412,7 @@ export default function CustomOrdersPage() {
             </div>
 
             {/* Step 4: Occasion, Timeline & Notes */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
               <div>
                 <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 04</span>
                 <h2 className="font-editorial text-xl font-bold text-ink mt-0.5">Occasion & Timing</h2>
@@ -426,7 +426,7 @@ export default function CustomOrdersPage() {
                   <select
                     value={form.occasion}
                     onChange={(e) => setForm((prev) => ({ ...prev, occasion: e.target.value }))}
-                    className="input-field text-sm bg-white"
+                    className="input-field text-sm bg-surface"
                   >
                     {OCCASIONS.map((occ) => (
                       <option key={occ} value={occ}>{occ}</option>
@@ -505,7 +505,7 @@ export default function CustomOrdersPage() {
             </div>
 
             {/* Step 5: Contact Information */}
-            <div className="bg-white rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
               <div>
                 <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 05</span>
                 <h2 className="font-editorial text-xl font-bold text-ink mt-0.5">Your Details</h2>
@@ -545,8 +545,8 @@ export default function CustomOrdersPage() {
 
           {/* Right Column: Live Request Summary & Action Card */}
           <div className="lg:col-span-5 sticky top-24 space-y-6">
-            <div className="bg-white rounded-2xl border border-canvas-border shadow-md overflow-hidden">
-              <div className="bg-ink text-white p-5">
+            <div className="bg-surface rounded-2xl border border-canvas-border shadow-md overflow-hidden">
+              <div className="bg-elevated text-white p-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Wand2 size={16} className="text-terracotta-400" />
@@ -557,7 +557,7 @@ export default function CustomOrdersPage() {
                   </span>
                 </div>
                 <p className="text-xs text-white/70 mt-1">
-                  Ready to send to Niharika for instant confirmation & pricing.
+                  Ready to send for instant confirmation & pricing.
                 </p>
               </div>
 
@@ -628,7 +628,7 @@ export default function CustomOrdersPage() {
                   <button
                     type="button"
                     onClick={handleSendInstagram}
-                    className="w-full py-3.5 px-4 rounded-xl bg-ink hover:bg-ink-charcoal text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs transition-colors"
+                    className="w-full py-3.5 px-4 rounded-xl bg-elevated hover:bg-elevated-2 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-xs transition-colors"
                   >
                     <FaInstagram size={18} />
                     <span>Send on Instagram DM</span>
@@ -667,7 +667,7 @@ export default function CustomOrdersPage() {
       </section>
 
       {/* 3. Inspiration Showcase */}
-      <section className="bg-white border-y border-canvas-border py-20">
+      <section className="bg-surface border-y border-canvas-border py-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
@@ -688,7 +688,7 @@ export default function CustomOrdersPage() {
                 className="bg-canvas rounded-2xl overflow-hidden border border-canvas-border flex flex-col justify-between hover:shadow-card transition-all duration-300"
               >
                 {/* Photo frame */}
-                <div className="aspect-[4/3] bg-stone-100 overflow-hidden relative">
+                <div className="aspect-[4/3] bg-canvas-muted overflow-hidden relative">
                   <img
                     src={item.image}
                     alt={item.title}
@@ -735,7 +735,7 @@ export default function CustomOrdersPage() {
             return (
               <div 
                 key={idx}
-                className="bg-white rounded-xl border border-canvas-border overflow-hidden transition-all shadow-2xs"
+                className="bg-surface rounded-xl border border-canvas-border overflow-hidden transition-all shadow-2xs"
               >
                 <button
                   type="button"
@@ -768,11 +768,11 @@ export default function CustomOrdersPage() {
             Have a Specific Reference Picture or Urgent Order?
           </h3>
           <p className="text-sm text-ink-muted mt-2 max-w-xl mx-auto">
-            You can skip the form and chat with Niharika directly. Send your photo, budget, or preferred deadline.
+            You can skip the form and chat with us directly. Send your photo, budget, or preferred deadline.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi Niharika! I have a question about a custom crochet design.')}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi! I have a question about a custom crochet design.')}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-semibold shadow-xs transition-colors"
@@ -784,14 +784,14 @@ export default function CustomOrdersPage() {
               href={INSTAGRAM_DM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-ink hover:bg-ink-charcoal text-white text-xs font-semibold shadow-xs transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-elevated hover:bg-elevated-2 text-white text-xs font-semibold shadow-xs transition-colors"
             >
               <FaInstagram size={15} />
               <span>Send Instagram DM</span>
             </a>
             <Link
               to="/contact"
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-canvas-border bg-white text-ink hover:text-terracotta-700 text-xs font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-canvas-border bg-surface text-ink hover:text-terracotta-700 text-xs font-medium transition-colors"
             >
               <span>General Help & Contact Page</span>
               <ArrowRight size={13} />

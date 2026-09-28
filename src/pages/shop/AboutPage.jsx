@@ -72,7 +72,7 @@ export default function AboutPage() {
               </Link>
               <button
                 onClick={() => openCustomStudio()}
-                className="btn-outline text-xs sm:text-sm px-6 py-3.5 bg-white"
+                className="btn-outline text-xs sm:text-sm px-6 py-3.5 bg-surface"
               >
                 <Wand2 size={15} className="text-terracotta-600" />
                 <span>Custom Orders</span>
@@ -81,18 +81,18 @@ export default function AboutPage() {
           </div>
 
           <div className="lg:col-span-5">
-            <div className="relative rounded-3xl overflow-hidden bg-white border border-canvas-border shadow-lifted">
+            <div className="relative rounded-3xl overflow-hidden bg-surface border border-canvas-border shadow-lifted">
               <img
                 src="/images/about_1.jpg"
                 alt="Crochet workspace and handcrafted floral pieces"
                 className="w-full aspect-[4/5] object-cover"
               />
-              <div className="p-6 bg-white border-t border-canvas-border">
+              <div className="p-6 bg-surface border-t border-canvas-border">
                 <p className="font-editorial text-lg font-bold text-ink">
                   Every loop is made by hand
                 </p>
                 <p className="text-xs text-ink-muted mt-1">
-                  Crocheted by Niharika with love and patience in small batches.
+                  Crocheted by Us with love and patience in small batches.
                 </p>
               </div>
             </div>
@@ -117,7 +117,7 @@ export default function AboutPage() {
             {CRAFT_STEPS.map((step) => (
               <div
                 key={step.num}
-                className="bg-white p-6 rounded-2xl border border-canvas-border shadow-subtle flex flex-col justify-between"
+                className="bg-surface p-6 rounded-2xl border border-canvas-border shadow-subtle flex flex-col justify-between"
               >
                 <div>
                   <span className="font-mono text-xs font-bold text-terracotta-700">
@@ -151,7 +151,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {FIBERS.map((f) => (
-              <div key={f.name} className="bg-white p-6 rounded-2xl border border-canvas-border shadow-xs">
+              <div key={f.name} className="bg-surface p-6 rounded-2xl border border-canvas-border shadow-xs">
                 <span className="text-[11px] font-mono uppercase tracking-wider text-terracotta-700 font-semibold">
                   {f.badge}
                 </span>
@@ -167,7 +167,7 @@ export default function AboutPage() {
         </div>
 
         {/* Commission Callout Banner */}
-        <div className="bg-ink text-white rounded-3xl p-8 sm:p-14 text-center max-w-4xl mx-auto shadow-float">
+        <div className="bg-elevated text-white rounded-3xl p-8 sm:p-14 text-center max-w-4xl mx-auto shadow-float">
           <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-400">
             Custom Orders
           </span>

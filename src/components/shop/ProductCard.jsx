@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Heart, ShoppingBag, Eye, Check } from 'lucide-react'
 import { useShop } from '../../context/ShopContext'
 import { isOnSale, discountPercent } from '../../models/Product'
+import { getRatingSummary } from '../../models/Review'
+import StarRating from '../ui/StarRating'
 
 export default function ProductCard({ product, className = '' }) {
   const { addToCart, isInWishlist, toggleWishlist, openQuickLook, setIsCartOpen } = useShop()
@@ -13,6 +15,7 @@ export default function ProductCard({ product, className = '' }) {
   const isSaved = isInWishlist(product.id)
   const primaryImage = product.images?.[0] || '/images/crochet-main.jpg'
   const colors = product.color_options || []
+  const { average, count } = getRatingSummary(product.id)
 
   const handleQuickAdd = (e) => {
     e.preventDefault()
@@ -39,7 +42,7 @@ export default function ProductCard({ product, className = '' }) {
   }
 
   return (
-    <div className={`group flex flex-col bg-white rounded-2xl border border-canvas-border hover:border-terracotta-300 shadow-xs hover:shadow-card transition-all duration-300 overflow-hidden ${className}`}>
+    <div className={`group flex flex-col bg-surface rounded-3xl border border-canvas-border hover:border-terracotta-300 shadow-xs hover:shadow-card hover:-translate-y-1 transition-all duration-300 overflow-hidden ${className}`}>
       {/* Visual Frame */}
       <div className="relative aspect-[4/5] bg-canvas-subtle overflow-hidden">
         <Link to={`/shop/${product.id}`} className="block w-full h-full">
@@ -54,7 +57,7 @@ export default function ProductCard({ product, className = '' }) {
         {/* Quiet corner micro-indicator (No candy pill badges) */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none">
           {onSale && (
-            <span className="bg-ink text-white font-mono text-[10px] tracking-wider px-2 py-0.5 rounded font-semibold shadow-xs">
+            <span className="bg-elevated text-white font-mono text-[10px] tracking-wider px-2 py-0.5 rounded font-semibold shadow-xs">
               -{discount}%
             </span>
           )}
@@ -76,8 +79,8 @@ export default function ProductCard({ product, className = '' }) {
             onClick={handleWishlist}
             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
               isSaved
-                ? 'bg-white text-terracotta-600 shadow-xs'
-                : 'bg-white/90 hover:bg-white text-ink-muted hover:text-ink shadow-xs backdrop-blur-xs'
+                ? 'bg-surface text-terracotta-600 shadow-xs'
+                : 'bg-white/90 hover:bg-surface text-ink-muted hover:text-ink shadow-xs backdrop-blur-xs'
             }`}
             aria-label={isSaved ? 'Remove from favorites' : 'Save to favorites'}
           >
@@ -86,7 +89,7 @@ export default function ProductCard({ product, className = '' }) {
 
           <button
             onClick={handleQuickLook}
-            className="w-9 h-9 rounded-full bg-white/90 hover:bg-white text-ink-muted hover:text-ink shadow-xs backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/90 hover:bg-surface text-ink-muted hover:text-ink shadow-xs backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
             aria-label="Quick preview"
             title="Quick view"
           >
@@ -98,7 +101,7 @@ export default function ProductCard({ product, className = '' }) {
         <div className="absolute inset-x-3 bottom-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-200">
           <button
             onClick={handleQuickAdd}
-            className="w-full py-3 px-4 bg-ink/95 hover:bg-ink text-white text-xs font-semibold rounded-xl backdrop-blur-xs flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all"
+            className="w-full py-3 px-4 bg-elevated/95 hover:bg-elevated text-white text-xs font-semibold rounded-xl backdrop-blur-xs flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all"
           >
             {justAdded ? (
               <>
@@ -132,6 +135,12 @@ export default function ProductCard({ product, className = '' }) {
               {product.name}
             </h3>
           </Link>
+
+          {count > 0 && (
+            <div className="mt-1.5">
+              <StarRating value={average} count={count} size={13} />
+            </div>
+          )}
         </div>
 
         <div className="mt-3.5 pt-3 border-t border-canvas-border/80 flex items-center justify-between">

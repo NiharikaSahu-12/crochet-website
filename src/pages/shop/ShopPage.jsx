@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Search, X, SlidersHorizontal, ArrowUpDown, Wand2, Sparkles } from 'lucide-react'
 import ProductCard from '../../components/shop/ProductCard'
+import Reveal from '../../components/ui/Reveal'
 import { useProducts } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
 import { useShop } from '../../context/ShopContext'
@@ -27,6 +28,8 @@ export default function ShopPage() {
   const [priceTier, setPriceTier] = useState('all')
   const [sortBy, setSortBy] = useState('featured')
   const [inStockOnly, setInStockOnly] = useState(false)
+  const [searchFocused, setSearchFocused] = useState(false)
+  const searchBoxRef = useRef(null)
   const { openCustomStudio } = useShop()
 
   const { categories } = useCategories({ activeOnly: true })
@@ -36,6 +39,34 @@ export default function ShopPage() {
     category: selectedCategory || undefined,
     search: search.trim() || undefined,
   })
+
+  // Full active catalog powers the search autocomplete suggestions.
+  const { products: catalog } = useProducts({ status: 'active' })
+
+  const suggestions = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (q.length < 1) return []
+    return catalog
+      .filter((p) => {
+        const haystack = [p.name, p.category, p.yarn_type, ...(p.tags || [])]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+        return haystack.includes(q)
+      })
+      .slice(0, 6)
+  }, [catalog, search])
+
+  // Close the suggestion dropdown on outside click.
+  useEffect(() => {
+    const onClick = (e) => {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target)) {
+        setSearchFocused(false)
+      }
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [])
 
   const updateCategory = (catValue) => {
     setSelectedCategory(catValue)
@@ -106,22 +137,69 @@ export default function ShopPage() {
         <div className="mt-8 pt-6 border-t border-canvas-border space-y-4">
           <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
             {/* Search Input */}
-            <div className="relative flex-1 max-w-md">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-subtle pointer-events-none" />
+            <div className="relative flex-1 max-w-md" ref={searchBoxRef}>
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-subtle pointer-events-none z-10" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
                 placeholder="Search bookmarks, keychains, flowers..."
-                className="w-full pl-10 pr-9 py-2.5 bg-white border border-canvas-border rounded-xl text-xs sm:text-sm text-ink outline-none focus:border-terracotta-600 focus:ring-1 focus:ring-terracotta-600 transition-all placeholder:text-ink-subtle"
+                className="w-full pl-10 pr-9 py-2.5 bg-surface border border-canvas-border rounded-xl text-xs sm:text-sm text-ink outline-none focus:border-terracotta-600 focus:ring-1 focus:ring-terracotta-600 transition-all placeholder:text-ink-subtle"
               />
               {search && (
                 <button
                   onClick={() => setSearch('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-subtle hover:text-ink"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-subtle hover:text-ink z-10"
                 >
                   <X size={14} />
                 </button>
+              )}
+
+              {/* Smart Search Autocomplete */}
+              {searchFocused && search.trim().length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-canvas-border rounded-2xl shadow-lifted overflow-hidden z-30 animate-fade-up">
+                  {suggestions.length > 0 ? (
+                    <ul className="divide-y divide-canvas-border/70">
+                      {suggestions.map((p) => (
+                        <li key={p.id}>
+                          <Link
+                            to={`/shop/${p.id}`}
+                            onClick={() => setSearchFocused(false)}
+                            className="flex items-center gap-3 px-3.5 py-2.5 hover:bg-canvas-subtle transition-colors"
+                          >
+                            <img
+                              src={p.images?.[0] || '/images/crochet-main.jpg'}
+                              alt=""
+                              className="w-10 h-12 rounded-lg object-cover border border-canvas-border shrink-0"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-ink truncate">{p.name}</p>
+                              <p className="text-[11px] text-ink-subtle capitalize truncate">
+                                {p.category?.replace(/_/g, ' ')}
+                              </p>
+                            </div>
+                            <span className="font-mono text-xs text-terracotta-700 shrink-0">
+                              ₹{Number(p.price).toLocaleString()}
+                            </span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="px-4 py-5 text-center">
+                      <p className="text-sm text-ink">No matches for “{search.trim()}”</p>
+                      <Link
+                        to="/custom-orders"
+                        onClick={() => setSearchFocused(false)}
+                        className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-terracotta-700 hover:text-terracotta-900"
+                      >
+                        <Wand2 size={13} />
+                        Request a custom piece
+                      </Link>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
@@ -133,8 +211,8 @@ export default function ShopPage() {
                 onClick={() => setInStockOnly(!inStockOnly)}
                 className={`text-xs px-3.5 py-2 rounded-xl border transition-all ${
                   inStockOnly
-                    ? 'border-ink bg-ink text-white font-medium'
-                    : 'border-canvas-border bg-white text-ink-muted hover:border-ink/20'
+                    ? 'border-ink bg-elevated text-white font-medium'
+                    : 'border-canvas-border bg-surface text-ink-muted hover:border-ink/20'
                 }`}
               >
                 In Stock Only
@@ -144,7 +222,7 @@ export default function ShopPage() {
               <select
                 value={priceTier}
                 onChange={(e) => setPriceTier(e.target.value)}
-                className="text-xs px-3 py-2 bg-white border border-canvas-border rounded-xl text-ink outline-none focus:border-terracotta-600 font-medium cursor-pointer"
+                className="text-xs px-3 py-2 bg-surface border border-canvas-border rounded-xl text-ink outline-none focus:border-terracotta-600 font-medium cursor-pointer"
               >
                 {PRICE_TIERS.map((tier) => (
                   <option key={tier.id} value={tier.id}>
@@ -158,7 +236,7 @@ export default function ShopPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="text-xs pl-3 pr-8 py-2 bg-white border border-canvas-border rounded-xl text-ink outline-none focus:border-terracotta-600 font-medium appearance-none cursor-pointer"
+                  className="text-xs pl-3 pr-8 py-2 bg-surface border border-canvas-border rounded-xl text-ink outline-none focus:border-terracotta-600 font-medium appearance-none cursor-pointer"
                 >
                   {SORT_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -186,8 +264,8 @@ export default function ShopPage() {
               onClick={() => updateCategory('')}
               className={`text-xs px-4 py-2 rounded-xl transition-all shrink-0 font-medium ${
                 selectedCategory === ''
-                  ? 'bg-ink text-white shadow-xs'
-                  : 'bg-white border border-canvas-border text-ink-muted hover:text-ink hover:border-ink/20'
+                  ? 'bg-elevated text-white shadow-xs'
+                  : 'bg-surface border border-canvas-border text-ink-muted hover:text-ink hover:border-ink/20'
               }`}
             >
               All Products
@@ -201,8 +279,8 @@ export default function ShopPage() {
                   onClick={() => updateCategory(cat.value)}
                   className={`text-xs px-4 py-2 rounded-xl transition-all shrink-0 font-medium capitalize ${
                     active
-                      ? 'bg-ink text-white shadow-xs'
-                      : 'bg-white border border-canvas-border text-ink-muted hover:text-ink hover:border-ink/20'
+                      ? 'bg-elevated text-white shadow-xs'
+                      : 'bg-surface border border-canvas-border text-ink-muted hover:text-ink hover:border-ink/20'
                   }`}
                 >
                   {cat.label}
@@ -231,11 +309,11 @@ export default function ShopPage() {
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="aspect-[4/5] bg-canvas-subtle rounded-2xl animate-pulse" />
+                <div key={i} className="aspect-[4/5] bg-canvas-subtle rounded-3xl animate-pulse" />
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="bg-white rounded-3xl border border-canvas-border p-12 text-center max-w-lg mx-auto my-12 shadow-xs">
+            <div className="bg-surface rounded-3xl border border-canvas-border p-12 text-center max-w-lg mx-auto my-12 shadow-xs">
               <div className="text-3xl mb-3">🧶</div>
               <h3 className="font-editorial text-xl font-bold text-ink">
                 No items found
@@ -255,8 +333,10 @@ export default function ShopPage() {
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {filteredProducts.map((product, i) => (
+                <Reveal key={product.id} delay={(i % 4) * 0.06} duration={0.5}>
+                  <ProductCard product={product} />
+                </Reveal>
               ))}
             </div>
           )}

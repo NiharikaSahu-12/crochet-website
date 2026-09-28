@@ -4,6 +4,10 @@ import { ArrowLeft, Heart, ShoppingBag, Wand2, ShieldCheck, Sparkles, Plus, Minu
 import { FaWhatsapp, FaInstagram } from 'react-icons/fa'
 import productController from '../../controllers/productController'
 import ProductCard from '../../components/shop/ProductCard'
+import ReviewsSection from '../../components/shop/ReviewsSection'
+import RecentlyViewedRail from '../../components/shop/RecentlyViewedRail'
+import StarRating from '../../components/ui/StarRating'
+import { getRatingSummary } from '../../models/Review'
 import { useShop } from '../../context/ShopContext'
 import { isOnSale, discountPercent } from '../../models/Product'
 import { WHATSAPP_NUMBER, INSTAGRAM_DM_URL } from '../../utils/instagram'
@@ -12,7 +16,7 @@ import toast from 'react-hot-toast'
 export default function ProductDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { addToCart, isInWishlist, toggleWishlist, setIsCartOpen, openCustomStudio } = useShop()
+  const { addToCart, isInWishlist, toggleWishlist, setIsCartOpen, openCustomStudio, trackRecentlyViewed } = useShop()
 
   const [product, setProduct] = useState(null)
   const [related, setRelated] = useState([])
@@ -55,6 +59,11 @@ export default function ProductDetailPage() {
     }
   }, [id])
 
+  useEffect(() => {
+    if (product) trackRecentlyViewed(product)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-canvas py-16 flex items-center justify-center">
@@ -66,7 +75,7 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <div className="min-h-screen bg-canvas py-20 text-center px-4">
-        <div className="max-w-md mx-auto bg-white p-8 rounded-3xl border border-canvas-border">
+        <div className="max-w-md mx-auto bg-surface p-8 rounded-3xl border border-canvas-border">
           <p className="font-editorial text-2xl font-bold text-ink">Item Not Found</p>
           <p className="text-xs text-ink-muted mt-2">
             This item may be sold out or currently unavailable.
@@ -85,6 +94,7 @@ export default function ProductDetailPage() {
   const discount = discountPercent(product)
   const isSaved = isInWishlist(product.id)
   const colors = product.color_options || []
+  const { average, count } = getRatingSummary(product.id)
 
   const handleAddToCart = () => {
     addToCart(product, {
@@ -159,14 +169,14 @@ export default function ProductDetailPage() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14">
           {/* Visual Column */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="relative aspect-[4/5] bg-white rounded-3xl overflow-hidden border border-canvas-border shadow-lifted">
+            <div className="relative aspect-[4/5] bg-surface rounded-3xl overflow-hidden border border-canvas-border shadow-lifted">
               <img
                 src={currentImg}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
               {onSale && (
-                <div className="absolute top-4 left-4 bg-ink text-white font-mono text-xs uppercase tracking-wider px-3 py-1 rounded-md font-semibold">
+                <div className="absolute top-4 left-4 bg-elevated text-white font-mono text-xs uppercase tracking-wider px-3 py-1 rounded-md font-semibold">
                   SAVE {discount}%
                 </div>
               )}
@@ -184,7 +194,7 @@ export default function ProductDetailPage() {
                   <button
                     key={idx}
                     onClick={() => setSelectedImageIdx(idx)}
-                    className={`w-20 h-24 rounded-xl overflow-hidden border-2 bg-white transition-all shrink-0 ${
+                    className={`w-20 h-24 rounded-xl overflow-hidden border-2 bg-surface transition-all shrink-0 ${
                       selectedImageIdx === idx
                         ? 'border-terracotta-600 shadow-subtle'
                         : 'border-canvas-border opacity-70 hover:opacity-100'
@@ -197,7 +207,7 @@ export default function ProductDetailPage() {
             )}
 
             {/* Quality Stamp */}
-            <div className="p-5 rounded-2xl bg-white border border-canvas-border flex items-start gap-4">
+            <div className="p-5 rounded-2xl bg-surface border border-canvas-border flex items-start gap-4">
               <div className="w-10 h-10 rounded-full bg-terracotta-50 flex items-center justify-center text-terracotta-700 shrink-0">
                 <Flower2 size={20} />
               </div>
@@ -226,6 +236,15 @@ export default function ProductDetailPage() {
               <h1 className="mt-2 font-editorial text-3xl sm:text-4xl font-bold text-ink leading-tight">
                 {product.name}
               </h1>
+
+              {count > 0 && (
+                <a href="#reviews" className="mt-2.5 inline-flex items-center gap-2 group">
+                  <StarRating value={average} size={15} />
+                  <span className="text-xs text-ink-muted group-hover:text-terracotta-700 transition-colors">
+                    {average.toFixed(1)} · {count} {count === 1 ? 'review' : 'reviews'}
+                  </span>
+                </a>
+              )}
 
               {/* Price */}
               <div className="mt-4 flex items-baseline gap-3">
@@ -265,7 +284,7 @@ export default function ProductDetailPage() {
                           className={`text-xs px-3.5 py-2 rounded-xl border transition-all ${
                             active
                               ? 'border-terracotta-600 bg-terracotta-50 text-terracotta-900 font-semibold shadow-xs'
-                              : 'border-canvas-border bg-white text-ink-muted hover:border-ink/20'
+                              : 'border-canvas-border bg-surface text-ink-muted hover:border-ink/20'
                           }`}
                         >
                           {c}
@@ -281,7 +300,7 @@ export default function ProductDetailPage() {
                 <span className="text-xs font-semibold text-ink uppercase tracking-wider">
                   Quantity:
                 </span>
-                <div className="flex items-center border border-canvas-border rounded-xl bg-white shadow-xs">
+                <div className="flex items-center border border-canvas-border rounded-xl bg-surface shadow-xs">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="p-2 hover:bg-canvas-subtle rounded-l-xl text-ink-muted transition-colors"
@@ -318,7 +337,7 @@ export default function ProductDetailPage() {
                     className={`p-3.5 rounded-full border transition-all ${
                       isSaved
                         ? 'border-terracotta-600 bg-terracotta-50 text-terracotta-600'
-                        : 'border-canvas-border bg-white text-ink-muted hover:text-ink hover:border-ink/30'
+                        : 'border-canvas-border bg-surface text-ink-muted hover:text-ink hover:border-ink/30'
                     }`}
                     aria-label="Save to favorites"
                     title="Wishlist"
@@ -328,7 +347,7 @@ export default function ProductDetailPage() {
 
                   <button
                     onClick={handleShare}
-                    className="p-3.5 rounded-full border border-canvas-border bg-white text-ink-muted hover:text-ink hover:border-ink/30 transition-all"
+                    className="p-3.5 rounded-full border border-canvas-border bg-surface text-ink-muted hover:text-ink hover:border-ink/30 transition-all"
                     aria-label="Share product"
                     title="Share"
                   >
@@ -456,6 +475,14 @@ export default function ProductDetailPage() {
             </div>
           </div>
         )}
+
+        {/* Reviews & Ratings */}
+        <div id="reviews" className="scroll-mt-28">
+          <ReviewsSection productId={product.id} />
+        </div>
+
+        {/* Recently Viewed */}
+        <RecentlyViewedRail excludeId={product.id} />
       </div>
     </div>
   )

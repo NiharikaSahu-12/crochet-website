@@ -14,6 +14,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminProducts from './pages/admin/AdminProducts'
 import AdminProductForm from './pages/admin/AdminProductForm'
 import AdminCategories from './pages/admin/AdminCategories'
+import AdminReviews from './pages/admin/AdminReviews'
 import ShopLayout from './components/layout/ShopLayout'
 import AdminLayout from './components/layout/AdminLayout'
 
@@ -62,6 +63,7 @@ export default function App() {
           <Route path="products/new" element={<AdminProductForm />} />
           <Route path="products/:id/edit" element={<AdminProductForm />} />
           <Route path="categories" element={<AdminCategories />} />
+          <Route path="reviews" element={<AdminReviews />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

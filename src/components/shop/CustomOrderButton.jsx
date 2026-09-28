@@ -8,7 +8,7 @@ export default function CustomOrderButton({ className = '', children, defaults =
     <button
       type="button"
       onClick={() => openCustomStudio(defaults)}
-      className={className || 'btn-outline text-xs px-5 py-2.5 bg-white inline-flex items-center gap-1.5'}
+      className={className || 'btn-outline text-xs px-5 py-2.5 bg-surface inline-flex items-center gap-1.5'}
     >
       {children || (
         <>

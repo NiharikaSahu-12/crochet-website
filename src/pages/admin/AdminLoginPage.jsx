@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
     setSubmitting(true)
     try {
       await authService.signIn(email, password)
-      toast.success('Welcome to Atelier Management')
+      toast.success('Welcome to Admin Management Panel')
       navigate('/admin')
     } catch {
       toast.error('Invalid admin credentials')
@@ -36,18 +36,18 @@ export default function AdminLoginPage() {
         className="mb-8 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-ink-muted hover:text-ink transition-colors"
       >
         <ArrowLeft size={14} />
-        <span>Return to Atelier Storefront</span>
+        <span>Return to Storefront</span>
       </Link>
 
-      <div className="w-full max-w-md bg-white rounded-3xl border border-canvas-border shadow-lifted overflow-hidden">
+      <div className="w-full max-w-md bg-surface rounded-3xl border border-canvas-border shadow-lifted overflow-hidden">
         {/* Header */}
-        <div className="bg-ink px-8 py-10 text-center text-white relative">
+        <div className="bg-elevated px-8 py-10 text-center text-white relative">
           <div className="w-12 h-12 rounded-2xl bg-terracotta-500/20 border border-terracotta-400/30 flex items-center justify-center mx-auto mb-3.5 text-terracotta-400 shadow-xs">
             <Sparkles size={22} />
           </div>
           <h1 className="font-editorial text-2xl font-semibold tracking-tight text-white">TheCozzyLoops</h1>
           <p className="text-[11px] font-mono uppercase tracking-widest text-terracotta-300 mt-1">
-            Atelier Portal Management
+            Admin Portal Management
           </p>
         </div>
 
@@ -107,7 +107,7 @@ export default function AdminLoginPage() {
                   <span>Authenticating...</span>
                 </>
               ) : (
-                <span>Sign In to Atelier Console</span>
+                <span>Sign In to Admin Console</span>
               )}
             </button>
           </form>

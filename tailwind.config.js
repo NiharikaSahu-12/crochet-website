@@ -1,40 +1,64 @@
 /** @type {import('tailwindcss').Config} */
+
+// Semantic tokens are CSS variables (RGB triplets) defined in src/index.css.
+// They flip between light and dark via the `.dark` class so utilities like
+// `bg-surface`, `text-ink`, and alpha modifiers (`bg-surface/80`) all work.
+const semantic = (name) => `rgb(var(--${name}) / <alpha-value>)`
+
 export default {
+  darkMode: 'class',
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
+        // --- Flipping semantic surfaces & text ---
         canvas: {
-          DEFAULT: '#FAFAF9',
-          surface: '#FFFFFF',
-          subtle: '#F4F4F5',
-          muted: '#EAEAEA',
-          border: '#E4E4E7',
+          DEFAULT: semantic('canvas'),
+          subtle: semantic('canvas-subtle'),
+          muted: semantic('canvas-muted'),
+          border: semantic('canvas-border'),
         },
         surface: {
-          DEFAULT: '#FFFFFF',
-          secondary: '#FAFAF9',
-          card: '#FFFFFF',
-          border: '#E4E4E7',
+          DEFAULT: semantic('surface'),
+          secondary: semantic('canvas-subtle'),
+          card: semantic('surface'),
+          border: semantic('canvas-border'),
+          raised: semantic('surface-raised'),
         },
         ink: {
-          DEFAULT: '#18181B', // Rich Zinc 900 - crisp, modern, luxury obsidian
-          charcoal: '#27272A', // Zinc 800
-          muted: '#52525B', // Zinc 600 - high contrast, readable
-          subtle: '#71717A', // Zinc 500
-          light: '#A1A1AA',
+          DEFAULT: semantic('ink'),
+          charcoal: semantic('ink-charcoal'),
+          muted: semantic('ink-muted'),
+          subtle: semantic('ink-subtle'),
+          light: semantic('ink-light'),
         },
+        // Always-dark surfaces (buttons, badges, announcement bar) — stay dark in both modes
+        elevated: {
+          DEFAULT: semantic('elevated'),
+          2: semantic('elevated-2'),
+        },
+        // Deepest backdrop (footer, modals)
+        night: semantic('night'),
+        'on-elevated': semantic('on-elevated'),
+        // Accent flips for contrast on dark backgrounds
+        accent: {
+          DEFAULT: semantic('accent'),
+          soft: semantic('accent-soft'),
+          hover: semantic('accent-hover'),
+        },
+
+        // --- Static brand ramps (read well in both modes) ---
         terracotta: {
-          50: '#FDF5F3',
-          100: '#FAECE8',
-          200: '#F4D5CC',
-          300: '#E9B2A4',
-          400: '#D98772',
-          500: '#C45F46',
-          600: '#A7462E', // Elegant signature copper carnelian
-          700: '#87341F',
-          800: '#6C2A1A',
-          900: '#522115',
+          50: '#FBF1EE',
+          100: '#F6E1DA',
+          200: '#EBC3B6',
+          300: '#DDA08C',
+          400: '#CB7B61',
+          500: '#B4573C', // signature
+          600: '#A24A31',
+          700: '#833A26',
+          800: '#68301F',
+          900: '#4F2718',
         },
         forest: {
           50: '#F0FDF4',
@@ -43,19 +67,19 @@ export default {
           700: '#15803D',
           800: '#166534',
           900: '#14532D',
-          atelier: '#233F33', // Deep artisan forest green
+          atelier: '#233F33',
         },
         sage: {
           50: '#F2F6F3',
-          100: '#E3EDE6',
-          200: '#C7DBCB',
-          300: '#A4C3AC',
-          400: '#7AA385',
-          500: '#568462',
-          600: '#42694D',
-          700: '#32503B',
-          800: '#273E2E',
-          900: '#1E3024',
+          100: '#E4EDE7',
+          200: '#C9DBCE',
+          300: '#A6C4AE',
+          400: '#87A98F',
+          500: '#6E8F76', // signature
+          600: '#56735E',
+          700: '#425A49',
+          800: '#314237',
+          900: '#233028',
         },
         bronze: {
           50: '#FCF9F3',
@@ -68,7 +92,7 @@ export default {
           warm: '#D97706',
           soft: '#FEF3C7',
         },
-        // Backwards compatibility with previous classes
+        // Backwards compatibility
         blush: {
           50: '#FDF6F4',
           100: '#FAEAE5',
@@ -81,47 +105,61 @@ export default {
           800: '#6E2E1F',
           900: '#542419',
         },
-        cream: '#FFFFFF',
+        cream: semantic('surface'),
         yarn: {
           pink: '#EAAFA0',
           blush: '#B24A31',
           gold: '#D97706',
           dark: '#0F172A',
-        }
+        },
       },
       fontFamily: {
         display: ['Fraunces', 'Playfair Display', 'Georgia', 'serif'],
         serif: ['Fraunces', 'Playfair Display', 'serif'],
-        body: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        body: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       letterSpacing: {
         tightest: '-0.035em',
         editorial: '0.18em',
       },
+      borderRadius: {
+        '4xl': '2rem',
+      },
       boxShadow: {
-        '2xs': '0 1px 2px rgba(0,0,0,0.02)',
-        'xs': '0 1px 2px rgba(0,0,0,0.04)',
-        'card': '0 1px 3px rgba(0,0,0,0.04), 0 8px 24px -4px rgba(0,0,0,0.04)',
-        'subtle': '0 1px 3px rgba(28,25,23,0.04), 0 4px 12px rgba(28,25,23,0.03)',
-        'lifted': '0 10px 30px -10px rgba(28,25,23,0.08), 0 2px 6px -1px rgba(28,25,23,0.04)',
-        'float': '0 20px 40px -15px rgba(28,25,23,0.12)',
+        '2xs': '0 1px 2px rgb(26 24 21 / 0.03)',
+        'xs': '0 1px 2px rgb(26 24 21 / 0.05)',
+        'card': '0 1px 3px rgb(26 24 21 / 0.05), 0 10px 28px -8px rgb(26 24 21 / 0.08)',
+        'subtle': '0 1px 3px rgb(26 24 21 / 0.05), 0 6px 16px -6px rgb(26 24 21 / 0.06)',
+        'lifted': '0 12px 34px -12px rgb(26 24 21 / 0.16), 0 3px 8px -2px rgb(26 24 21 / 0.06)',
+        'float': '0 24px 48px -18px rgb(26 24 21 / 0.22)',
+        'glow': '0 8px 30px -6px rgb(180 87 60 / 0.35)',
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',
-        'fade-up': 'fadeUp 0.4s ease-out forwards',
+        'fade-up': 'fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) forwards',
+        'fade-in': 'fadeIn 0.4s ease-out forwards',
+        'shimmer': 'shimmer 2.2s linear infinite',
       },
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-6px)' },
+          '50%': { transform: 'translateY(-8px)' },
         },
         fadeUp: {
-          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-      }
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+      },
     },
   },
   plugins: [],

@@ -1,8 +1,9 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
-import { Search, ShoppingBag, Heart, Menu, X, Wand2, Sparkles, ArrowRight, ShieldCheck, RefreshCw, Feather } from 'lucide-react'
+import { ShoppingBag, Heart, Menu, X, Wand2, Sun, Moon, ArrowUp } from 'lucide-react'
 import { FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { useShop } from '../../context/ShopContext'
+import { useTheme } from '../../context/ThemeContext'
 import { INSTAGRAM_HANDLE, WHATSAPP_NUMBER, EMAIL } from '../../utils/instagram'
 import CartDrawer from '../shop/CartDrawer'
 import WishlistDrawer from '../shop/WishlistDrawer'
@@ -19,7 +20,7 @@ const NAV_LINKS = [
 
 function AnnouncementBar() {
   return (
-    <div className="bg-ink text-white/90 text-[11px] font-mono tracking-editorial uppercase py-2.5 px-4 text-center border-b border-white/10 overflow-hidden">
+    <div className="bg-elevated text-on-elevated/90 text-[11px] font-mono tracking-editorial uppercase py-2.5 px-4 text-center border-b border-white/10 overflow-hidden">
       <div className="flex items-center justify-center gap-3">
         <span>100% Handcrafted with Hook</span>
         <span className="text-terracotta-400">·</span>
@@ -35,11 +36,12 @@ function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const { theme, toggleTheme } = useTheme()
   const { cartCount, wishlist, setIsCartOpen, setIsWishlistOpen, openCustomStudio } = useShop()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll)
+    window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
@@ -49,19 +51,19 @@ function Navbar() {
 
   return (
     <header className={`sticky top-0 z-40 transition-all duration-300 ${
-      scrolled 
-        ? 'glass-header border-b border-canvas-border shadow-xs' 
+      scrolled
+        ? 'glass-header border-b border-canvas-border shadow-xs'
         : 'bg-canvas/95 border-b border-canvas-border/60'
     }`}>
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="flex items-center justify-between h-20">
-          
+
           {/* Brand Logo & Name */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-full overflow-hidden border border-canvas-border group-hover:border-terracotta-500 transition-colors shadow-2xs">
-              <img 
-                src="/logo.jpeg" 
-                alt="TheCozzyLoops" 
+              <img
+                src="/logo.jpeg"
+                alt="TheCozzyLoops"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.target.style.display = 'none'
@@ -88,8 +90,8 @@ function Navbar() {
                   key={to}
                   to={to}
                   className={`text-sm tracking-wide transition-colors relative py-1.5 ${
-                    active 
-                      ? 'text-terracotta-700 font-semibold' 
+                    active
+                      ? 'text-terracotta-700 font-semibold'
                       : 'text-ink-muted hover:text-ink font-normal'
                   }`}
                 >
@@ -104,6 +106,16 @@ function Navbar() {
 
           {/* Right Action Controls */}
           <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            >
+              {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
+            </button>
+
             {/* Wishlist Button */}
             <button
               onClick={() => setIsWishlistOpen(true)}
@@ -122,12 +134,12 @@ function Navbar() {
             {/* Bag Button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="inline-flex items-center gap-2 bg-ink hover:bg-ink-charcoal text-white px-4 py-2.5 rounded-full text-xs font-semibold transition-all shadow-xs"
+              className="inline-flex items-center gap-2 bg-elevated hover:bg-elevated-2 text-on-elevated px-4 py-2.5 rounded-full text-xs font-semibold transition-all shadow-xs"
               aria-label="Open shopping bag"
             >
               <ShoppingBag size={15} />
               <span>Bag</span>
-              <span className="font-mono bg-white/20 px-1.5 py-0.2 rounded-full text-[11px] ml-0.5">{cartCount}</span>
+              <span className="font-mono bg-white/20 px-1.5 py-0.5 rounded-full text-[11px] ml-0.5">{cartCount}</span>
             </button>
 
             {/* Mobile Hamburger */}
@@ -145,7 +157,7 @@ function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-canvas-border bg-white px-6 py-5 space-y-4 animate-fade-up">
+        <div className="md:hidden border-t border-canvas-border bg-surface px-6 py-5 space-y-4 animate-fade-up">
           <div className="space-y-2">
             {NAV_LINKS.map(({ to, label }) => {
               const active = location.pathname === to
@@ -205,159 +217,117 @@ function Navbar() {
 
 function ModernFooter() {
   return (
-    <footer className="bg-[#121214] text-[#E4E4E7] border-t border-white/10 pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-14 pb-16 border-b border-white/10">
-          
-          {/* Brand info */}
-          <div className="lg:col-span-5 space-y-5">
-            <div className="font-editorial text-3xl font-bold text-white tracking-tight">
+    <footer className="bg-night text-zinc-300 border-t border-white/10">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-12 pb-6">
+        <div className="grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-10 pb-10">
+          {/* Brand */}
+          <div className="col-span-2 md:col-span-5 space-y-4">
+            <div className="font-editorial text-2xl font-bold text-white tracking-tight">
               TheCozzyLoops
             </div>
-            <p className="text-xs font-mono tracking-editorial uppercase text-terracotta-400 font-medium">
-              Handmade Crochet Atelier · Odisha, India
-            </p>
             <p className="text-sm text-zinc-400 leading-relaxed max-w-sm font-light">
-              Crafted with delicate loops, warm hearts, and ultra-soft milk cotton yarn. Every piece is an everlasting keepsake created to brighten your books, desks, and special gifts.
+              Hand-crocheted in Mumbai with ultra-soft milk cotton yarn. Keepsakes for your books,
+              desks, and special gifts.
             </p>
-
-            <div className="pt-2 flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <a
                 href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white transition-colors"
+                className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-white transition-colors"
                 aria-label="Instagram profile"
               >
-                <FaInstagram size={17} />
+                <FaInstagram size={16} />
               </a>
               <a
                 href={`https://wa.me/${WHATSAPP_NUMBER}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] transition-colors"
+                className="w-9 h-9 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 flex items-center justify-center text-[#25D366] transition-colors"
                 aria-label="WhatsApp direct chat"
               >
-                <FaWhatsapp size={17} />
+                <FaWhatsapp size={16} />
               </a>
               <a
                 href={`mailto:${EMAIL}`}
-                className="text-xs text-zinc-400 hover:text-white transition-colors pl-2"
+                className="text-xs text-zinc-400 hover:text-white transition-colors pl-1"
               >
                 {EMAIL}
               </a>
             </div>
           </div>
 
-          {/* Quick links */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="text-xs font-mono tracking-editorial uppercase text-white font-semibold">
-              Collections
-            </h4>
-            <ul className="space-y-2.5 text-sm text-zinc-400">
-              <li>
-                <Link to="/shop?category=bouquets" className="hover:text-white transition-colors">
-                  Bouquets &amp; Pots
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop?category=flowers" className="hover:text-white transition-colors">
-                  Floral Bookmarks
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop?category=keychains" className="hover:text-white transition-colors">
-                  Keychains &amp; Charms
-                </Link>
-              </li>
-              <li>
-                <Link to="/custom-orders" className="hover:text-white transition-colors text-terracotta-400 font-medium">
-                  Custom Orders Studio
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop" className="hover:text-white transition-colors">
-                  All Handmade Pieces
-                </Link>
-              </li>
+          {/* Shop */}
+          <div className="md:col-span-2 space-y-3">
+            <h4 className="font-editorial text-base font-semibold text-white">Shop</h4>
+            <ul className="space-y-2 text-sm text-zinc-400">
+              <li><Link to="/shop?category=bouquets" className="hover:text-white transition-colors">Bouquets &amp; Pots</Link></li>
+              <li><Link to="/shop?category=flowers" className="hover:text-white transition-colors">Floral Bookmarks</Link></li>
+              <li><Link to="/shop?category=keychains" className="hover:text-white transition-colors">Keychains &amp; Charms</Link></li>
+              <li><Link to="/shop" className="hover:text-white transition-colors">All Pieces</Link></li>
             </ul>
           </div>
 
-          {/* Ethos & Care */}
-          <div className="lg:col-span-2 space-y-4">
-            <h4 className="text-xs font-mono tracking-editorial uppercase text-white font-semibold">
-              Customer Care
-            </h4>
-            <ul className="space-y-2.5 text-sm text-zinc-400">
-              <li>
-                <Link to="/about" className="hover:text-white transition-colors">
-                  Our Story
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="hover:text-white transition-colors">
-                  Care &amp; Washing Guide
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="hover:text-white transition-colors">
-                  Shipping &amp; Delivery
-                </Link>
-              </li>
-              <li>
-                <Link to="/about#yarn-studio" className="hover:text-white transition-colors">
-                  Yarn Library
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="hover:text-white transition-colors">
-                  Contact Niharika
-                </Link>
-              </li>
+          {/* Help */}
+          <div className="md:col-span-2 space-y-3">
+            <h4 className="font-editorial text-base font-semibold text-white">Help</h4>
+            <ul className="space-y-2 text-sm text-zinc-400">
+              <li><Link to="/about" className="hover:text-white transition-colors">Our Story</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">Care &amp; Washing</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">Shipping &amp; Returns</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">Contact &amp; FAQs</Link></li>
             </ul>
           </div>
 
-          {/* Custom Gifting Card */}
-          <div className="lg:col-span-3 bg-white/5 rounded-2xl border border-white/10 p-6 space-y-3.5">
-            <div className="flex items-center gap-2 text-terracotta-400 text-xs font-mono uppercase tracking-wider font-semibold">
-              <Sparkles size={14} />
-              <span>Gifts &amp; Favors</span>
+          {/* Custom order CTA */}
+          <div className="col-span-2 md:col-span-3">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-3">
+              <p className="font-editorial text-base text-white font-medium leading-snug">
+                Wedding favors or event gifts?
+              </p>
+              <p className="text-xs text-zinc-400 font-light">
+                Bulk bouquets, initial charms, and custom gift boxes.
+              </p>
+              <Link
+                to="/custom-orders"
+                className="block text-center py-2.5 rounded-xl bg-terracotta-600 hover:bg-terracotta-500 text-white text-xs font-semibold tracking-wide transition-colors"
+              >
+                Start a Custom Order
+              </Link>
             </div>
-            <p className="font-editorial text-lg text-white font-medium leading-snug">
-              Looking for wedding favors or event gifts?
-            </p>
-            <p className="text-xs text-zinc-400 leading-relaxed font-light">
-              We create bulk floral bouquets, personalized initial charms, and customized palette gift boxes.
-            </p>
-            <Link
-              to="/custom-orders"
-              className="mt-2 block text-center w-full py-3 px-4 rounded-xl bg-terracotta-600 hover:bg-terracotta-700 text-white text-xs font-semibold tracking-wide transition-colors shadow-xs"
-            >
-              Start a Custom Order
-            </Link>
           </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500 font-light">
-          <p>© {new Date().getFullYear()} TheCozzyLoops. All rights reserved. Handcrafted by Niharika.</p>
-          <div className="flex items-center gap-6">
-            <Link to="/about" className="hover:text-white transition-colors">
-              About
-            </Link>
-            <Link to="/custom-orders" className="hover:text-white transition-colors">
-              Custom Orders
-            </Link>
-            <Link to="/contact" className="hover:text-white transition-colors">
-              Contact &amp; FAQs
-            </Link>
-            <Link to="/admin/login" className="hover:text-white transition-colors font-mono opacity-50 hover:opacity-100">
-              Admin
-            </Link>
-          </div>
+        <div className="pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 sm:pr-14 text-xs text-zinc-400 font-light">
+          <p>© {new Date().getFullYear()} TheCozzyLoops. All rights reserved.</p>
+          <p>Orders taken on WhatsApp &amp; Instagram</p>
         </div>
       </div>
     </footer>
+  )
+}
+
+function BackToTop() {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      aria-label="Back to top"
+      className={`fixed bottom-6 right-6 z-30 w-11 h-11 rounded-full bg-elevated text-on-elevated shadow-lifted
+                 flex items-center justify-center transition-all duration-300 hover:bg-elevated-2 hover:-translate-y-0.5
+                 ${visible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-3 pointer-events-none'}`}
+    >
+      <ArrowUp size={18} />
+    </button>
   )
 }
 
@@ -370,6 +340,8 @@ export default function ShopLayout() {
         <Outlet />
       </main>
       <ModernFooter />
+
+      <BackToTop />
 
       {/* Global Interactive Overlays */}
       <CartDrawer />

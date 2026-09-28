@@ -113,7 +113,7 @@ export default function CustomStudioModal() {
       `*Name:* ${customerName || 'Friend'} (${customerContact || 'DM'})`,
       `*Notes:* ${customRequestText || 'Standard order'}`,
       `━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `Hi Niharika! Could you let me know if you can make this and when it would be ready?`,
+      `Hi ! Could you let me know if you can make this and when it would be ready?`,
     ].join('\n')
   }
 
@@ -141,13 +141,13 @@ export default function CustomStudioModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       <div 
-        className="fixed inset-0 bg-ink/60 backdrop-blur-sm transition-opacity" 
+        className="fixed inset-0 bg-night/60 backdrop-blur-sm transition-opacity" 
         onClick={closeCustomStudio}
       />
 
       <div className="relative w-full max-w-4xl bg-canvas rounded-3xl border border-canvas-border shadow-float overflow-hidden z-10 max-h-[92vh] flex flex-col animate-fade-up">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-canvas-border bg-white flex items-center justify-between shrink-0">
+        <div className="px-6 py-5 border-b border-canvas-border bg-surface flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-terracotta-100 flex items-center justify-center text-terracotta-700">
               <Wand2 size={16} />
@@ -186,8 +186,8 @@ export default function CustomStudioModal() {
                     onClick={() => setArchetype(arch.id)}
                     className={`p-3.5 rounded-2xl border text-left transition-all relative ${
                       active
-                        ? 'border-terracotta-600 bg-white ring-2 ring-terracotta-500/20 shadow-subtle'
-                        : 'border-canvas-border bg-white/70 hover:border-ink/20 hover:bg-white'
+                        ? 'border-terracotta-600 bg-surface ring-2 ring-terracotta-500/20 shadow-subtle'
+                        : 'border-canvas-border bg-white/70 hover:border-ink/20 hover:bg-surface'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -216,8 +216,8 @@ export default function CustomStudioModal() {
                     onClick={() => setYarn(y.id)}
                     className={`p-3.5 rounded-2xl border text-left transition-all ${
                       active
-                        ? 'border-terracotta-600 bg-white ring-2 ring-terracotta-500/20 shadow-subtle'
-                        : 'border-canvas-border bg-white/70 hover:border-ink/20 hover:bg-white'
+                        ? 'border-terracotta-600 bg-surface ring-2 ring-terracotta-500/20 shadow-subtle'
+                        : 'border-canvas-border bg-white/70 hover:border-ink/20 hover:bg-surface'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -249,7 +249,7 @@ export default function CustomStudioModal() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 bg-white p-3.5 rounded-2xl border border-canvas-border">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 bg-surface p-3.5 rounded-2xl border border-canvas-border">
               {SWATCHES.map((swatch) => {
                 const isSelected = selectedColors.includes(swatch.name)
                 return (
@@ -298,8 +298,8 @@ export default function CustomStudioModal() {
                     onClick={() => toggleFinish(finish.id)}
                     className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all text-xs ${
                       active
-                        ? 'border-terracotta-600 bg-white ring-1 ring-terracotta-500/30'
-                        : 'border-canvas-border bg-white/70 hover:bg-white text-ink-muted'
+                        ? 'border-terracotta-600 bg-surface ring-1 ring-terracotta-500/30'
+                        : 'border-canvas-border bg-white/70 hover:bg-surface text-ink-muted'
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -370,7 +370,7 @@ export default function CustomStudioModal() {
         </form>
 
         {/* Footer sticky bar */}
-        <div className="px-6 py-4 border-t border-canvas-border bg-white flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+        <div className="px-6 py-4 border-t border-canvas-border bg-surface flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
           <div>
             <div className="text-xs text-ink-muted">Estimated Total</div>
             <div className="flex items-baseline gap-2">
@@ -396,7 +396,7 @@ export default function CustomStudioModal() {
             <button
               type="button"
               onClick={handleInstagramSubmit}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-ink hover:bg-ink-charcoal text-white font-medium text-xs py-3 px-5 rounded-full transition-all shadow-xs"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 bg-elevated hover:bg-elevated-2 text-white font-medium text-xs py-3 px-5 rounded-full transition-all shadow-xs"
             >
               <FaInstagram size={15} />
               <span>Send on Instagram</span>

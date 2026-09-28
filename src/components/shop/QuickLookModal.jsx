@@ -42,15 +42,15 @@ export default function QuickLookModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-ink/50 backdrop-blur-sm transition-opacity" 
+        className="fixed inset-0 bg-night/50 backdrop-blur-sm transition-opacity" 
         onClick={closeQuickLook}
       />
 
-      <div className="relative w-full max-w-3xl bg-white rounded-3xl border border-canvas-border shadow-float overflow-hidden z-10 animate-fade-up">
+      <div className="relative w-full max-w-3xl bg-surface rounded-3xl border border-canvas-border shadow-float overflow-hidden z-10 animate-fade-up">
         {/* Close Button */}
         <button
           onClick={closeQuickLook}
-          className="absolute top-4 right-4 z-20 p-2 bg-white/90 hover:bg-white text-ink rounded-full border border-canvas-border shadow-xs transition-colors"
+          className="absolute top-4 right-4 z-20 p-2 bg-white/90 hover:bg-surface text-ink rounded-full border border-canvas-border shadow-xs transition-colors"
           aria-label="Close modal"
         >
           <X size={18} />
@@ -59,7 +59,7 @@ export default function QuickLookModal() {
         <div className="grid md:grid-cols-2">
           {/* Visual Column */}
           <div className="bg-canvas-subtle p-6 flex flex-col justify-between">
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border border-canvas-border">
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-surface border border-canvas-border">
               <img
                 src={currentImg}
                 alt={product.name}
@@ -137,7 +137,7 @@ export default function QuickLookModal() {
                           className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                             active
                               ? 'border-terracotta-600 bg-terracotta-50 text-terracotta-900 font-semibold'
-                              : 'border-canvas-border bg-white text-ink-muted hover:border-ink/30'
+                              : 'border-canvas-border bg-surface text-ink-muted hover:border-ink/30'
                           }`}
                         >
                           {c}

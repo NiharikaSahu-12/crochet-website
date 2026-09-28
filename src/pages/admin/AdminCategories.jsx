@@ -116,7 +116,7 @@ export default function AdminCategories() {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-surface rounded-2xl border border-canvas-border p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="font-editorial text-2xl lg:text-3xl font-semibold text-ink">Catalog Categories</h1>
@@ -143,7 +143,7 @@ export default function AdminCategories() {
         <div className="lg:col-span-5">
           <form 
             onSubmit={handleSubmit} 
-            className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5 sticky top-24"
+            className="bg-surface rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5 sticky top-24"
           >
             <div className="flex items-center justify-between pb-3 border-b border-canvas-border">
               <div className="flex items-center gap-2.5">
@@ -237,7 +237,7 @@ export default function AdminCategories() {
                     className={`w-full py-2.5 px-3 rounded-xl border text-xs font-medium transition-colors flex items-center justify-center gap-1.5 ${
                       form.is_active 
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                        : 'bg-zinc-100 text-zinc-600 border-zinc-200'
+                        : 'bg-canvas-muted text-ink-muted border-zinc-200'
                     }`}
                   >
                     {form.is_active ? <Eye size={14} /> : <EyeOff size={14} />}
@@ -284,7 +284,7 @@ export default function AdminCategories() {
         {/* Category List (7 cols on lg) */}
         <div className="lg:col-span-7 space-y-4">
           {/* Search Bar */}
-          <div className="bg-white p-3.5 rounded-2xl border border-canvas-border shadow-xs flex items-center gap-3">
+          <div className="bg-surface p-3.5 rounded-2xl border border-canvas-border shadow-xs flex items-center gap-3">
             <Search size={16} className="text-ink-subtle ml-1" />
             <input
               type="text"
@@ -305,7 +305,7 @@ export default function AdminCategories() {
           </div>
 
           {/* List Card */}
-          <div className="bg-white rounded-2xl border border-canvas-border shadow-xs overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-canvas-border shadow-xs overflow-hidden">
             {loading ? (
               <div className="p-6 space-y-3">
                 {[1, 2, 3, 4].map((i) => (
@@ -336,7 +336,7 @@ export default function AdminCategories() {
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-medium border ${
                           category.is_active 
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                            : 'bg-zinc-100 text-zinc-600 border-zinc-200'
+                            : 'bg-canvas-muted text-ink-muted border-zinc-200'
                         }`}>
                           {category.is_active ? 'Active' : 'Hidden'}
                         </span>

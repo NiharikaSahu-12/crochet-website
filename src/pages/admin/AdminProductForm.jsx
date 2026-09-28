@@ -65,7 +65,7 @@ function TagInput({ label, values = [], onChange, placeholder }) {
 
   return (
     <Field label={label}>
-      <div className="flex min-h-[44px] flex-wrap items-center gap-1.5 rounded-xl border border-canvas-border bg-white p-2 focus-within:border-ink transition-colors">
+      <div className="flex min-h-[44px] flex-wrap items-center gap-1.5 rounded-xl border border-canvas-border bg-surface p-2 focus-within:border-ink transition-colors">
         {values.map((value) => (
           <span 
             key={value} 
@@ -137,7 +137,7 @@ function ImageStudio({ images = [], onChange, productId }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-canvas-border p-5 shadow-xs space-y-4">
+    <div className="bg-surface rounded-2xl border border-canvas-border p-5 shadow-xs space-y-4">
       <div className="flex items-center justify-between pb-3 border-b border-canvas-border">
         <div>
           <h3 className="font-editorial text-lg font-semibold text-ink">Visual Gallery</h3>
@@ -156,7 +156,7 @@ function ImageStudio({ images = [], onChange, productId }) {
             <img src={img} alt="" className="w-full h-full object-cover" />
             
             {index === 0 && (
-              <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-ink/80 text-white text-[10px] font-mono tracking-wider backdrop-blur-xs">
+              <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-night/80 text-white text-[10px] font-mono tracking-wider backdrop-blur-xs">
                 Cover
               </span>
             )}
@@ -178,7 +178,7 @@ function ImageStudio({ images = [], onChange, productId }) {
             <div className="w-6 h-6 border-2 border-terracotta-600 border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <div className="w-9 h-9 rounded-xl bg-white border border-canvas-border flex items-center justify-center text-terracotta-600 shadow-xs mb-2">
+              <div className="w-9 h-9 rounded-xl bg-surface border border-canvas-border flex items-center justify-center text-terracotta-600 shadow-xs mb-2">
                 <UploadCloud size={18} />
               </div>
               <span className="text-xs font-semibold text-ink">Upload photo</span>
@@ -229,7 +229,7 @@ function ToggleOption({ title, desc, icon: Icon, checked, onChange }) {
       className={`w-full flex items-start justify-between gap-3 p-4 rounded-xl border text-left transition-all ${
         checked 
           ? 'border-terracotta-500 bg-terracotta-50/50 shadow-xs' 
-          : 'border-canvas-border bg-white hover:border-zinc-300'
+          : 'border-canvas-border bg-surface hover:border-zinc-300'
       }`}
     >
       <div className="flex items-start gap-3">
@@ -244,7 +244,7 @@ function ToggleOption({ title, desc, icon: Icon, checked, onChange }) {
         </div>
       </div>
       <div className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 border transition-colors ${
-        checked ? 'bg-terracotta-600 border-terracotta-600 text-white' : 'border-zinc-300 bg-white'
+        checked ? 'bg-terracotta-600 border-terracotta-600 text-white' : 'border-zinc-300 bg-surface'
       }`}>
         {checked && <Check size={12} strokeWidth={3} />}
       </div>
@@ -296,7 +296,7 @@ export default function AdminProductForm() {
         toast.success('Creation updated successfully')
       } else {
         const created = await productController.createProduct(payload)
-        toast.success('New creation added to atelier')
+        toast.success('New creation added to admin')
         navigate(`/admin/products/${created.id}/edit`)
       }
     } catch (err) {
@@ -310,7 +310,7 @@ export default function AdminProductForm() {
     return (
       <div className="flex flex-col items-center justify-center py-28">
         <div className="w-9 h-9 rounded-full border-2 border-terracotta-600 border-t-transparent animate-spin mb-3" />
-        <p className="text-xs text-ink-subtle font-mono uppercase tracking-wider">Loading atelier creation...</p>
+        <p className="text-xs text-ink-subtle font-mono uppercase tracking-wider">Loading creation...</p>
       </div>
     )
   }
@@ -318,7 +318,7 @@ export default function AdminProductForm() {
   return (
     <div className="space-y-6">
       {/* Top Header Card */}
-      <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="bg-surface rounded-2xl border border-canvas-border p-6 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <Link
             to="/admin/products"
@@ -355,7 +355,7 @@ export default function AdminProductForm() {
             form.status === 'active' 
               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
               : form.status === 'draft' 
-              ? 'bg-zinc-100 text-zinc-600 border border-zinc-200' 
+              ? 'bg-canvas-muted text-ink-muted border border-zinc-200' 
               : 'bg-rose-50 text-rose-700 border border-rose-200'
           }`}>
             {form.status}
@@ -368,7 +368,7 @@ export default function AdminProductForm() {
         {/* Left Column: Core Product Info (2 spans) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Basic Info Card */}
-          <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
+          <div className="bg-surface rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
             <div className="flex items-center gap-3 pb-3 border-b border-canvas-border">
               <div className="w-8 h-8 rounded-lg bg-terracotta-50 text-terracotta-600 flex items-center justify-center">
                 <Package size={17} />
@@ -391,7 +391,7 @@ export default function AdminProductForm() {
             </Field>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Category" required helper="Select the relevant atelier collection">
+              <Field label="Category" required helper="Select the relevant collection">
                 <select
                   required
                   value={form.category}
@@ -432,7 +432,7 @@ export default function AdminProductForm() {
           </div>
 
           {/* Pricing & Inventory Card */}
-          <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
+          <div className="bg-surface rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
             <div className="flex items-center gap-3 pb-3 border-b border-canvas-border">
               <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <DollarSign size={17} />
@@ -493,7 +493,7 @@ export default function AdminProductForm() {
           </div>
 
           {/* Artisan Craft Specifications Card */}
-          <div className="bg-white rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
+          <div className="bg-surface rounded-2xl border border-canvas-border p-6 shadow-xs space-y-5">
             <div className="flex items-center gap-3 pb-3 border-b border-canvas-border">
               <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
                 <Layers size={17} />
@@ -552,7 +552,7 @@ export default function AdminProductForm() {
           />
 
           {/* Curation & Homepage Highlights */}
-          <div className="bg-white rounded-2xl border border-canvas-border p-5 shadow-xs space-y-4">
+          <div className="bg-surface rounded-2xl border border-canvas-border p-5 shadow-xs space-y-4">
             <div className="pb-3 border-b border-canvas-border">
               <h3 className="font-editorial text-lg font-semibold text-ink">Storefront Curation</h3>
               <p className="text-xs text-ink-subtle">Promote in featured carousel and custom studios</p>
@@ -560,7 +560,7 @@ export default function AdminProductForm() {
 
             <div className="space-y-3">
               <ToggleOption
-                title="Featured Atelier Piece"
+                title="Featured Piece"
                 desc="Showcase in homepage top picks and hero highlight sections."
                 icon={Sparkles}
                 checked={form.is_featured}

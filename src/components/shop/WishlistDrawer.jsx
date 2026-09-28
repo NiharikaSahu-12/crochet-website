@@ -48,14 +48,14 @@ export default function WishlistDrawer() {
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       <div 
-        className="absolute inset-0 bg-ink/40 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-night/40 backdrop-blur-sm transition-opacity" 
         onClick={() => setIsWishlistOpen(false)}
       />
 
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
         <div className="w-screen max-w-md bg-canvas border-l border-canvas-border shadow-float flex flex-col">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-canvas-border bg-white flex items-center justify-between">
+          <div className="px-6 py-5 border-b border-canvas-border bg-surface flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <Heart size={18} className="text-terracotta-600 fill-terracotta-600" />
               <h2 className="font-editorial text-xl font-semibold text-ink">Saved Items</h2>
@@ -93,14 +93,14 @@ export default function WishlistDrawer() {
             ) : loading ? (
               <div className="space-y-3 py-6">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-24 bg-white rounded-xl border border-canvas-border animate-pulse" />
+                  <div key={i} className="h-24 bg-surface rounded-xl border border-canvas-border animate-pulse" />
                 ))}
               </div>
             ) : (
               products.map((product) => (
                 <div
                   key={product.id}
-                  className="flex gap-4 p-3 bg-white rounded-xl border border-canvas-border/80 shadow-xs"
+                  className="flex gap-4 p-3 bg-surface rounded-xl border border-canvas-border/80 shadow-xs"
                 >
                   <div className="w-20 h-24 rounded-lg bg-canvas-subtle overflow-hidden shrink-0">
                     <img

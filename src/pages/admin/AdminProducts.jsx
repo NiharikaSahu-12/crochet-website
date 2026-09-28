@@ -12,7 +12,8 @@ import {
   Sparkles, 
   Filter,
   X,
-  ExternalLink
+  ExternalLink,
+  ArrowUpDown
 } from 'lucide-react'
 import { useProducts } from '../../hooks/useProducts'
 import productController from '../../controllers/productController'
@@ -24,6 +25,7 @@ export default function AdminProducts() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+  const [sortBy, setSortBy] = useState('recent')
   const { products, loading, refetch } = useProducts({ 
     search: search || undefined, 
     category: category || undefined 
@@ -33,17 +35,23 @@ export default function AdminProducts() {
 
   // Filter by status on client side if selected
   const filteredProducts = useMemo(() => {
-    if (!statusFilter) return products
-    return products.filter((p) => {
-      if (statusFilter === 'out_of_stock') {
-        return p.status === PRODUCT_STATUS.OUT_OF_STOCK || p.stock_qty === 0
-      }
-      return p.status === statusFilter
-    })
-  }, [products, statusFilter])
+    let list = [...products]
+    if (statusFilter === 'out_of_stock') {
+      list = list.filter((p) => p.status === PRODUCT_STATUS.OUT_OF_STOCK || p.stock_qty === 0)
+    } else if (statusFilter) {
+      list = list.filter((p) => p.status === statusFilter)
+    }
+
+    if (sortBy === 'price-asc') list.sort((a, b) => (a.price || 0) - (b.price || 0))
+    else if (sortBy === 'price-desc') list.sort((a, b) => (b.price || 0) - (a.price || 0))
+    else if (sortBy === 'name-asc') list.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    else if (sortBy === 'stock-asc') list.sort((a, b) => (a.stock_qty || 0) - (b.stock_qty || 0))
+
+    return list
+  }, [products, statusFilter, sortBy])
 
   const handleDelete = async (id, name) => {
-    if (!window.confirm(`Are you sure you want to delete "${name}" from the atelier catalog? This action cannot be undone.`)) {
+    if (!window.confirm(`Are you sure you want to delete "${name}" from the catalog? This action cannot be undone.`)) {
       return
     }
     setDeleting(id)
@@ -78,12 +86,13 @@ export default function AdminProducts() {
     }
   }
 
-  const hasActiveFilters = Boolean(search || category || statusFilter)
+  const hasActiveFilters = Boolean(search || category || statusFilter || sortBy !== 'recent')
 
   const clearFilters = () => {
     setSearch('')
     setCategory('')
     setStatusFilter('')
+    setSortBy('recent')
   }
 
   return (
@@ -101,18 +110,10 @@ export default function AdminProducts() {
             Curate your handcrafted creations, update pricing, manage stock counts, and showcase featured items.
           </p>
         </div>
-
-        <Link 
-          to="/admin/products/new" 
-          className="btn-primary inline-flex items-center justify-center gap-2 text-xs font-semibold py-3 px-5 shadow-subtle self-start sm:self-auto"
-        >
-          <Plus size={16} /> 
-          <span>Add New Product</span>
-        </Link>
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-canvas-border shadow-xs flex flex-wrap gap-3 items-center">
+      <div className="bg-surface p-4 rounded-2xl border border-canvas-border shadow-xs flex flex-wrap gap-3 items-center">
         {/* Search */}
         <div className="relative flex-1 min-w-[220px]">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-subtle" />
@@ -164,6 +165,22 @@ export default function AdminProducts() {
           </select>
         </div>
 
+        {/* Sort */}
+        <div className="w-full sm:w-auto min-w-[160px] relative">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="input-field py-2.5 pr-8 text-xs w-full bg-canvas-subtle/50 appearance-none"
+          >
+            <option value="recent">Sort: Default</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A – Z</option>
+            <option value="stock-asc">Stock: Low to High</option>
+          </select>
+          <ArrowUpDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-subtle pointer-events-none" />
+        </div>
+
         {/* Reset */}
         {hasActiveFilters && (
           <button
@@ -178,7 +195,7 @@ export default function AdminProducts() {
       </div>
 
       {/* Products Table Card */}
-      <div className="bg-white rounded-2xl border border-canvas-border shadow-xs overflow-hidden">
+      <div className="bg-surface rounded-2xl border border-canvas-border shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -194,7 +211,7 @@ export default function AdminProducts() {
             <p className="text-xs text-ink-subtle mt-1 mb-5 max-w-sm mx-auto">
               {hasActiveFilters 
                 ? 'Try adjusting your search query or category filters to see more results.' 
-                : 'Your atelier catalog is empty. Add your first handcrafted crochet piece.'}
+                : 'Your catalog is empty. Add your first handcrafted crochet piece.'}
             </p>
             {hasActiveFilters ? (
               <button
@@ -319,7 +336,7 @@ export default function AdminProducts() {
                           product.status === 'active' 
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
                             : product.status === 'draft' 
-                            ? 'bg-zinc-100 text-zinc-600 border border-zinc-200' 
+                            ? 'bg-canvas-muted text-ink-muted border border-zinc-200' 
                             : 'bg-rose-50 text-rose-700 border border-rose-200'
                         }`}>
                           {product.status}

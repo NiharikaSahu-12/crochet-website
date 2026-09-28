@@ -37,7 +37,7 @@ const SHOP_FAQS = [
   },
   {
     q: 'Where are you based and do you ship internationally?',
-    a: 'Our crochet studio is based in Bhubaneswar, Odisha, India. We ship all across India. For international orders, please send us a direct message on WhatsApp or Instagram with your location so we can arrange international courier shipping.',
+    a: 'Our crochet studio is based in Bhubaneswar, Mumbai, India. We ship all across India. For international orders, please send us a direct message on WhatsApp or Instagram with your location so we can arrange international courier shipping.',
   },
   {
     q: 'What is your return or exchange policy?',
@@ -67,7 +67,7 @@ export default function ContactPage() {
       form.orderId.trim() ? `*Order ID:* ${form.orderId.trim()}` : null,
       `*Message:* ${form.message || '(No message provided)'}`,
       `━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `Hi Niharika! Could you please help me with this inquiry?`,
+      `Hi! Could you please help me with this inquiry?`,
     ].filter(Boolean).join('\n')
   }
 
@@ -155,16 +155,16 @@ export default function ContactPage() {
               <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Quick Channels</span>
               <h2 className="font-editorial text-2xl font-bold text-ink mt-0.5">Get in Touch Directly</h2>
               <p className="text-xs text-ink-muted mt-1">
-                For the fastest answer, send a message directly to Niharika on WhatsApp.
+                For the fastest answer, send a message directly to Us on WhatsApp.
               </p>
             </div>
 
             {/* WhatsApp Card */}
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi Niharika! I have a question about The CozyLoops.')}`}
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi! I have a question about The CozyLoops.')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block p-5 rounded-2xl bg-white border border-canvas-border hover:border-[#25D366] transition-all group shadow-2xs"
+              className="block p-5 rounded-2xl bg-surface border border-canvas-border hover:border-[#25D366] transition-all group shadow-2xs"
             >
               <div className="flex items-center gap-3.5">
                 <div className="w-11 h-11 rounded-full bg-[#25D366]/10 text-[#25D366] flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -190,7 +190,7 @@ export default function ContactPage() {
               href={INSTAGRAM_DM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="block p-5 rounded-2xl bg-white border border-canvas-border hover:border-terracotta-500 transition-all group shadow-2xs"
+              className="block p-5 rounded-2xl bg-surface border border-canvas-border hover:border-terracotta-500 transition-all group shadow-2xs"
             >
               <div className="flex items-center gap-3.5">
                 <div className="w-11 h-11 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -209,7 +209,7 @@ export default function ContactPage() {
             {/* Email Card */}
             <a
               href={`mailto:${EMAIL}`}
-              className="block p-5 rounded-2xl bg-white border border-canvas-border hover:border-ink transition-all group shadow-2xs"
+              className="block p-5 rounded-2xl bg-surface border border-canvas-border hover:border-ink transition-all group shadow-2xs"
             >
               <div className="flex items-center gap-3.5">
                 <div className="w-11 h-11 rounded-full bg-canvas-subtle text-ink flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -238,7 +238,7 @@ export default function ContactPage() {
                 <MapPin size={16} className="text-terracotta-600 shrink-0 mt-0.5" />
                 <div>
                   <span className="font-semibold text-ink block">Studio Location</span>
-                  <span>Bhubaneswar, Odisha, India • Delivering Nationwide & Worldwide</span>
+                  <span>Mumbai, India • Delivering Nationwide & Worldwide</span>
                 </div>
               </div>
             </div>
@@ -246,7 +246,7 @@ export default function ContactPage() {
           </div>
 
           {/* Right Column: Contact Message Form */}
-          <div className="lg:col-span-7 bg-white rounded-2xl p-6 sm:p-8 border border-canvas-border shadow-xs">
+          <div className="lg:col-span-7 bg-surface rounded-2xl p-6 sm:p-8 border border-canvas-border shadow-xs">
             <div className="mb-6">
               <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Message Form</span>
               <h2 className="font-editorial text-2xl font-bold text-ink mt-0.5">Send Us a Note</h2>
@@ -293,7 +293,7 @@ export default function ContactPage() {
                   <select
                     value={form.topic}
                     onChange={(e) => setForm((prev) => ({ ...prev, topic: e.target.value }))}
-                    className="input-field text-sm bg-white"
+                    className="input-field text-sm bg-surface"
                   >
                     {INQUIRY_TOPICS.map((topic) => (
                       <option key={topic} value={topic}>{topic}</option>
@@ -362,7 +362,7 @@ export default function ContactPage() {
       </section>
 
       {/* 4. Customer Care & FAQs Accordion */}
-      <section className="py-16 bg-white border-t border-canvas-border">
+      <section className="py-16 bg-surface border-t border-canvas-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700">
