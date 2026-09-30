@@ -64,6 +64,7 @@ export default function App() {
           <Route path="products/:id/edit" element={<AdminProductForm />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="reviews" element={<AdminReviews />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

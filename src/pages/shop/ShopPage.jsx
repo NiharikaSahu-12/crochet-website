@@ -1,11 +1,11 @@
 import { useMemo, useState, useRef, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Search, X, SlidersHorizontal, ArrowUpDown, Wand2, Sparkles } from 'lucide-react'
+import { Search, X, ArrowUpDown, Wand2 } from 'lucide-react'
 import ProductCard from '../../components/shop/ProductCard'
 import Reveal from '../../components/ui/Reveal'
 import { useProducts } from '../../hooks/useProducts'
 import { useCategories } from '../../hooks/useCategories'
-import { useShop } from '../../context/ShopContext'
+import useSEO from '../../hooks/useSEO'
 
 const PRICE_TIERS = [
   { id: 'all', label: 'All Prices' },
@@ -23,14 +23,37 @@ const SORT_OPTIONS = [
 
 export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [search, setSearch] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || '')
-  const [priceTier, setPriceTier] = useState('all')
-  const [sortBy, setSortBy] = useState('featured')
-  const [inStockOnly, setInStockOnly] = useState(false)
   const [searchFocused, setSearchFocused] = useState(false)
   const searchBoxRef = useRef(null)
-  const { openCustomStudio } = useShop()
+
+  // Canonical stays /shop even with filters/search in the URL.
+  useSEO({
+    title: 'Shop Handmade Crochet Gifts & Everlasting Flowers',
+    description:
+      'Browse hand-crocheted bouquets, potted blooms, floral bookmarks, keychains and amigurumi gifts. Small batches, custom colors, gift-boxed with a handwritten note.',
+    path: '/shop',
+  })
+
+  // Every filter lives in the URL, so results are shareable, refresh-safe,
+  // and footer links like /shop?category=flowers keep working even when
+  // we are already on this page.
+  const search = searchParams.get('q') || ''
+  const selectedCategory = searchParams.get('category') || ''
+  const priceTier = searchParams.get('price') || 'all'
+  const sortBy = searchParams.get('sort') || 'featured'
+  const inStockOnly = searchParams.get('stock') === '1'
+
+  const updateParams = (patch) => {
+    const next = new URLSearchParams(searchParams)
+    Object.entries(patch).forEach(([key, value]) => {
+      if (value === null || value === undefined || value === '' || value === false) {
+        next.delete(key)
+      } else {
+        next.set(key, String(value))
+      }
+    })
+    setSearchParams(next, { replace: true })
+  }
 
   const { categories } = useCategories({ activeOnly: true })
 
@@ -69,12 +92,7 @@ export default function ShopPage() {
   }, [])
 
   const updateCategory = (catValue) => {
-    setSelectedCategory(catValue)
-    if (catValue) {
-      setSearchParams({ category: catValue })
-    } else {
-      setSearchParams({})
-    }
+    updateParams({ category: catValue || null })
   }
 
   // Filter & sort products
@@ -108,18 +126,15 @@ export default function ShopPage() {
   }, [products, priceTier, inStockOnly, sortBy])
 
   const clearAllFilters = () => {
-    setSearch('')
-    updateCategory('')
-    setPriceTier('all')
-    setInStockOnly(false)
-    setSortBy('featured')
+    setSearchFocused(false)
+    setSearchParams({}, { replace: true })
   }
 
   const hasActiveFilters = Boolean(search || selectedCategory || priceTier !== 'all' || inStockOnly)
 
   return (
-    <div className="bg-canvas min-h-screen py-12 sm:py-20">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+    <div className="bg-canvas min-h-screen py-8 sm:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Page Header */}
         <div className="max-w-2xl">
           <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700 font-semibold">
@@ -134,7 +149,7 @@ export default function ShopPage() {
         </div>
 
         {/* Search & Filter Toolbar */}
-        <div className="mt-8 pt-6 border-t border-canvas-border space-y-4">
+        <div className="mt-6 pt-5 border-t border-canvas-border space-y-4">
           <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
             {/* Search Input */}
             <div className="relative flex-1 max-w-md" ref={searchBoxRef}>
@@ -142,14 +157,14 @@ export default function ShopPage() {
               <input
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => updateParams({ q: e.target.value })}
                 onFocus={() => setSearchFocused(true)}
                 placeholder="Search bookmarks, keychains, flowers..."
                 className="w-full pl-10 pr-9 py-2.5 bg-surface border border-canvas-border rounded-xl text-xs sm:text-sm text-ink outline-none focus:border-terracotta-600 focus:ring-1 focus:ring-terracotta-600 transition-all placeholder:text-ink-subtle"
               />
               {search && (
                 <button
-                  onClick={() => setSearch('')}
+                  onClick={() => updateParams({ q: null })}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-subtle hover:text-ink z-10"
                 >
                   <X size={14} />
@@ -208,7 +223,7 @@ export default function ShopPage() {
               {/* In stock toggle */}
               <button
                 type="button"
-                onClick={() => setInStockOnly(!inStockOnly)}
+                onClick={() => updateParams({ stock: inStockOnly ? null : '1' })}
                 className={`text-xs px-3.5 py-2 rounded-xl border transition-all ${
                   inStockOnly
                     ? 'border-ink bg-elevated text-white font-medium'
@@ -221,7 +236,7 @@ export default function ShopPage() {
               {/* Price Tier Select */}
               <select
                 value={priceTier}
-                onChange={(e) => setPriceTier(e.target.value)}
+                onChange={(e) => updateParams({ price: e.target.value === 'all' ? null : e.target.value })}
                 className="text-xs px-3 py-2 bg-surface border border-canvas-border rounded-xl text-ink outline-none focus:border-terracotta-600 font-medium cursor-pointer"
               >
                 {PRICE_TIERS.map((tier) => (
@@ -235,7 +250,7 @@ export default function ShopPage() {
               <div className="relative">
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => updateParams({ sort: e.target.value === 'featured' ? null : e.target.value })}
                   className="text-xs pl-3 pr-8 py-2 bg-surface border border-canvas-border rounded-xl text-ink outline-none focus:border-terracotta-600 font-medium appearance-none cursor-pointer"
                 >
                   {SORT_OPTIONS.map((opt) => (
@@ -291,7 +306,7 @@ export default function ShopPage() {
         </div>
 
         {/* Results Counter */}
-        <div className="mt-6 flex items-center justify-between text-xs text-ink-muted font-mono">
+        <div className="mt-6 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between text-xs text-ink-muted font-mono">
           <span>
             Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}
           </span>
@@ -300,12 +315,14 @@ export default function ShopPage() {
             className="text-terracotta-700 hover:underline flex items-center gap-1 font-sans text-xs font-semibold"
           >
             <Wand2 size={13} />
-            <span>Looking for custom colors? Open Custom Studio →</span>
+            <span>
+              <span className="hidden sm:inline">Looking for custom colors? </span>Open Custom Studio →
+            </span>
           </Link>
         </div>
 
         {/* Products Grid */}
-        <div className="mt-8">
+        <div className="mt-6">
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -313,7 +330,7 @@ export default function ShopPage() {
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
-            <div className="bg-surface rounded-3xl border border-canvas-border p-12 text-center max-w-lg mx-auto my-12 shadow-xs">
+            <div className="bg-surface rounded-3xl border border-canvas-border p-8 text-center max-w-lg mx-auto my-8 shadow-xs">
               <div className="text-3xl mb-3">🧶</div>
               <h3 className="font-editorial text-xl font-bold text-ink">
                 No items found

@@ -5,25 +5,27 @@ export function useProducts(filters = {}) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [reloadToken, setReloadToken] = useState(0)
 
   const filterKey = JSON.stringify(filters)
 
-  const load = useCallback(async () => {
+  useEffect(() => {
+    // Cancelling on cleanup discards stale responses, so fast typing in search
+    // boxes can no longer let an older request overwrite newer results.
+    let cancelled = false
     setLoading(true)
     setError(null)
-    try {
-      const data = await productController.listProducts(filters)
-      setProducts(data)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }, [filterKey])
+    productController
+      .listProducts(filters)
+      .then((data) => { if (!cancelled) setProducts(data) })
+      .catch((err) => { if (!cancelled) setError(err.message) })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [filterKey, reloadToken])
 
-  useEffect(() => { load() }, [load])
+  const refetch = useCallback(() => setReloadToken((token) => token + 1), [])
 
-  return { products, loading, error, refetch: load }
+  return { products, loading, error, refetch }
 }
 
 export function useFeaturedProducts() {

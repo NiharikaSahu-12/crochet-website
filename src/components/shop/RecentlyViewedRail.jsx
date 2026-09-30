@@ -10,8 +10,8 @@ export default function RecentlyViewedRail({ excludeId }) {
   if (items.length === 0) return null
 
   return (
-    <section className="mt-20 pt-12 border-t border-canvas-border">
-      <div className="flex items-center justify-between mb-8">
+    <section className="mt-12 pt-8 border-t border-canvas-border">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2.5">
           <span className="w-9 h-9 rounded-full bg-canvas-subtle border border-canvas-border flex items-center justify-center text-terracotta-700">
             <History size={17} />

@@ -1,0 +1,12 @@
+# TheCozzyLoops — https://instagram.com/thecozzyloops
+# NOTE: after deploying on a custom domain, replace your-domain.com in the
+# Sitemap line below with the real domain.
+
+User-agent: *
+Allow: /
+
+# Admin console and login are private
+Disallow: /admin
+Disallow: /admin/
+
+Sitemap: https://your-domain.com/sitemap.xml

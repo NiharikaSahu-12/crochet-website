@@ -8,14 +8,12 @@ import {
   Plus,
   Save,
   Sparkles,
-  Tag,
   Trash2,
   UploadCloud,
   X,
   ExternalLink,
   Wand2,
   Layers,
-  Info,
   DollarSign
 } from 'lucide-react'
 import productController from '../../controllers/productController'
@@ -263,20 +261,39 @@ export default function AdminProductForm() {
 
   const activeCategories = useMemo(() => categories.filter((c) => c.is_active), [categories])
 
+  // Reload whenever the route switches between "new" and "edit/:id". React Router
+  // reuses the same component instance for both routes, so form and loading state
+  // must reset explicitly or stale values leak across (e.g. saving on the create
+  // page could silently update the product that was edited before).
   useEffect(() => {
-    if (!isEditing) return
+    if (!id) {
+      setForm(EMPTY_FORM)
+      setLoading(false)
+      return
+    }
+
+    let cancelled = false
+    setLoading(true)
     productController.getProduct(id)
-      .then((product) => setForm({ 
-        ...product, 
-        price: product.price || '', 
-        compare_price: product.compare_price || '' 
-      }))
+      .then((product) => {
+        if (cancelled) return
+        setForm({ 
+          ...product, 
+          price: product.price || '', 
+          compare_price: product.compare_price || '' 
+        })
+      })
       .catch(() => {
+        if (cancelled) return
         toast.error('Product not found in catalog')
         navigate('/admin/products')
       })
-      .finally(() => setLoading(false))
-  }, [id, isEditing, navigate])
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [id, navigate])
 
   const set = (key, value) => setForm((current) => ({ ...current, [key]: value }))
 
@@ -404,6 +421,11 @@ export default function AdminProductForm() {
                       {c.label}
                     </option>
                   ))}
+                  {form.category && !activeCategories.some((c) => c.value === form.category) && (
+                    <option value={form.category}>
+                      {form.category.replace(/_/g, ' ')} (hidden category)
+                    </option>
+                  )}
                 </select>
               </Field>
 

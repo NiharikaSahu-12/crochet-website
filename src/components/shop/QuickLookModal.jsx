@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { X, Heart, ShoppingBag, Plus, Minus, Check, ArrowRight, ShieldCheck } from 'lucide-react'
 import { useShop } from '../../context/ShopContext'
@@ -11,6 +11,14 @@ export default function QuickLookModal() {
   const [selectedImageIdx, setSelectedImageIdx] = useState(0)
   const [selectedColor, setSelectedColor] = useState('')
   const [quantity, setQuantity] = useState(1)
+
+  // Reset per-product selections whenever a different product is quick-looked,
+  // otherwise stale color/quantity/image leak between products.
+  useEffect(() => {
+    setSelectedImageIdx(0)
+    setSelectedColor('')
+    setQuantity(1)
+  }, [quickLookProduct?.id])
 
   if (!quickLookProduct) return null
 
@@ -39,14 +47,18 @@ export default function QuickLookModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex p-4 sm:p-6 overflow-y-auto">
+      {/* NOTE: the card below uses `m-auto` instead of `items-center` — auto
+          margins keep it centered when it fits, but collapse to 0 when the
+          modal is taller than the viewport, so the top never gets clipped and
+          the whole card stays reachable by scrolling. */}
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-night/50 backdrop-blur-sm transition-opacity" 
         onClick={closeQuickLook}
       />
 
-      <div className="relative w-full max-w-3xl bg-surface rounded-3xl border border-canvas-border shadow-float overflow-hidden z-10 animate-fade-up">
+      <div className="m-auto relative w-full max-w-3xl bg-surface rounded-3xl border border-canvas-border shadow-float overflow-hidden z-10 animate-fade-up">
         {/* Close Button */}
         <button
           onClick={closeQuickLook}
@@ -58,7 +70,7 @@ export default function QuickLookModal() {
 
         <div className="grid md:grid-cols-2">
           {/* Visual Column */}
-          <div className="bg-canvas-subtle p-6 flex flex-col justify-between">
+          <div className="bg-canvas-subtle p-5 flex flex-col justify-between">
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-surface border border-canvas-border">
               <img
                 src={currentImg}
@@ -95,7 +107,7 @@ export default function QuickLookModal() {
           </div>
 
           {/* Details Column */}
-          <div className="p-6 md:p-8 flex flex-col justify-between">
+          <div className="p-5 md:p-7 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between text-xs text-ink-muted uppercase tracking-editorial mb-1">
                 <span>{product.category?.replace(/_/g, ' ')}</span>
@@ -172,7 +184,7 @@ export default function QuickLookModal() {
             </div>
 
             {/* Actions */}
-            <div className="mt-8 pt-5 border-t border-canvas-border space-y-3">
+            <div className="mt-6 pt-5 border-t border-canvas-border space-y-3">
               <div className="flex gap-2">
                 <button
                   onClick={handleAddToCart}

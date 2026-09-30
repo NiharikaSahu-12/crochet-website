@@ -119,14 +119,23 @@ export default function CustomStudioModal() {
 
   const handleWhatsAppSubmit = (e) => {
     e.preventDefault()
+    if (!customerName.trim()) {
+      toast.error('Please add your name so we know who this order is for')
+      return
+    }
     const summary = buildSummary()
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(summary)}`
     window.open(url, '_blank', 'noopener,noreferrer')
+    resetCustomerFields()
     closeCustomStudio()
   }
 
   const handleInstagramSubmit = async (e) => {
     e.preventDefault()
+    if (!customerName.trim()) {
+      toast.error('Please add your name so we know who this order is for')
+      return
+    }
     const summary = buildSummary()
     try {
       await navigator.clipboard.writeText(summary)
@@ -135,7 +144,17 @@ export default function CustomStudioModal() {
       toast.success('Opening Instagram DM...')
     }
     window.open(INSTAGRAM_DM_URL, '_blank', 'noopener,noreferrer')
+    resetCustomerFields()
     closeCustomStudio()
+  }
+
+  // Clear customer details after a successful submission but keep the
+  // design selections in case they want to tweak and order again.
+  const resetCustomerFields = () => {
+    setCustomerName('')
+    setCustomerContact('')
+    setDeadline('')
+    setCustomColorNote('')
   }
 
   return (
@@ -147,7 +166,7 @@ export default function CustomStudioModal() {
 
       <div className="relative w-full max-w-4xl bg-canvas rounded-3xl border border-canvas-border shadow-float overflow-hidden z-10 max-h-[92vh] flex flex-col animate-fade-up">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-canvas-border bg-surface flex items-center justify-between shrink-0">
+        <div className="px-5 py-4 border-b border-canvas-border bg-surface flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-full bg-terracotta-100 flex items-center justify-center text-terracotta-700">
               <Wand2 size={16} />
@@ -166,7 +185,7 @@ export default function CustomStudioModal() {
         </div>
 
         {/* Form Body */}
-        <form className="flex-1 overflow-y-auto p-6 space-y-7">
+        <form className="flex-1 overflow-y-auto p-5 space-y-5">
           {/* Step 1: Base Item */}
           <div>
             <div className="flex items-center justify-between mb-3">
@@ -370,7 +389,7 @@ export default function CustomStudioModal() {
         </form>
 
         {/* Footer sticky bar */}
-        <div className="px-6 py-4 border-t border-canvas-border bg-surface flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+        <div className="px-5 py-4 border-t border-canvas-border bg-surface flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
           <div>
             <div className="text-xs text-ink-muted">Estimated Total</div>
             <div className="flex items-baseline gap-2">

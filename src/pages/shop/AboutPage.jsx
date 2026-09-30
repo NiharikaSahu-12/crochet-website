@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Wand2, Sparkles, Scissors, Heart, ShieldCheck, Feather, Flower2 } from 'lucide-react'
+import { ArrowRight, Wand2 } from 'lucide-react'
 import { useShop } from '../../context/ShopContext'
+import useSEO from '../../hooks/useSEO'
 
 const CRAFT_STEPS = [
   {
@@ -46,11 +47,19 @@ const FIBERS = [
 export default function AboutPage() {
   const { openCustomStudio } = useShop()
 
+  useSEO({
+    title: 'Our Story — Handmade Crochet Studio in Mumbai',
+    description:
+      'Meet TheCozzyLoops — a small Mumbai crochet studio making everlasting flowers, bookmarks and keepsakes by hand from soft milk cotton yarn.',
+    path: '/about',
+    image: '/images/about_1.jpg',
+  })
+
   return (
-    <div className="bg-canvas min-h-screen py-12 sm:py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-20">
+    <div className="bg-canvas min-h-screen py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Hero Banner */}
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
+        <div className="grid lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-7 space-y-6">
             <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700">
               Our Story
@@ -66,13 +75,13 @@ export default function AboutPage() {
               We believe everyday things — like a bookmark in your favorite book, a keychain on your keys, or a crochet flower on your desk — feel much more special when made by hand.
             </p>
             <div className="pt-2 flex flex-wrap gap-4">
-              <Link to="/shop" className="btn-primary text-xs sm:text-sm px-6 py-3.5">
+              <Link to="/shop" className="btn-primary text-xs sm:text-sm">
                 <span>Shop All Products</span>
                 <ArrowRight size={15} />
               </Link>
               <button
                 onClick={() => openCustomStudio()}
-                className="btn-outline text-xs sm:text-sm px-6 py-3.5 bg-surface"
+                className="btn-outline text-xs sm:text-sm bg-surface"
               >
                 <Wand2 size={15} className="text-terracotta-600" />
                 <span>Custom Orders</span>
@@ -100,8 +109,8 @@ export default function AboutPage() {
         </div>
 
         {/* The 4-step Crafting Process */}
-        <div className="border-t border-canvas-border pt-16">
-          <div className="max-w-2xl mb-12">
+        <div className="border-t border-canvas-border pt-10">
+          <div className="max-w-2xl mb-8">
             <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700">
               How We Work
             </span>
@@ -136,7 +145,7 @@ export default function AboutPage() {
         </div>
 
         {/* Interactive Fiber Studio */}
-        <div id="yarn-studio" className="bg-canvas-subtle p-8 sm:p-12 rounded-3xl border border-canvas-border">
+        <div id="yarn-studio" className="bg-canvas-subtle p-6 sm:p-9 rounded-3xl border border-canvas-border">
           <div className="max-w-2xl mb-8">
             <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700">
               Our Materials
@@ -167,7 +176,7 @@ export default function AboutPage() {
         </div>
 
         {/* Commission Callout Banner */}
-        <div className="bg-elevated text-white rounded-3xl p-8 sm:p-14 text-center max-w-4xl mx-auto shadow-float">
+        <div className="bg-elevated text-white rounded-3xl p-7 sm:p-10 text-center max-w-4xl mx-auto shadow-float">
           <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-400">
             Custom Orders
           </span>
@@ -181,7 +190,7 @@ export default function AboutPage() {
           <div className="mt-8 flex justify-center gap-4">
             <button
               onClick={() => openCustomStudio()}
-              className="btn-primary bg-terracotta-600 hover:bg-terracotta-700 text-xs sm:text-sm px-7 py-3.5"
+              className="btn-primary bg-terracotta-600 hover:bg-terracotta-700 text-xs sm:text-sm"
             >
               <Wand2 size={16} />
               <span>Start a Custom Order</span>

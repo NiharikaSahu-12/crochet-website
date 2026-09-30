@@ -14,6 +14,7 @@ export default function CartDrawer() {
   const [recipientName, setRecipientName] = useState('')
   const [showGiftOptions, setShowGiftOptions] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [confirmClear, setConfirmClear] = useState(false)
 
   if (!isCartOpen) return null
 
@@ -78,6 +79,20 @@ export default function CartDrawer() {
     }
   }
 
+  // Two-tap confirmation so a misclick doesn't wipe the whole bag
+  const handleClearCart = () => {
+    if (!confirmClear) {
+      setConfirmClear(true)
+      setTimeout(() => setConfirmClear(false), 3000)
+      return
+    }
+    clearCart()
+    setGiftNote('')
+    setRecipientName('')
+    setConfirmClear(false)
+    toast.success('Bag cleared')
+  }
+
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
@@ -89,7 +104,7 @@ export default function CartDrawer() {
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
         <div className="w-screen max-w-md bg-canvas border-l border-canvas-border shadow-float flex flex-col">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-canvas-border bg-surface flex items-center justify-between">
+          <div className="px-5 py-4 border-b border-canvas-border bg-surface flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <ShoppingBag size={18} className="text-terracotta-600" />
               <h2 className="font-editorial text-xl font-semibold text-ink">Your Shopping Bag</h2>
@@ -107,7 +122,7 @@ export default function CartDrawer() {
           </div>
 
           {/* Free gift progress bar */}
-          <div className="px-6 py-3.5 bg-terracotta-50/70 border-b border-terracotta-100/80">
+          <div className="px-5 py-3 bg-terracotta-50/70 border-b border-terracotta-100/80">
             <div className="flex items-center justify-between text-xs text-ink-charcoal mb-1.5 font-medium">
               <span className="flex items-center gap-1.5">
                 <Sparkles size={13} className="text-terracotta-600" />
@@ -128,9 +143,9 @@ export default function CartDrawer() {
           </div>
 
           {/* Cart items list */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {cart.length === 0 ? (
-              <div className="py-16 text-center">
+              <div className="py-12 text-center">
                 <div className="w-16 h-16 rounded-full bg-canvas-subtle flex items-center justify-center mx-auto text-2xl mb-3">
                   🧶
                 </div>
@@ -171,7 +186,7 @@ export default function CartDrawer() {
                         </Link>
                         <button
                           onClick={() => removeFromCart(item.cartItemId)}
-                          className="text-ink-subtle hover:text-red-500 transition-colors p-1"
+                          className="text-ink-subtle hover:text-red-500 transition-colors p-1.5 -m-0.5"
                           title="Remove item"
                         >
                           <Trash2 size={14} />
@@ -196,17 +211,17 @@ export default function CartDrawer() {
                       <div className="flex items-center border border-canvas-border rounded-lg bg-canvas-subtle/50">
                         <button
                           onClick={() => updateCartQuantity(item.cartItemId, item.quantity - 1)}
-                          className="p-1 hover:bg-canvas-muted rounded-l-lg text-ink-muted transition-colors"
+                          className="p-2 hover:bg-canvas-muted rounded-l-lg text-ink-muted transition-colors"
                           aria-label="Decrease quantity"
                         >
                           <Minus size={12} />
                         </button>
-                        <span className="px-2 text-xs font-mono font-medium text-ink">
+                        <span className="px-2.5 text-xs font-mono font-medium text-ink self-center">
                           {item.quantity}
                         </span>
                         <button
                           onClick={() => updateCartQuantity(item.cartItemId, item.quantity + 1)}
-                          className="p-1 hover:bg-canvas-muted rounded-r-lg text-ink-muted transition-colors"
+                          className="p-2 hover:bg-canvas-muted rounded-r-lg text-ink-muted transition-colors"
                           aria-label="Increase quantity"
                         >
                           <Plus size={12} />
@@ -259,7 +274,7 @@ export default function CartDrawer() {
 
           {/* Footer & Checkout actions */}
           {cart.length > 0 && (
-            <div className="px-6 py-5 border-t border-canvas-border bg-surface space-y-3">
+            <div className="px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-canvas-border bg-surface space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-ink-muted">Estimated Total</span>
                 <span className="font-mono text-lg font-bold text-ink">
@@ -299,10 +314,14 @@ export default function CartDrawer() {
                 </button>
 
                 <button
-                  onClick={clearCart}
-                  className="text-xs text-ink-subtle hover:text-red-500 transition-colors"
+                  onClick={handleClearCart}
+                  className={`text-xs transition-colors ${
+                    confirmClear
+                      ? 'text-red-500 font-semibold'
+                      : 'text-ink-subtle hover:text-red-500'
+                  }`}
                 >
-                  Clear Bag
+                  {confirmClear ? 'Tap again to clear' : 'Clear Bag'}
                 </button>
               </div>
             </div>

@@ -3,6 +3,17 @@ export const INSTAGRAM_DM_URL = `https://ig.me/m/${INSTAGRAM_HANDLE}`
 export const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '919876543210'
 export const EMAIL = import.meta.env.VITE_EMAIL || 'thecozzyloops@gmail.com'
 
+// Human-friendly version of the WhatsApp number for display, kept in sync
+// with WHATSAPP_NUMBER so the UI never shows a different number than the
+// one the chat buttons actually open.
+export const WHATSAPP_DISPLAY = (() => {
+  const digits = String(WHATSAPP_NUMBER).replace(/\D/g, '')
+  if (digits.length === 12 && digits.startsWith('91')) {
+    return `+91 ${digits.slice(2, 7)} ${digits.slice(7)}`
+  }
+  return `+${digits}`
+})()
+
 export const openInstagramDM = () => {
   window.open(INSTAGRAM_DM_URL, '_blank', 'noopener,noreferrer')
 }

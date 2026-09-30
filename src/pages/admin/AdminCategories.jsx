@@ -1,18 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { 
-  FolderTree, 
-  Plus, 
-  Save, 
-  Search, 
-  Trash2, 
-  X, 
-  Edit2, 
-  Eye, 
-  EyeOff, 
-  Layers,
-  Sparkles,
-  CheckCircle2
-} from 'lucide-react'
+import { FolderTree, Plus, Save, Search, Trash2, X, Edit2, Eye, EyeOff } from 'lucide-react'
 import categoryController from '../../controllers/categoryController'
 import { useCategories } from '../../hooks/useCategories'
 import toast from 'react-hot-toast'
@@ -31,6 +18,7 @@ export default function AdminCategories() {
   const [editing, setEditing] = useState(null)
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState('')
+  const [slugTouched, setSlugTouched] = useState(false)
 
   const filteredCategories = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -42,20 +30,25 @@ export default function AdminCategories() {
     )
   }, [categories, search])
 
+  // Auto-fill the URL slug from the label until the slug is edited by hand.
+  // The old version refilled the field whenever it was empty, so a manually
+  // cleared slug could never stay empty.
   useEffect(() => {
-    if (editing || !form.label || form.value) return
+    if (editing || slugTouched || !form.label) return
     setForm((current) => ({ ...current, value: categoryController.slugify(current.label) }))
-  }, [form.label, form.value, editing])
+  }, [form.label, editing, slugTouched])
 
   const set = (key, value) => setForm((current) => ({ ...current, [key]: value }))
 
   const resetForm = () => {
     setForm(EMPTY_FORM)
     setEditing(null)
+    setSlugTouched(false)
   }
 
   const startEdit = (category) => {
     setEditing(category.id)
+    setSlugTouched(true)
     setForm({
       label: category.label,
       value: category.value,
@@ -194,7 +187,10 @@ export default function AdminCategories() {
                   type="text"
                   required
                   value={form.value}
-                  onChange={(e) => set('value', categoryController.slugify(e.target.value))}
+                  onChange={(e) => {
+                    setSlugTouched(true)
+                    set('value', categoryController.slugify(e.target.value))
+                  }}
                   className="input-field text-xs font-mono"
                   placeholder="flower_bouquets"
                 />

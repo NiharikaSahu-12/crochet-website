@@ -4,11 +4,27 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TheCozzyLoops – Cute Handmade Crochet Flowers & Gifts</title>
-    <meta name="description" content="Handmade crochet flowers, cute bookmarks, keychains, and custom gifts made with soft cotton yarn." />
-    <meta property="og:title" content="TheCozzyLoops – Cute Handmade Crochet Flowers & Gifts" />
-    <meta property="og:description" content="Handmade crochet flowers, cute bookmarks, keychains, and custom gifts made with soft cotton yarn." />
+    <title>TheCozzyLoops – Cute Handmade Crochet Flowers &amp; Gifts</title>
+    <meta name="description" content="Handmade crochet flowers, everlasting bouquets, bookmarks &amp; keychains — custom gifts crocheted with soft milk cotton yarn in Mumbai, shipped across India." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TheCozzyLoops" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:title" content="TheCozzyLoops – Cute Handmade Crochet Flowers &amp; Gifts" />
+    <meta property="og:description" content="Handmade crochet flowers, everlasting bouquets, bookmarks &amp; keychains — custom gifts crocheted with soft milk cotton yarn in Mumbai, shipped across India." />
     <meta property="og:image" content="/images/crochet-main.jpg" />
+    <meta property="og:image:alt" content="Hand-crocheted pastel bouquet made with soft milk cotton yarn" />
+    <meta property="og:url" content="/" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TheCozzyLoops – Cute Handmade Crochet Flowers &amp; Gifts" />
+    <meta name="twitter:description" content="Handmade crochet flowers, everlasting bouquets, bookmarks &amp; keychains — custom gifts crocheted with soft milk cotton yarn in Mumbai, shipped across India." />
+    <meta name="twitter:image" content="/images/crochet-main.jpg" />
+
     <meta name="theme-color" content="#FBF9F6" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,6 +37,24 @@
           var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           var dark = stored ? stored === 'dark' : prefersDark;
           if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
+    <script>
+      // Resolve relative canonical / Open Graph URLs against the deployed origin.
+      // The React app keeps them absolute at runtime too; this covers tools
+      // that read the DOM before/without hydration (Lighthouse, previews).
+      (function () {
+        try {
+          var origin = window.location.origin;
+          document
+            .querySelectorAll(
+              'link[rel="canonical"][href^="/"], meta[property="og:url"][content^="/"], meta[property="og:image"][content^="/"], meta[name="twitter:image"][content^="/"]'
+            )
+            .forEach(function (el) {
+              var attr = el.hasAttribute('content') ? 'content' : 'href';
+              el.setAttribute(attr, origin + el.getAttribute(attr));
+            });
         } catch (e) {}
       })();
     </script>

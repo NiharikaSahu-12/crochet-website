@@ -20,13 +20,13 @@ const NAV_LINKS = [
 
 function AnnouncementBar() {
   return (
-    <div className="bg-elevated text-on-elevated/90 text-[11px] font-mono tracking-editorial uppercase py-2.5 px-4 text-center border-b border-white/10 overflow-hidden">
+    <div className="bg-elevated text-on-elevated/90 text-[11px] font-mono tracking-editorial uppercase py-2 px-4 text-center border-b border-white/10 overflow-hidden">
       <div className="flex items-center justify-center gap-3">
         <span>100% Handcrafted with Hook</span>
-        <span className="text-terracotta-400">·</span>
-        <span className="hidden sm:inline">Complimentary Handwritten Card &amp; Wax Seal</span>
         <span className="hidden sm:inline text-terracotta-400">·</span>
-        <span>Custom Colors &amp; Bouquets Available</span>
+        <span className="hidden lg:inline">Complimentary Handwritten Card &amp; Wax Seal</span>
+        <span className="hidden sm:inline text-terracotta-400">·</span>
+        <span className="hidden sm:inline">Custom Colors &amp; Bouquets Available</span>
       </div>
     </div>
   )
@@ -55,12 +55,12 @@ function Navbar() {
         ? 'glass-header border-b border-canvas-border shadow-xs'
         : 'bg-canvas/95 border-b border-canvas-border/60'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
 
           {/* Brand Logo & Name */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-full overflow-hidden border border-canvas-border group-hover:border-terracotta-500 transition-colors shadow-2xs">
+          <Link to="/" className="flex items-center gap-1.5 sm:gap-3 group min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border border-canvas-border group-hover:border-terracotta-500 transition-colors shadow-2xs shrink-0">
               <img
                 src="/logo.jpeg"
                 alt="TheCozzyLoops"
@@ -75,14 +75,14 @@ function Navbar() {
               </div>
             </div>
             <div>
-              <span className="font-editorial text-2xl font-bold tracking-tight text-ink group-hover:text-terracotta-700 transition-colors">
+              <span className="font-editorial text-xl sm:text-2xl font-bold tracking-tight text-ink group-hover:text-terracotta-700 transition-colors">
                 TheCozzyLoops
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-8">
             {NAV_LINKS.map(({ to, label }) => {
               const active = location.pathname === to
               return (
@@ -105,21 +105,21 @@ function Navbar() {
           </nav>
 
           {/* Right Action Controls */}
-          <div className="flex items-center gap-3">
-            {/* Theme Toggle */}
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            {/* Theme Toggle — hidden on phones, lives in the mobile menu there */}
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors"
+              className="hidden sm:block p-2.5 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors"
               aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
             >
               {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
             </button>
 
-            {/* Wishlist Button */}
+            {/* Wishlist Button — hidden on phones, lives in the mobile menu there */}
             <button
               onClick={() => setIsWishlistOpen(true)}
-              className="p-2.5 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors relative"
+              className="hidden sm:block p-2.5 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors relative"
               aria-label="View saved items"
               title="Saved Items"
             >
@@ -131,21 +131,23 @@ function Navbar() {
               )}
             </button>
 
-            {/* Bag Button */}
+            {/* Bag Button — collapses to an icon with a corner badge on phones */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="inline-flex items-center gap-2 bg-elevated hover:bg-elevated-2 text-on-elevated px-4 py-2.5 rounded-full text-xs font-semibold transition-all shadow-xs"
+              className="relative inline-flex items-center gap-2 bg-elevated hover:bg-elevated-2 text-on-elevated p-3 sm:px-4 sm:py-2.5 rounded-full text-xs font-semibold transition-all shadow-xs"
               aria-label="Open shopping bag"
             >
               <ShoppingBag size={15} />
-              <span>Bag</span>
-              <span className="font-mono bg-white/20 px-1.5 py-0.5 rounded-full text-[11px] ml-0.5">{cartCount}</span>
+              <span className="hidden sm:inline">Bag</span>
+              <span className="absolute -top-1 -right-1 min-w-[16px] text-center font-mono bg-white/20 px-1 py-0.5 rounded-full text-[10px] leading-none sm:static sm:ml-0.5 sm:px-1.5 sm:text-[11px] sm:leading-normal">
+                {cartCount}
+              </span>
             </button>
 
             {/* Mobile Hamburger */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors ml-1"
+              className="lg:hidden p-2.5 rounded-full text-ink-muted hover:text-ink hover:bg-canvas-subtle transition-colors"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
@@ -157,7 +159,7 @@ function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-canvas-border bg-surface px-6 py-5 space-y-4 animate-fade-up">
+        <div className="lg:hidden border-t border-canvas-border bg-surface px-4 py-4 space-y-3 animate-fade-up">
           <div className="space-y-2">
             {NAV_LINKS.map(({ to, label }) => {
               const active = location.pathname === to
@@ -173,6 +175,27 @@ function Navbar() {
                 </Link>
               )
             })}
+          </div>
+
+          {/* Phone-only helpers — the navbar hides these below sm */}
+          <div className="sm:hidden flex gap-2 pt-1">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false)
+                setIsWishlistOpen(true)
+              }}
+              className="flex-1 btn-outline text-xs py-2.5 flex items-center justify-center gap-1.5"
+            >
+              <Heart size={14} />
+              <span>Saved{wishlist.length > 0 ? ` (${wishlist.length})` : ''}</span>
+            </button>
+            <button
+              onClick={toggleTheme}
+              className="flex-1 btn-outline text-xs py-2.5 flex items-center justify-center gap-1.5"
+            >
+              {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+              <span>{theme === 'dark' ? 'Light' : 'Dark'} mode</span>
+            </button>
           </div>
 
           <div className="pt-3 border-t border-canvas-border flex flex-col gap-2.5">
@@ -218,8 +241,8 @@ function Navbar() {
 function ModernFooter() {
   return (
     <footer className="bg-night text-zinc-300 border-t border-white/10">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-12 pb-6">
-        <div className="grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-10 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+        <div className="grid grid-cols-2 md:grid-cols-12 gap-x-8 gap-y-8 pb-8">
           {/* Brand */}
           <div className="col-span-2 md:col-span-5 space-y-4">
             <div className="font-editorial text-2xl font-bold text-white tracking-tight">
@@ -322,7 +345,7 @@ function BackToTop() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Back to top"
-      className={`fixed bottom-6 right-6 z-30 w-11 h-11 rounded-full bg-elevated text-on-elevated shadow-lifted
+      className={`fixed bottom-24 lg:bottom-6 right-4 sm:right-6 z-30 w-11 h-11 rounded-full bg-elevated text-on-elevated shadow-lifted
                  flex items-center justify-center transition-all duration-300 hover:bg-elevated-2 hover:-translate-y-0.5
                  ${visible ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-3 pointer-events-none'}`}
     >
@@ -332,6 +355,20 @@ function BackToTop() {
 }
 
 export default function ShopLayout() {
+  const { isCartOpen, isWishlistOpen, isCustomStudioOpen, quickLookProduct } = useShop()
+  const overlayOpen = isCartOpen || isWishlistOpen || isCustomStudioOpen || Boolean(quickLookProduct)
+
+  // Lock the page behind the overlay so touch scrolling doesn't "scroll
+  // through" the backdrop on mobile. Restores whatever was set before.
+  useEffect(() => {
+    if (!overlayOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [overlayOpen])
+
   return (
     <div className="min-h-screen flex flex-col bg-canvas text-ink selection:bg-terracotta-200 selection:text-terracotta-900">
       <AnnouncementBar />

@@ -55,7 +55,7 @@ export default function WishlistDrawer() {
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
         <div className="w-screen max-w-md bg-canvas border-l border-canvas-border shadow-float flex flex-col">
           {/* Header */}
-          <div className="px-6 py-5 border-b border-canvas-border bg-surface flex items-center justify-between">
+          <div className="px-5 py-4 border-b border-canvas-border bg-surface flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <Heart size={18} className="text-terracotta-600 fill-terracotta-600" />
               <h2 className="font-editorial text-xl font-semibold text-ink">Saved Items</h2>
@@ -73,9 +73,9 @@ export default function WishlistDrawer() {
           </div>
 
           {/* Items */}
-          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
             {wishlist.length === 0 ? (
-              <div className="py-20 text-center">
+              <div className="py-14 text-center">
                 <div className="w-14 h-14 rounded-full bg-canvas-subtle flex items-center justify-center mx-auto text-xl mb-3">
                   🤍
                 </div>

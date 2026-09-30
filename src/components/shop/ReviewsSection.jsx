@@ -40,8 +40,8 @@ export default function ReviewsSection({ productId }) {
   }
 
   return (
-    <section className="mt-20 pt-12 border-t border-canvas-border">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+    <section className="mt-12 pt-8 border-t border-canvas-border">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
         <div>
           <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700">
             Verified Notes
@@ -62,7 +62,7 @@ export default function ReviewsSection({ productId }) {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="mb-10 bg-surface rounded-3xl border border-canvas-border shadow-xs p-6 sm:p-8 space-y-5 animate-fade-up"
+          className="mb-8 bg-surface rounded-3xl border border-canvas-border shadow-xs p-5 sm:p-7 space-y-5 animate-fade-up"
         >
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-ink mb-2.5">
@@ -126,7 +126,7 @@ export default function ReviewsSection({ productId }) {
       <div className="grid lg:grid-cols-12 gap-10">
         {/* Summary */}
         <div className="lg:col-span-4">
-          <div className="bg-surface rounded-3xl border border-canvas-border shadow-xs p-7 sticky top-28">
+          <div className="bg-surface rounded-3xl border border-canvas-border shadow-xs p-6 sticky top-24">
             <div className="flex items-end gap-3">
               <span className="font-editorial text-5xl font-bold text-ink leading-none">
                 {summary.count > 0 ? summary.average.toFixed(1) : '—'}
@@ -164,7 +164,7 @@ export default function ReviewsSection({ productId }) {
         {/* List */}
         <div className="lg:col-span-8 space-y-5">
           {reviews.length === 0 ? (
-            <div className="bg-canvas-subtle rounded-3xl border border-canvas-border p-12 text-center">
+            <div className="bg-canvas-subtle rounded-3xl border border-canvas-border p-8 text-center">
               <p className="font-editorial text-lg text-ink">No reviews yet</p>
               <p className="text-xs text-ink-muted mt-1.5">
                 Be the first to share your thoughts on this piece.
@@ -174,7 +174,7 @@ export default function ReviewsSection({ productId }) {
             reviews.map((r) => (
               <article
                 key={r.id}
-                className="bg-surface rounded-3xl border border-canvas-border shadow-xs p-6 sm:p-7"
+                className="bg-surface rounded-3xl border border-canvas-border shadow-xs p-5 sm:p-6"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>

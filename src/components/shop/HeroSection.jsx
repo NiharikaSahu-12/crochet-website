@@ -33,8 +33,8 @@ export default function HeroSection() {
         }}
       />
 
-      <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-14 sm:pt-20 lg:pt-24 pb-16 lg:pb-20">
-        <div className="grid lg:grid-cols-12 gap-14 lg:gap-12 items-center">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-12 lg:pt-14 pb-12 lg:pb-14">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           {/* Left: editorial copy */}
           <div className="lg:col-span-6 space-y-8 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-terracotta-600/25 bg-surface/70 backdrop-blur-xs text-[11px] font-mono tracking-editorial uppercase text-terracotta-700">
@@ -42,7 +42,7 @@ export default function HeroSection() {
               <span>Artisan Crochet Studio · Small Batches</span>
             </div>
 
-            <h1 className="font-editorial text-5xl sm:text-6xl lg:text-[4.4rem] font-semibold tracking-tight text-ink leading-[1.04]">
+            <h1 className="font-editorial text-4xl min-[380px]:text-[2.6rem] sm:text-6xl lg:text-[4.4rem] font-semibold tracking-tight text-ink leading-[1.04]">
               Everlasting blooms,{' '}
               <span className="block italic font-normal text-terracotta-700">
                 stitched to be kept forever.

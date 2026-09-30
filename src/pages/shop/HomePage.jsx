@@ -1,12 +1,16 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Wand2, Sparkles, Heart, Flower2, Bookmark, Key, Gift, Check, ShieldCheck, Star } from 'lucide-react'
+import { ArrowRight, Wand2, Star } from 'lucide-react'
 import HeroSection from '../../components/shop/HeroSection'
 import ProductCard from '../../components/shop/ProductCard'
 import Reveal from '../../components/ui/Reveal'
 import { useFeaturedProducts } from '../../hooks/useProducts'
-import { useCategories } from '../../hooks/useCategories'
-import { useShop } from '../../context/ShopContext'
+import useSEO from '../../hooks/useSEO'
+import {
+  DEFAULT_TITLE,
+  DEFAULT_DESCRIPTION,
+  buildOrganizationJsonLd,
+  buildWebsiteJsonLd,
+} from '../../utils/seo'
 
 const CATEGORIES_SHOWCASE = [
   {
@@ -103,16 +107,24 @@ const COMMUNITY_STORIES = [
 export default function HomePage() {
   const { products, loading } = useFeaturedProducts()
 
+  useSEO({
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    path: '/',
+    image: '/images/hero_bouquet.jpg',
+    jsonLd: [buildOrganizationJsonLd(), buildWebsiteJsonLd()],
+  })
+
   return (
     <div className="bg-canvas">
       {/* 1. Hero Section */}
       <HeroSection />
 
       {/* 2. Visual Categories Showcase with High-Res Photography */}
-      <section className="py-24 sm:py-32 border-b border-canvas-border">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="py-12 sm:py-16 border-b border-canvas-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <Reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
+          <Reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
               <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
                 Curated Collections
@@ -166,10 +178,10 @@ export default function HomePage() {
       </section>
 
       {/* 3. Featured Products Collection */}
-      <section className="py-24 sm:py-32 border-b border-canvas-border bg-surface">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="py-12 sm:py-16 border-b border-canvas-border bg-surface">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <Reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
+          <Reveal className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
             <div>
               <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
                 Handcrafted Favorites
@@ -194,7 +206,7 @@ export default function HomePage() {
               ))}
             </div>
           ) : products.length === 0 ? (
-            <div className="bg-canvas-subtle rounded-3xl border border-canvas-border p-12 text-center max-w-xl mx-auto">
+            <div className="bg-canvas-subtle rounded-3xl border border-canvas-border p-8 text-center max-w-xl mx-auto">
               <p className="font-editorial text-xl text-ink">New products coming soon!</p>
               <p className="text-xs text-ink-muted mt-2">
                 Custom orders are always open! Click below to order your favorite piece.
@@ -216,8 +228,8 @@ export default function HomePage() {
       </section>
 
       {/* 4. Atelier Pillars / Handcrafted Values */}
-      <section className="border-b border-canvas-border bg-canvas-subtle py-20 sm:py-24">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="border-b border-canvas-border bg-canvas-subtle py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
             {ATELIER_PILLARS.map((p, i) => (
               <Reveal key={p.step} delay={i * 0.08} className="space-y-2.5">
@@ -237,12 +249,12 @@ export default function HomePage() {
       </section>
 
       {/* 5. Custom Orders Studio Banner */}
-      <section className="py-24 sm:py-32 border-b border-canvas-border">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="py-12 sm:py-16 border-b border-canvas-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal>
           <div className="bg-elevated text-white rounded-3xl overflow-hidden border border-canvas-border shadow-float grid lg:grid-cols-12">
             
-            <div className="lg:col-span-7 p-8 sm:p-12 lg:p-16 flex flex-col justify-between space-y-8">
+            <div className="lg:col-span-7 p-7 sm:p-10 lg:p-12 flex flex-col justify-between space-y-8">
               <div className="space-y-4">
                 <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-400 font-semibold">
                   Custom Orders &amp; Studio
@@ -258,7 +270,7 @@ export default function HomePage() {
               <div className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-4">
                 <Link
                   to="/custom-orders"
-                  className="btn-primary bg-terracotta-600 hover:bg-terracotta-700 px-7 py-3.5"
+                  className="btn-primary bg-terracotta-600 hover:bg-terracotta-700"
                 >
                   <Wand2 size={16} />
                   <span>Open Custom Orders Studio</span>
@@ -289,10 +301,10 @@ export default function HomePage() {
       </section>
 
       {/* 6. Customer Stories */}
-      <section className="py-24 sm:py-32 bg-surface border-b border-canvas-border">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="py-12 sm:py-16 bg-surface border-b border-canvas-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <Reveal className="text-center max-w-2xl mx-auto mb-16">
+          <Reveal className="text-center max-w-2xl mx-auto mb-10">
             <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700 font-semibold">
               Loved by Customers
             </span>
@@ -309,7 +321,7 @@ export default function HomePage() {
               <Reveal
                 key={story.author}
                 delay={i * 0.09}
-                className="bg-canvas rounded-3xl p-8 border border-canvas-border shadow-xs hover:shadow-card transition-shadow flex flex-col justify-between h-full"
+                className="bg-canvas rounded-3xl p-6 border border-canvas-border shadow-xs hover:shadow-card transition-shadow flex flex-col justify-between h-full"
               >
                 <div>
                   <div className="flex gap-1 text-amber-500 mb-5">
@@ -322,7 +334,7 @@ export default function HomePage() {
                   </p>
                 </div>
 
-                <div className="mt-8 pt-5 border-t border-canvas-border flex items-center justify-between text-xs">
+                <div className="mt-6 pt-5 border-t border-canvas-border flex items-center justify-between text-xs">
                   <div>
                     <span className="font-bold text-ink">{story.author}</span>
                     <span className="text-ink-muted"> · {story.location}</span>
@@ -339,8 +351,8 @@ export default function HomePage() {
       </section>
 
       {/* 7. Instagram & Atelier Visual Gallery */}
-      <section className="py-20 sm:py-24 bg-canvas">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="py-12 sm:py-16 bg-canvas">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <span className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">

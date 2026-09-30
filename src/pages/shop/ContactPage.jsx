@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { 
-  Mail, Phone, MapPin, Send, MessageCircle, HelpCircle, 
-  Sparkles, Wand2, Check, Copy, Clock, Gift, Heart, 
-  Info, ArrowRight, CheckCircle2, ChevronDown, Truck, ShieldCheck
-} from 'lucide-react'
+import { Mail, MapPin, MessageCircle, Wand2, Copy, Clock, ArrowRight, CheckCircle2, ChevronDown } from 'lucide-react'
 import { FaInstagram, FaWhatsapp } from 'react-icons/fa'
-import { INSTAGRAM_HANDLE, INSTAGRAM_DM_URL, WHATSAPP_NUMBER, EMAIL } from '../../utils/instagram'
+import { INSTAGRAM_HANDLE, INSTAGRAM_DM_URL, WHATSAPP_NUMBER, WHATSAPP_DISPLAY, EMAIL } from '../../utils/instagram'
 import toast from 'react-hot-toast'
+import useSEO from '../../hooks/useSEO'
 
 const INQUIRY_TOPICS = [
   'Order Status & Tracking',
@@ -37,7 +34,7 @@ const SHOP_FAQS = [
   },
   {
     q: 'Where are you based and do you ship internationally?',
-    a: 'Our crochet studio is based in Bhubaneswar, Mumbai, India. We ship all across India. For international orders, please send us a direct message on WhatsApp or Instagram with your location so we can arrange international courier shipping.',
+    a: 'Our crochet studio is based in Mumbai, India. We ship all across India. For international orders, please send us a direct message on WhatsApp or Instagram with your location so we can arrange international courier shipping.',
   },
   {
     q: 'What is your return or exchange policy?',
@@ -46,6 +43,13 @@ const SHOP_FAQS = [
 ]
 
 export default function ContactPage() {
+  useSEO({
+    title: 'Contact & Help — FAQs, Shipping & Care',
+    description:
+      'Questions about orders, shipping, care or bulk gifting? Message TheCozzyLoops on WhatsApp or Instagram — we usually reply within a few hours.',
+    path: '/contact',
+  })
+
   const [form, setForm] = useState({
     name: '',
     contact: '',
@@ -102,8 +106,8 @@ export default function ContactPage() {
   return (
     <div className="bg-canvas min-h-screen">
       {/* 1. Header Banner */}
-      <section className="bg-canvas-subtle border-b border-canvas-border py-14 sm:py-20">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center max-w-3xl">
+      <section className="bg-canvas-subtle border-b border-canvas-border py-10 sm:py-14">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-terracotta-100/70 border border-terracotta-200/80 text-terracotta-800 text-xs font-mono uppercase tracking-editorial mb-4">
             <MessageCircle size={13} className="text-terracotta-600" />
             <span>Customer Care &amp; Support</span>
@@ -120,7 +124,7 @@ export default function ContactPage() {
       </section>
 
       {/* 2. Custom Orders Notice Banner */}
-      <section className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-10">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <div className="bg-gradient-to-r from-terracotta-50 to-amber-50/50 border border-terracotta-200/90 rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
           <div className="flex items-center gap-4 text-center sm:text-left">
             <div className="w-12 h-12 rounded-2xl bg-terracotta-600 text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -146,7 +150,7 @@ export default function ContactPage() {
       </section>
 
       {/* 3. Main Contact Section (Channels + Inquiry Form) */}
-      <section className="py-14 sm:py-20 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="py-10 sm:py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 items-start">
 
           {/* Left Column: Direct Contact Info Cards */}
@@ -179,7 +183,7 @@ export default function ContactPage() {
                       Fastest
                     </span>
                   </div>
-                  <p className="text-xs text-ink-muted mt-0.5">+91 94399 22002</p>
+                  <p className="text-xs text-ink-muted mt-0.5">{WHATSAPP_DISPLAY}</p>
                   <p className="text-[11px] text-ink-muted/80 mt-1">Replies usually within 1 hour</p>
                 </div>
               </div>
@@ -246,7 +250,7 @@ export default function ContactPage() {
           </div>
 
           {/* Right Column: Contact Message Form */}
-          <div className="lg:col-span-7 bg-surface rounded-2xl p-6 sm:p-8 border border-canvas-border shadow-xs">
+          <div className="lg:col-span-7 bg-surface rounded-2xl p-5 sm:p-7 border border-canvas-border shadow-xs">
             <div className="mb-6">
               <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Message Form</span>
               <h2 className="font-editorial text-2xl font-bold text-ink mt-0.5">Send Us a Note</h2>
@@ -362,7 +366,7 @@ export default function ContactPage() {
       </section>
 
       {/* 4. Customer Care & FAQs Accordion */}
-      <section className="py-16 bg-surface border-t border-canvas-border">
+      <section className="py-10 bg-surface border-t border-canvas-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700">

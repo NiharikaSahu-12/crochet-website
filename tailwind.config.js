@@ -162,5 +162,12 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // `can-hover:` only applies on devices with a real pointer (mouse/trackpad).
+    // Touch devices get the un-prefixed styles, so hover-only controls
+    // (quick-add bars, preview buttons) stay visible and tappable there.
+    function ({ addVariant }) {
+      addVariant('can-hover', '@media (hover: hover)')
+    },
+  ],
 }

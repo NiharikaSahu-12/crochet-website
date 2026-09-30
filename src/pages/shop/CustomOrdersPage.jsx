@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { 
-  Wand2, Sparkles, Check, Copy, Palette, Flower2, Clock, 
-  Gift, Heart, Info, ArrowRight, CheckCircle2, MessageCircle, 
-  HelpCircle, ShieldCheck, Feather, Star, ChevronDown, RefreshCw
-} from 'lucide-react'
+import { Wand2, Sparkles, Check, Copy, Clock, Gift, ArrowRight, CheckCircle2, ShieldCheck, ChevronDown } from 'lucide-react'
 import { FaInstagram, FaWhatsapp } from 'react-icons/fa'
 import { INSTAGRAM_HANDLE, INSTAGRAM_DM_URL, WHATSAPP_NUMBER } from '../../utils/instagram'
 import toast from 'react-hot-toast'
+import useSEO from '../../hooks/useSEO'
 
 const PRODUCT_TYPES = [
   { id: 'bouquet', name: 'Flower Bouquet', desc: 'Handcrafted floral stems wrapped in kraft paper with cotton ribbon', icon: '💐', popular: true },
@@ -116,6 +113,13 @@ const CUSTOM_FAQS = [
 ]
 
 export default function CustomOrdersPage() {
+  useSEO({
+    title: 'Custom Crochet Orders — Your Colors, Your Design',
+    description:
+      'Request a custom crochet bouquet, bookmark, keychain or gift box in your own colors. Share your idea on WhatsApp and get a handmade piece made just for you.',
+    path: '/custom-orders',
+  })
+
   const [form, setForm] = useState({
     name: '',
     contact: '',
@@ -191,6 +195,10 @@ export default function CustomOrdersPage() {
       toast.error('Please enter your name so we know who is asking!')
       return
     }
+    if (!form.contact.trim()) {
+      toast.error('Please add your WhatsApp number or Instagram handle so we can confirm your order!')
+      return
+    }
     const text = buildCustomSummary()
     const encoded = encodeURIComponent(text)
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`, '_blank')
@@ -203,6 +211,10 @@ export default function CustomOrdersPage() {
       toast.error('Please enter your name!')
       return
     }
+    if (!form.contact.trim()) {
+      toast.error('Please add your WhatsApp number or Instagram handle so we can confirm your order!')
+      return
+    }
     const text = buildCustomSummary()
     navigator.clipboard.writeText(text)
     window.open(INSTAGRAM_DM_URL, '_blank')
@@ -213,8 +225,8 @@ export default function CustomOrdersPage() {
   return (
     <div className="bg-canvas min-h-screen">
       {/* 1. Header Banner */}
-      <section className="bg-canvas-subtle border-b border-canvas-border py-14 sm:py-20">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 text-center max-w-3xl">
+      <section className="bg-canvas-subtle border-b border-canvas-border py-10 sm:py-14">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-terracotta-100/70 border border-terracotta-200/80 text-terracotta-800 text-xs font-mono uppercase tracking-editorial mb-4">
             <Wand2 size={13} className="text-terracotta-600" />
             <span>Custom Crochet Studio</span>
@@ -247,14 +259,14 @@ export default function CustomOrdersPage() {
       </section>
 
       {/* 2. Main Builder Section */}
-      <section className="py-14 sm:py-20 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+      <section className="py-10 sm:py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-10 items-start">
           
           {/* Left Column: Form Fields */}
-          <div className="lg:col-span-7 space-y-10">
+          <div className="lg:col-span-7 space-y-6">
 
             {/* Step 1: Product Type */}
-            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-5 sm:p-6 border border-canvas-border shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 01</span>
@@ -319,7 +331,7 @@ export default function CustomOrdersPage() {
             </div>
 
             {/* Step 2: Yarn Material */}
-            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-5 sm:p-6 border border-canvas-border shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 02</span>
@@ -355,7 +367,7 @@ export default function CustomOrdersPage() {
             </div>
 
             {/* Step 3: Color Preferences */}
-            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-5 sm:p-6 border border-canvas-border shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 03</span>
@@ -412,7 +424,7 @@ export default function CustomOrdersPage() {
             </div>
 
             {/* Step 4: Occasion, Timeline & Notes */}
-            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-5 sm:p-6 border border-canvas-border shadow-xs space-y-4">
               <div>
                 <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 04</span>
                 <h2 className="font-editorial text-xl font-bold text-ink mt-0.5">Occasion & Timing</h2>
@@ -505,7 +517,7 @@ export default function CustomOrdersPage() {
             </div>
 
             {/* Step 5: Contact Information */}
-            <div className="bg-surface rounded-2xl p-6 sm:p-7 border border-canvas-border shadow-xs space-y-4">
+            <div className="bg-surface rounded-2xl p-5 sm:p-6 border border-canvas-border shadow-xs space-y-4">
               <div>
                 <span className="text-xs font-mono font-bold text-terracotta-700 uppercase tracking-editorial">Step 05</span>
                 <h2 className="font-editorial text-xl font-bold text-ink mt-0.5">Your Details</h2>
@@ -561,7 +573,7 @@ export default function CustomOrdersPage() {
                 </p>
               </div>
 
-              <div className="p-6 space-y-4">
+              <div className="p-5 space-y-4">
                 {/* Selected item highlight */}
                 <div className="flex items-center gap-3 p-3 bg-canvas-subtle rounded-xl border border-canvas-border">
                   <span className="text-3xl">{selectedProductObj.icon}</span>
@@ -667,9 +679,9 @@ export default function CustomOrdersPage() {
       </section>
 
       {/* 3. Inspiration Showcase */}
-      <section className="bg-surface border-y border-canvas-border py-20">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="text-center max-w-2xl mx-auto mb-14">
+      <section className="bg-surface border-y border-canvas-border py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-10">
             <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700 font-semibold">
               Made for Customers Like You
             </p>
@@ -719,7 +731,7 @@ export default function CustomOrdersPage() {
       </section>
 
       {/* 4. Frequently Asked Questions */}
-      <section className="py-16 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <p className="text-xs font-mono uppercase tracking-editorial text-terracotta-700">
             Everything You Need to Know
@@ -762,7 +774,7 @@ export default function CustomOrdersPage() {
       </section>
 
       {/* 5. Direct Contact Banner */}
-      <section className="bg-canvas-subtle border-t border-canvas-border py-12">
+      <section className="bg-canvas-subtle border-t border-canvas-border py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h3 className="font-editorial text-2xl font-bold text-ink">
             Have a Specific Reference Picture or Urgent Order?

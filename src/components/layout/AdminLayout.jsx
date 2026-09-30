@@ -17,6 +17,7 @@ import {
 import { useAuth } from '../../context/AuthContext'
 import authService from '../../services/authService'
 import toast from 'react-hot-toast'
+import useSEO from '../../hooks/useSEO'
 
 const ADMIN_NAV = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
@@ -30,6 +31,9 @@ export default function AdminLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const { session } = useAuth()
+
+  // The admin console must never be indexed.
+  useSEO({ title: 'Admin Console', path: '/admin', noindex: true })
 
   const handleSignOut = async () => {
     try {

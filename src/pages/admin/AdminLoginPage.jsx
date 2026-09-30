@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useNavigate, Navigate, Link } from 'react-router-dom'
-import { Eye, EyeOff, Lock, ArrowLeft, Sparkles, ShieldCheck } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Sparkles, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import authService from '../../services/authService'
+import useSEO from '../../hooks/useSEO'
 import toast from 'react-hot-toast'
 
 export default function AdminLoginPage() {
@@ -13,13 +14,20 @@ export default function AdminLoginPage() {
   const [showPass, setShowPass] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
+  // The login screen is standalone (no AdminLayout), so it needs its own
+  // noindex — otherwise it inherits "index, follow" from the previous page.
+  useSEO({ title: 'Admin Sign In', path: '/admin/login', noindex: true })
+
   if (!loading && session) return <Navigate to="/admin" replace />
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
     try {
-      await authService.signIn(email, password)
+      const result = await authService.signIn(email, password)
+      // Guard against a sign-in that resolves without a session, which used to
+      // toast "Welcome" and then silently bounce back off /admin.
+      if (!result?.session) throw new Error('No session returned')
       toast.success('Welcome to Admin Management Panel')
       navigate('/admin')
     } catch {

@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Heart, ShoppingBag, Wand2, ShieldCheck, Sparkles, Plus, Minus, Check, Copy, Share2, Flower2 } from 'lucide-react'
+import { ArrowLeft, Heart, ShoppingBag, Wand2, Plus, Minus, Share2, Flower2, ZoomIn } from 'lucide-react'
 import { FaWhatsapp, FaInstagram } from 'react-icons/fa'
 import productController from '../../controllers/productController'
 import ProductCard from '../../components/shop/ProductCard'
 import ReviewsSection from '../../components/shop/ReviewsSection'
 import RecentlyViewedRail from '../../components/shop/RecentlyViewedRail'
+import ImageLightbox from '../../components/shop/ImageLightbox'
 import StarRating from '../../components/ui/StarRating'
 import { getRatingSummary } from '../../models/Review'
 import { useShop } from '../../context/ShopContext'
 import { isOnSale, discountPercent } from '../../models/Product'
 import { WHATSAPP_NUMBER, INSTAGRAM_DM_URL } from '../../utils/instagram'
+import useSEO from '../../hooks/useSEO'
+import { DEFAULT_IMAGE, buildProductJsonLd, buildBreadcrumbJsonLd } from '../../utils/seo'
 import toast from 'react-hot-toast'
 
 export default function ProductDetailPage() {
@@ -25,10 +28,48 @@ export default function ProductDetailPage() {
   const [selectedColor, setSelectedColor] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState('materials')
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [showStickyBar, setShowStickyBar] = useState(false)
+
+  // Page metadata + Product/Breadcrumb structured data; reacts as the product loads.
+  useSEO({
+    title: product ? product.name : 'Handmade Crochet Gift',
+    description: product
+      ? product.description
+      : 'Handmade crochet gifts — bouquets, bookmarks and charms crocheted with soft milk cotton yarn.',
+    path: `/shop/${id}`,
+    image: product?.images?.[0] || DEFAULT_IMAGE,
+    type: 'product',
+    jsonLd: product
+      ? [
+          buildProductJsonLd(product, `/shop/${id}`),
+          buildBreadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Shop', path: '/shop' },
+            { name: product.name, path: `/shop/${id}` },
+          ]),
+        ]
+      : null,
+  })
+
+  // Mobile sticky add-to-bag bar appears after scrolling past the hero image area
+  useEffect(() => {
+    const onScroll = () => setShowStickyBar(window.scrollY > 560)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     let isMounted = true
     setLoading(true)
+    // Reset per-product selections so stale color/quantity/image/tab
+    // never leak when navigating from one product to another.
+    setSelectedImageIdx(0)
+    setSelectedColor('')
+    setQuantity(1)
+    setActiveTab('materials')
+    setLightboxOpen(false)
 
     productController
       .getProduct(id)
@@ -144,10 +185,10 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="bg-canvas min-h-screen py-10 sm:py-16">
+    <div className="bg-canvas min-h-screen py-8 sm:py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb Navigation */}
-        <div className="flex items-center justify-between text-xs text-ink-muted mb-8 font-mono">
+        <div className="flex items-center justify-between text-xs text-ink-muted mb-6 font-mono">
           <div className="flex items-center gap-2">
             <Link to="/" className="hover:text-ink">Home</Link>
             <span>/</span>
@@ -169,7 +210,12 @@ export default function ProductDetailPage() {
         <div className="grid lg:grid-cols-12 gap-10 lg:gap-14">
           {/* Visual Column */}
           <div className="lg:col-span-7 space-y-4">
-            <div className="relative aspect-[4/5] bg-surface rounded-3xl overflow-hidden border border-canvas-border shadow-lifted">
+            <button
+              type="button"
+              onClick={() => setLightboxOpen(true)}
+              className="group relative block w-full aspect-[4/5] bg-surface rounded-3xl overflow-hidden border border-canvas-border shadow-lifted cursor-zoom-in"
+              aria-label="View larger image"
+            >
               <img
                 src={currentImg}
                 alt={product.name}
@@ -185,7 +231,11 @@ export default function ProductDetailPage() {
                   Made to Order
                 </div>
               )}
-            </div>
+              <span className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 bg-night/70 backdrop-blur-xs text-white text-[11px] font-medium px-3 py-1.5 rounded-full transition-opacity can-hover:opacity-0 can-hover:group-hover:opacity-100">
+                <ZoomIn size={13} />
+                <span>View larger</span>
+              </span>
+            </button>
 
             {/* Gallery Thumbnails */}
             {images.length > 1 && (
@@ -450,8 +500,8 @@ export default function ProductDetailPage() {
 
         {/* Related Items */}
         {related.length > 0 && (
-          <div className="mt-20 pt-12 border-t border-canvas-border">
-            <div className="flex items-center justify-between mb-8">
+          <div className="mt-12 pt-8 border-t border-canvas-border">
+            <div className="flex items-center justify-between mb-6">
               <div>
                 <span className="font-mono text-xs uppercase tracking-editorial text-terracotta-700">
                   More Cute Items
@@ -477,12 +527,46 @@ export default function ProductDetailPage() {
         )}
 
         {/* Reviews & Ratings */}
-        <div id="reviews" className="scroll-mt-28">
+        <div id="reviews" className="scroll-mt-24">
           <ReviewsSection productId={product.id} />
         </div>
 
         {/* Recently Viewed */}
         <RecentlyViewedRail excludeId={product.id} />
+      </div>
+
+      {/* Fullscreen image viewer */}
+      {lightboxOpen && (
+        <ImageLightbox
+          images={images}
+          index={selectedImageIdx}
+          onIndexChange={setSelectedImageIdx}
+          onClose={() => setLightboxOpen(false)}
+          alt={product.name}
+        />
+      )}
+
+      {/* Mobile sticky add-to-bag bar */}
+      <div
+        className={`lg:hidden fixed bottom-0 inset-x-0 z-40 transition-transform duration-300 ${
+          showStickyBar ? 'translate-y-0' : 'translate-y-full'
+        }`}
+      >
+        <div className="bg-surface/95 backdrop-blur-md border-t border-canvas-border px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex items-center gap-3 shadow-float">
+          <div className="min-w-0">
+            <p className="text-[11px] text-ink-muted truncate">{product.name}</p>
+            <p className="font-mono text-base font-bold text-ink leading-tight">
+              ₹{Number(product.price).toLocaleString()}
+            </p>
+          </div>
+          <button
+            onClick={handleAddToCart}
+            className="ml-auto btn-primary flex-1 max-w-[220px] py-3 text-sm"
+          >
+            <ShoppingBag size={16} />
+            <span>Add to Bag</span>
+          </button>
+        </div>
       </div>
     </div>
   )

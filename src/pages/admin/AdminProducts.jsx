@@ -1,20 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  Star, 
-  Eye, 
-  EyeOff, 
-  Search, 
-  Package, 
-  Sparkles, 
-  Filter,
-  X,
-  ExternalLink,
-  ArrowUpDown
-} from 'lucide-react'
+import { Plus, Edit2, Trash2, Star, Eye, EyeOff, Search, Package, X, ExternalLink, ArrowUpDown } from 'lucide-react'
 import { useProducts } from '../../hooks/useProducts'
 import productController from '../../controllers/productController'
 import { useCategories } from '../../hooks/useCategories'

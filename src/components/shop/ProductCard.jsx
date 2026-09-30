@@ -89,7 +89,7 @@ export default function ProductCard({ product, className = '' }) {
 
           <button
             onClick={handleQuickLook}
-            className="w-9 h-9 rounded-full bg-white/90 hover:bg-surface text-ink-muted hover:text-ink shadow-xs backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center"
+            className="w-9 h-9 rounded-full bg-white/90 hover:bg-surface text-ink-muted hover:text-ink shadow-xs backdrop-blur-xs transition-all flex items-center justify-center can-hover:opacity-0 can-hover:pointer-events-none can-hover:group-hover:opacity-100 can-hover:group-hover:pointer-events-auto can-hover:group-focus-within:opacity-100 can-hover:group-focus-within:pointer-events-auto"
             aria-label="Quick preview"
             title="Quick view"
           >
@@ -97,8 +97,8 @@ export default function ProductCard({ product, className = '' }) {
           </button>
         </div>
 
-        {/* Quick Add Overlay Bar */}
-        <div className="absolute inset-x-3 bottom-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-200">
+        {/* Quick Add Overlay Bar — always visible on touch, hover-reveal on desktop */}
+        <div className="absolute inset-x-3 bottom-3 transition-all duration-200 can-hover:translate-y-2 can-hover:opacity-0 can-hover:pointer-events-none can-hover:group-hover:translate-y-0 can-hover:group-hover:opacity-100 can-hover:group-hover:pointer-events-auto can-hover:group-focus-within:translate-y-0 can-hover:group-focus-within:opacity-100 can-hover:group-focus-within:pointer-events-auto">
           <button
             onClick={handleQuickAdd}
             className="w-full py-3 px-4 bg-elevated/95 hover:bg-elevated text-white text-xs font-semibold rounded-xl backdrop-blur-xs flex items-center justify-center gap-2 shadow-xs active:scale-[0.98] transition-all"
@@ -119,7 +119,7 @@ export default function ProductCard({ product, className = '' }) {
       </div>
 
       {/* Info Body */}
-      <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
+      <div className="p-3.5 sm:p-4 flex flex-col flex-1 justify-between">
         <div>
           <div className="flex items-center justify-between text-[11px] text-ink-muted uppercase tracking-editorial mb-1">
             <span>{product.category?.replace(/_/g, ' ')}</span>
